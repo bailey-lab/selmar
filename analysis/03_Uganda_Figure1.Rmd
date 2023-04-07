@@ -1,0 +1,237 @@
+---
+title: "Figure 1 - Kelch Selection Coefficient Modeling - MANUSCRIPT"
+output: html_document
+date: "2023-03-24"
+---
+## load libraries
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+```{r}
+#load data
+df<- read.table("data/Ugandan_data.txt")
+df_comb <- read.table("data/Ugandan_comb_data.txt")
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures/"
+
+#log ratio function
+se_ln_ratio_noZeros<-function(x,N) {
+  inds<-which(x==0)
+  x[inds]<-0.5
+  inds<-which(x==N)
+  x[inds]<-x[inds]-0.5
+  se<- sqrt(1/x + 1/(N-x))
+  return(se)
+}
+
+df_comb2 <- df_comb %>% group_by(District, year) %>% distinct(comb)%>%group_by(District) %>%  
+  mutate(nobs = sum(comb>0)) %>% ungroup
+df_comb2$n <- df %>% group_by(District, year) %>% 
+  summarise(min(n)) %>% 
+  ungroup 
+colnames(df_comb2)[7] <- "n"
+df_comb2 <- df_comb %>%mutate(med = comb/n)
+
+df_comb <- df_comb2 %>% mutate(med = comb/n, lrsmed = log(med/(1-med)))
+
+df_comb$lrsmed[df_comb$lrsmed == -Inf] <- NA
+
+df_comb$wt_med <- NA
+df_comb$wt_med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)] <- 1/(se_ln_ratio_noZeros(round(df_comb$med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]*df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]), df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)])^2)
+```
+
+# PREVALENCE PLOT 
+```{r}
+prev <- df %>% group_by(year, Locus) %>% 
+  mutate(min_n = sum(n), mut_sample = sum(x)) %>% 
+  distinct(min_n, mut_sample) %>% 
+  mutate(prop_sample = mut_sample/min_n) %>%
+  ggplot(aes(x=year, y=prop_sample, fill=Locus)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_manual(values = c("#D55E00", "#0072B2", "#009E73", "#F0E442"), labels = c("675V", "469F", "469Y", "561H")) +
+  xlab("Year") +
+  ylab("Allele frequency") + 
+  ylim(0, 1) +
+  scale_x_continuous("Year", labels = as.character(df$year), breaks = df$year) +
+  theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(.2 , .95), legend.justification = c("right", "top"), legend.box.just = "right", legend.margin = margin(1, 1, 1, 1))
+
+print(prev, width = 5, height = 6)
+
+ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.png"), prev, width = 6, height = 3, , dpi= 700)
+
+```
+
+
+
+## MAP OF UGANDA
+```{r}
+#load base map layers
+admin8 <- ne_download(scale="large", type = "admin_1_states_provinces_lines",
+                      category = "cultural", returnclass = "sf")
+rivers8 <- ne_download(scale = 10, type = 'rivers_lake_centerlines',
+                       category = 'physical', returnclass = "sf")
+lakes8 <- ne_download(scale = "large", type = 'lakes',
+                      category = 'physical', returnclass = "sf")
+sov110 <- ne_download(scale="medium", type = "sovereignty",
+                      category = "cultural", returnclass = "sf")
+admin110 <- ne_download(scale="large", type = "populated_places",
+                        category = "cultural", returnclass = "sf")
+kampala <- data.frame(name="Kampala", long=32.5833, lat=0.31666)
+
+pt.lim = data.frame(xlim = c(28.5, 35.5), ylim = c(4.25,-3))
+pt.bbox <- st_bbox(c(xmin=pt.lim$xlim[1],
+           xmax=pt.lim$xlim[2],
+           ymin=pt.lim$ylim[1],
+           ymax=pt.lim$ylim[2]))
+
+uganda <- ne_states(country="Uganda", returnclass = "sf") %>% 
+  st_crop(pt.bbox) %>% 
+  select(name, latitude, longitude) %>%
+  arrange(name)
+uganda$name[uganda$name == "Kabale"] <- "Rukiga"
+uganda <- uganda %>% filter(name %in% unique(df$District)) %>% na.omit() %>% arrange(name)
+
+pie_data <- df %>% group_by(Locus, District) %>% mutate(sum_district_locus = sum(x)) %>% select(District, Locus, sum_district_locus) %>% distinct(District, Locus, .keep_all = TRUE) %>% ungroup() 
+
+nwild <- df %>% group_by(District) %>% mutate(sum_district_locus = sum(n)) %>% select(District, sum_district_locus) %>% distinct(District, .keep_all = TRUE) %>% ungroup() 
+
+pie_data <- pie_data %>% add_row(District = unique(df$District), Locus = rep("Wild-Type", 14), sum_district_locus = nwild$sum_district_locus) %>% arrange(District) %>% ungroup
+pie_data$lat <- NA
+pie_data$long <- NA
+for (i in unique(pie_data$District)){
+  pie_data$lat[pie_data$District == i] <- rep(uganda$latitude[uganda$name == i], sum((pie_data$District == i)))
+  pie_data$long[pie_data$District == i] <- rep(uganda$longitude[uganda$name == i], sum((pie_data$District == i)))
+}
+
+pie_data2 <- pie_data %>% select(District, lat, long) %>% distinct(District, .keep_all = TRUE)
+pie_data2$A675V <- NA
+pie_data2$C469Y <- NA
+pie_data2$C469F <- NA
+pie_data2$R561H <- NA
+pie_data2$WildType <- NA
+
+C469Y_dist <- unique(df$District[df$Locus == "C469Y"])
+A675V_dist <- unique(df$District[df$Locus == "A675V"])
+C469F_dist <- unique(df$District[df$Locus == "C469F"])
+R561H_dist <- unique(df$District[df$Locus == "R561H"])
+WT_dist <- unique(df$District[df$Locus == "Wild-Type"])
+
+pie_data2$A675V[match(A675V_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "A675V"]
+pie_data2$C469Y[match(C469Y_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C469Y"]
+pie_data2$C469F[match(C469F_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C469F"]
+pie_data2$R561H[match(R561H_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "R561H"]
+pie_data2$WildType <- pie_data$sum_district_locus[pie_data$Locus == "Wild-Type"]
+pie_data2[is.na(pie_data2)] =0
+
+pie_data2$radius <- (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F +pie_data2$R561H)/pie_data2$WildType
+minr<-min(pie_data2$radius)  # min in the data original scale
+maxr<-max(pie_data2$radius)  # max in the data original scale
+ 
+min_scale<-0.1  ## min in the new scale
+max_scale<-0.4 ## max in the new scale
+ 
+pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
+
+```
+
+#Make maps
+```{r}
+# make plot with wild_type
+map_wt <- ggplot() +
+  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
+  geom_sf(data=uganda, fill = "pink") +
+  geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
+  geom_sf(data=admin8, color="grey80", size= 0.6) +
+  geom_sf(data=admin110, color="grey80", size= 0.4) +
+  annotation_scale(location = "bl", width_hint = 0.3, height = unit(0.1, "cm")) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.25, "in"), pad_y = unit(0.15, "in"),
+                         style = north_arrow_fancy_orienteering, height = unit(1, "cm"), width = unit(1, "cm")) +
+  coord_sf(xlim = c(28.5, 35), ylim = c(4 ,-2), expand = TRUE) +
+  annotate("text", x = 34.8, y = 0.5, label = "Kenya",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 29.7, y = 1, label = "Democratic Republic \n of the Congo",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 30.2, y = -1.7, label = "Rwanda",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 32, y = 3.95, label = "South Sudan",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 34.5, y = -2, label = "Tanzania",
+           color="grey50", size=4 , fontface="italic") +
+  theme_minimal() + 
+  annotate(geom = "text", x = 31, y = -0.5, label = "Uganda", fontface = "bold", color = "black", size = 7) +
+  annotate(geom = "text", x = 33, y = -1, label = "Lake Victoria", 
+           fontface = "italic", color = "grey50", size = 4) +
+  xlab("") +
+  ylab("") +
+  geom_scatterpie(data = pie_data2, aes(x=long, y=lat, group=District, r = 0.23), cols=c("A675V", "C469F", "C469Y", "R561H", "WildType")) +
+  scale_fill_manual(values = c("#D55E00", "#56B4E9", "#009E73", "#F0E442", "grey70"), labels = c("A675V", "C469F", "C469Y", "R561H", "Wild-Type"), name = "") +
+  theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.12,0.9))
+
+print(map_wt,width = 6, height = 7)
+
+ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda_wild_type.png"), width = 6.5, height = 8)
+
+# make plot with wild_type
+map <- ggplot() +
+  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
+  geom_sf(data=uganda, fill = "moccasin") +
+  geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
+  geom_sf(data=admin8, color="grey80", size= 0.6) +
+  geom_sf(data=admin110, color="grey80", size= 0.4) +
+  annotation_scale(location = "bl", width_hint = 0.3, height = unit(0.1, "cm")) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.25, "in"), pad_y = unit(0.15, "in"),
+                         style = north_arrow_fancy_orienteering, height = unit(1, "cm"), width = unit(1, "cm")) +
+  coord_sf(xlim = c(28.5, 35), ylim = c(4 ,-2), expand = TRUE) +
+  annotate("text", x = 34.8, y = 0.5, label = "Kenya",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 29.4, y = 1.5, label = "Democratic Republic \n of the Congo",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 30.2, y = -1.7, label = "Rwanda",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 31.4, y = 3.956, label = "South Sudan",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 34.5, y = -2, label = "Tanzania",
+           color="grey50", size=4 , fontface="italic") +
+  theme_minimal() + 
+  annotate(geom = "text", x = 31, y = -0.5, label = "Uganda", fontface = "bold", color = "black", size = 6) +
+  annotate(geom = "text", x = 33, y = -1, label = "Lake Victoria", 
+           fontface = "italic", color = "grey50", size = 5) +
+  xlab("") +
+  ylab("") +
+  geom_scatterpie(data = pie_data2, aes(x=long, y=lat, group=District, r = radius_adj), cols=c("A675V", "C469F", "C469Y", "R561H")) +
+  geom_scatterpie_legend(pie_data2$radius*2, x=28.7, y=2.3, labeller = function(x) round(x * 100/2)) +
+    scale_fill_manual(values = c("#D55E00", "#0072B2", "#009E73", "#F0E442"), labels = c("675V", "469F", "469Y", "561H"), name = "")  +
+  theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.085,0.91))
+
+print(map,width = 5.5, height = 6.5)
+
+ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.png"), map, width = 6.2, height = 6.5, dpi= 700)
+
+```
