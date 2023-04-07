@@ -1,0 +1,222 @@
+---
+title: "Figure 1 - Kelch Selection Coefficient Modeling - MANUSCRIPT"
+output: html_document
+date: "2023-03-24"
+---
+## load libraries
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+library(ggbreak) 
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+#load data
+```{r}
+#load data
+pfk7_data <- read.table("data/pfk7_data.txt")
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript_pfK7 <- "figures/"
+```
+
+# PREVALENCE PLOT 
+```{r}
+
+d1 <- pfk7_data %>% select(country, District, year, c580y, nobs_c580y, n) %>% mutate(Locus = "C580Y") %>% rename(x = c580y, nobs = nobs_c580y)
+d2 <- pfk7_data %>% select(country, District, year, r539t, nobs_r539t, n) %>% mutate(Locus = "R539T") %>% rename(x = r539t, nobs = nobs_r539t)
+d3 <- pfk7_data %>% select(country, District, year, all_kelch, nobs_kelch, n) %>% mutate(Locus = "all_kelch") %>% rename(x=all_kelch, nobs = nobs_kelch)
+d3$x<- d3$x - d2$x - d1$x
+
+prev_df <- rbind(d1, d2, d3)
+prev_df <- prev_df %>% group_by(year, Locus) %>% 
+  mutate(min_n = sum(n), mut_sample = sum(x)) %>% 
+  distinct(min_n, mut_sample) %>% 
+  mutate(prop_sample = mut_sample/min_n)
+
+prev <- prev_df %>%
+  ggplot(aes(x=year, y=prop_sample, fill=Locus)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73"), labels = c("other PfK13", "580Y", "539T")) +
+  xlab("Year") +
+  ylab("Allele frequency") +
+  ylim(0, 1) +
+  scale_x_continuous(breaks=seq(1993, 2018, 3)) +
+  theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(0.15, 0.9))
+
+ggsave(paste0(fileLocManuscript_pfK7, "/SupplementFigure1A_PfK7_prevalence.jpeg"), prev, width = 5, height = 6.5, , dpi= 700)
+
+```
+
+
+## MAP OF SE Asia
+```{r}
+#load base map layers
+admin8 <- ne_download(scale="large", type = "admin_1_states_provinces_lines",
+                      category = "cultural", returnclass = "sf")
+rivers8 <- ne_download(scale = 10, type = 'rivers_lake_centerlines',
+                       category = 'physical', returnclass = "sf")
+lakes8 <- ne_download(scale = "large", type = 'lakes',
+                      category = 'physical', returnclass = "sf")
+sov110 <- ne_download(scale="medium", type = "sovereignty",
+                      category = "cultural", returnclass = "sf")
+admin110 <- ne_download(scale="large", type = "populated_places",
+                        category = "cultural", returnclass = "sf")
+
+pt.lim = data.frame(xlim = c(28.5, 35.5), ylim = c(4.25,-3))
+pt.bbox <- st_bbox(c(xmin=pt.lim$xlim[1],
+           xmax=pt.lim$xlim[2],
+           ymin=pt.lim$ylim[1],
+           ymax=pt.lim$ylim[2]))
+
+SE_asia <- ne_states(country=unique(pfk7_data$country), returnclass = "sf") %>% 
+  #st_crop(pt.bbox) %>% 
+  select(name, admin, latitude, longitude) %>%
+  arrange(name) %>% arrange(admin) %>%
+  mutate(name = str_replace(name, "Batdâmbâng", "Battambang"), name = str_replace(name, "Kaôh Kong", "Koh Kong"), name = str_replace(name, "Krong Pailin", "Pailin"), name = str_replace(name, "Preah Vihéar", "Preah Vihear"), name = str_replace(name, "Pouthisat", "Pursat"), name = str_replace(name,"Si Sa Ket", "Sisakhet"), name = str_replace(name, "Rôtânôkiri", "Ratanakiri"), name = str_replace(name, "Attapu", "Attapeu"), name = str_replace(name, "Saravan", "Salavan"), name = str_replace(name, "Savannakhét", "Savannakhet"), name = str_replace(name, "Xékong", "Sekong"), name = str_replace(name, "Khánh Hòa", "Khanh Hoa"), name = str_replace(name, "Quàng Nam", "Quang Nam"))
+
+SE_asia$name[SE_asia$latitude == 9.33941] <- "Bac Lieu" 
+SE_asia$name[SE_asia$latitude == 11.6805] <- "Binh Phuoc" 
+SE_asia$name[SE_asia$latitude == 11.1284] <- "Binh Thuan" 
+SE_asia$name[SE_asia$latitude == 12.7691] <- "Dak Lak"
+SE_asia$name[SE_asia$latitude == 12.1425] <- "Dak Nong" 
+SE_asia$name[SE_asia$latitude == 11.6242] <- "Ninh Thuan"
+SE_asia$name[SE_asia$latitude == 16.7204] <- "Quang Tri" 
+SE_asia$name[SE_asia$latitude == 13.6662] <- "Stueng Traeng"
+
+SE_asia <- SE_asia  %>% filter(name %in% unique(pfk7_data$District)) %>% na.omit() %>% arrange(name) 
+
+SE_asia$color <- "not_enough_samples"
+r539t_district <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs) %>% distinct(District)
+c580y_district <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs) %>% distinct(District)
+allkelch_district <-pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs) %>% distinct(District)
+
+r539t_district <- t(as.data.frame(r539t_district))
+c580y_district <- t(as.data.frame(c580y_district))
+allkelch_district <- t(as.data.frame(allkelch_district))
+
+districts <- cbind(c580y_district, r539t_district)
+
+allkelch_district <- allkelch_district[!allkelch_district %in% districts]
+r539t_district <- array(r539t_district)
+c580y_district <- array(c580y_district)
+
+SE_asia$color[SE_asia$name %in% r539t_district] <- "r539t" #combined
+SE_asia$color[SE_asia$name %in% c580y_district] <- "c580y, " #combined
+SE_asia$color[SE_asia$name %in% allkelch_district] <- "other PfK13" #only other kelch mutants
+
+pie_data <- pfk7_data %>% mutate(WildType = n-c580y - r539t - (all_kelch-c580y - r539t), all_kelch = all_kelch-c580y - r539t) %>% select(District, n, c580y, r539t, all_kelch, WildType)  
+
+pie_data <- pie_data %>% group_by(District) %>% mutate(c580y = sum(c580y), r539t = sum(r539t), all_kelch = sum(all_kelch), WildType = sum(WildType)) %>% arrange(District) %>% ungroup %>% distinct(District, .keep_all = TRUE)
+pie_data$lat <- NA
+pie_data$long <- NA
+for (i in unique(pie_data$District)){
+  pie_data$lat[pie_data$District == i] <- rep(SE_asia$latitude[SE_asia$name == i], sum((pie_data$District == i)))
+  pie_data$long[pie_data$District == i] <- rep(SE_asia$longitude[SE_asia$name == i], sum((pie_data$District == i)))
+}
+
+pie_data$radius <- (pie_data$c580y + pie_data$r539t + pie_data$all_kelch)/pie_data$WildType
+minr<-min(pie_data$radius)  # min in the data original scale
+maxr<-max(pie_data$radius)  # max in the data original scale
+ 
+min_scale<-0.3  ## min in the new scale
+max_scale<-0.7 ## max in the new scale
+ 
+pie_data$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data$radius/(maxr-minr)
+```
+
+## MAP WITH PIE CHARTS
+```{r}
+# make plot with wild_type
+map_SEAsia <- ggplot() +
+  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
+  geom_sf(data=SE_asia, aes(fill = color)) +
+  geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
+  geom_sf(data=admin8, color="grey80", size= 0.6) +
+  geom_sf(data=admin110, color="grey80", size= 0.4) +
+  annotation_scale(location = "bl", width_hint = 0.3, height = unit(0.1, "cm")) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.25, "in"), pad_y = unit(0.15, "in"),
+                         style = north_arrow_fancy_orienteering, height = unit(1, "cm"), width = unit(1, "cm")) +
+  coord_sf(xlim = c(109, 92.5), ylim = c(6.5, 28), expand = TRUE) +
+  annotate("text", x = 102.5, y = 20, label = "Laos",
+           color="black", size=3 , fontface="bold") +
+  annotate("text", x = 101.5, y = 16, label = "Thailand",
+           color="black", size= 3 , fontface="bold") +
+  annotate("text", x = 105.9, y = 12.8, label = "Cambodia",
+           color="black", size=3 , fontface="bold") +
+  annotate("text", x = 104.9, y = 21.5, label = "Vietnam",
+           color="black", size=3 , fontface="bold") +
+  annotate("text", x =95.2, y = 16.9, label = "Myanmar",
+           color="black", size=3 , fontface="bold") +
+    annotate("text", x = 104, y = 24, label = "China",
+           color="grey50", size=4 , fontface="italic") +
+  theme_minimal() + 
+  xlab("") +
+  ylab("") +
+  geom_scatterpie(data = pie_data, aes(x=long, y=lat, group=District, r = radius_adj), cols=c("c580y", "r539t", "all_kelch")) +
+  geom_scatterpie_legend(pie_data$radius*2, x=28.7, y=2.5, labeller = function(x) round(x * 100/2)) +
+  #scale_fill_manual(values = c("#009E73", "#E69F00", "moccasin"), labels = c("580Y", "539T", "other PfK13"), name = "")  +
+  theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.76,0.95))
+
+```
+
+
+#Make maps
+```{r}
+# make plot with wild_type
+map_SEAsia <- ggplot() +
+  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
+  geom_sf(data=SE_asia, aes(fill = color)) +
+  geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
+  geom_sf(data=admin8, color="grey80", size= 0.6) +
+  geom_sf(data=admin110, color="grey80", size= 0.4) +
+  annotation_scale(location = "bl", width_hint = 0.3, height = unit(0.1, "cm")) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.25, "in"), pad_y = unit(0.15, "in"),
+                         style = north_arrow_fancy_orienteering, height = unit(1, "cm"), width = unit(1, "cm")) +
+  coord_sf(xlim = c(109, 92.5), ylim = c(6.5, 28), expand = TRUE) +
+  annotate("text", x = 102.5, y = 20, label = "Laos",
+           color="black", size=3 , fontface="bold") +
+  annotate("text", x = 101.5, y = 16, label = "Thailand",
+           color="black", size= 3 , fontface="bold") +
+  annotate("text", x = 105.9, y = 12.8, label = "Cambodia",
+           color="black", size=3 , fontface="bold") +
+  annotate("text", x = 104.9, y = 21.5, label = "Vietnam",
+           color="black", size=3 , fontface="bold") +
+  annotate("text", x =95.2, y = 16.9, label = "Myanmar",
+           color="black", size=3 , fontface="bold") +
+    annotate("text", x = 104, y = 24, label = "China",
+           color="grey50", size=4 , fontface="italic") +
+  theme_minimal() + 
+  xlab("") +
+  ylab("") +
+  #geom_scatterpie(data = pie_data, aes(x=long, y=lat, group=District, r = radius_adj), cols=c("c580y", "r539t", "all_kelch")) +
+  #geom_scatterpie_legend(pie_data$radius*2, x=28.7, y=2.5, labeller = function(x) round(x * 100/2)) +
+  scale_fill_manual(values = c("#56B4E9", "moccasin", "#E69F00", "#009E73"), labels = c("580Y", "not enough samples", "other PfK13", "539T"), name = "")  +
+  theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.8,0.92))
+
+ggsave(paste0(fileLocManuscript_pfK7, "/SupplementFigure1A_PfK7_MapSEAsia.jpeg"), map_SEAsia, width = 7, height = 7, dpi= 700)
+
+```

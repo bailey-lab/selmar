@@ -1,0 +1,305 @@
+---
+title: "Kelch PfK7 Selection Coefficient Modeling - MANUSCRIPT"
+output: html_document
+date: "2023-03-16"
+---
+
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+
+```
+
+#load data
+```{r}
+#load data
+pfk7_data <- read.table("data/pfk7_data.txt")
+#set the limit of number of observations
+numofobs <- 2
+```
+
+# Bayesian stan model with slopes and intercepts
+```{r}
+# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+
+# ---- Model for c580y -----
+c580y_stanmod <- rstanarm::stan_glmer(
+  lrsmed_580y ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_c580y > numofobs),
+  weights = wt_med_580y, adapt_delta = 0.9975
+)
+
+c580y_pred <- rstanarm::stan_glmer(
+  lrsmed_580y ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_c580y > numofobs, year >= min_year_c580y | year <= min_year_c580y+6),
+  weights = wt_med_580y, adapt_delta = 0.9975
+)
+
+vals <- summary(c580y_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c580y_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c580y_stanmod$mutation <- rep("c580y", dim(ranef_c580y_stanmod)[1])
+
+# forecasting
+new_data <- pfk7_data %>%
+  filter(nobs_c580y > numofobs, is.finite(pfk7_data$lrsmed_580y)) %>% # this is for c469Y model 
+  mutate(Locus = "C580Y") %>%
+  group_by(country, District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(min(min_year_c580y)+6, 2023, 1)) %>% # this creates all the year values up to 2023
+  mutate(adj_year = year - 1993) %>%
+  select(adj_year,year, country, District, Locus) # select just the columns needed for the model
+
+predictions <- rstanarm::posterior_predict(c580y_pred, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+new_data$year <- new_data$adj_year +1993
+
+df_predict <- new_data
+
+# ---- Model for r539t -----
+
+r539t_stanmod <- rstanarm::stan_glmer(
+  lrsmed_539t ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_r539t > numofobs),
+  weights = wt_med_539t, adapt_delta = 0.9975
+)
+
+r539t_pred <- rstanarm::stan_glmer(
+  lrsmed_539t ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_r539t > numofobs, year >= min_year_r539t | year <= min_year_r539t+6),
+  weights = wt_med_539t, adapt_delta = 0.9975
+)
+
+vals <- summary(r539t_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_r539t_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_r539t_stanmod$mutation <- rep("r539t", dim(ranef_r539t_stanmod)[1])
+
+# forecasting
+new_data <- pfk7_data %>%
+  filter(nobs_r539t > numofobs, is.finite(pfk7_data$lrsmed_539t)) %>% # this is for c469Y model 
+  mutate(Locus = "R539T") %>%
+  group_by(country, District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(min(min_year_r539t)+6, 2023, 1)) %>% # this creates all the year values up to 2023
+  mutate(adj_year = year - 1993) %>%
+  select(adj_year,year, country, District, Locus) # select just the columns needed for the model
+
+predictions <- rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+new_data$year <- new_data$adj_year +1993
+
+df_predict <- rbind(df_predict, new_data)
+
+# ---- Model for combined kelch -----
+
+all_kelch_stanmod <- rstanarm::stan_glmer(
+  lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_kelch > numofobs),
+  weights = wt_med_all_kelch, adapt_delta = 0.9975
+)
+
+all_kelch_pred <- rstanarm::stan_glmer(
+  lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_kelch > numofobs, year >= min_year_all_kelch | year <= min_year_all_kelch+6),
+  weights = wt_med_580y, adapt_delta = 0.9975
+)
+
+vals <- summary(all_kelch_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_all_kelch_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_all_kelch_stanmod$mutation <- rep("all_kelch", dim(ranef_all_kelch_stanmod)[1])
+
+# forecasting
+new_data <- pfk7_data %>%
+  filter(nobs_kelch > numofobs, is.finite(pfk7_data$lrsmed_all_kelch)) %>% # this is for c469Y model 
+  mutate(Locus = "all_kelch") %>%
+  group_by(country, District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(min(min_year_all_kelch)+6, 2023, 1)) %>% # this creates all the year values up to 2023
+  mutate(adj_year = year - 1993) %>%
+  select(adj_year,year, country, District, Locus) # select just the columns needed for the model
+
+predictions <- rstanarm::posterior_predict(all_kelch_pred, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+new_data$year <- new_data$adj_year +1993
+
+df_predict <- rbind(df_predict, new_data)
+
+ranef_stanmod <- rbind(ranef_c580y_stanmod, ranef_all_kelch_stanmod, ranef_r539t_stanmod)
+ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
+ranef_stanmod$site <- str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
+
+
+``` 
+
+#get model predictions
+```{r}
+#  get model predictions for plotting
+pfk7_data$predict_stan_c580y <- NA
+pfk7_data$predict_stan_r539t <- NA
+pfk7_data$predict_stan_all_kelch <- NA
+
+pfk7_data$predict_stan_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
+```
+
+### MANUSCRIPT PLOTS ###
+```{r}
+fileLocManuscript_pfK7 <- "~/Dropbox (Brown)/Brown/PhD/Rotations/JeffBailey/Kelch_Uganda_Modeling/Results/20230120_Manuscript/Pfk7/"
+```
+
+## PLOT FOR ONLY BAYSIAN PREDICTION WITH CONF INTERVAL
+```{r}
+#  get model predictions for plotting
+pfk7_data$conf.low_c580y <- NA
+pfk7_data$conf.high_c580y <- NA
+pfk7_data$conf.low_r539t <- NA
+pfk7_data$conf.high_r539t <- NA
+pfk7_data$conf.low_all_kelch <- NA
+pfk7_data$conf.high_all_kelch <- NA
+
+c580y_conf <- rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+r539t_conf <- rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+all_kelch_conf <- rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+
+# here just add predictions  for the c469Y rows
+pfk7_data$conf.low_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <- c580y_conf[1,]
+pfk7_data$conf.low_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <- r539t_conf[1,]
+pfk7_data$conf.low_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[1,]
+
+pfk7_data$conf.high_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <- c580y_conf[2,]
+pfk7_data$conf.high_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <- r539t_conf[2,]
+pfk7_data$conf.high_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[2,]
+```
+
+
+#get model predictions
+```{r}
+# Plot the predictions in each site with only Bayesian
+#convert to prevalence scale
+#  get model predictions for plotting
+pfk7_data$predict_stan_c580y <- NA
+pfk7_data$predict_stan_r539t <- NA
+pfk7_data$predict_stan_all_kelch <- NA
+
+pfk7_data$predict_stan_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
+
+pfk7_data$predict_stan_prev_c580y <- exp(pfk7_data$predict_stan_c580y)*100/(1+exp(pfk7_data$predict_stan_c580y))
+pfk7_data$predict_stan_prev_r539t <- exp(pfk7_data$predict_stan_r539t)*100/(1+exp(pfk7_data$predict_stan_r539t))
+pfk7_data$predict_stan_prev_all_kelch <- exp(pfk7_data$predict_stan_all_kelch)*100/(1+exp(pfk7_data$predict_stan_all_kelch))
+
+pfk7_data$conf.high_prev_c580y <- exp(pfk7_data$conf.high_c580y)*100/(1+exp(pfk7_data$conf.high_c580y))
+pfk7_data$conf.high_prev_r539t <- exp(pfk7_data$conf.high_r539t)*100/(1+exp(pfk7_data$conf.high_r539t))
+pfk7_data$conf.high_prev_all_kelch <- exp(pfk7_data$conf.high_all_kelch)*100/(1+exp(pfk7_data$conf.high_all_kelch))
+
+pfk7_data$conf.low_prev_c580y <- exp(pfk7_data$conf.low_c580y)*100/(1+exp(pfk7_data$conf.low_c580y))
+pfk7_data$conf.low_prev_r539t <- exp(pfk7_data$conf.low_r539t)*100/(1+exp(pfk7_data$conf.low_r539t))
+pfk7_data$conf.low_prev_all_kelch <- exp(pfk7_data$conf.low_all_kelch)*100/(1+exp(pfk7_data$conf.low_all_kelch))
+
+d1 <- pfk7_data %>% select(country, District, year, c580y, n, nobs_c580y, lrsmed_580y, prev_580y, predict_stan_prev_c580y, conf.low_prev_c580y, conf.high_prev_c580y) %>% mutate(Locus = "C580Y")
+colnames(d1) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
+d2 <- pfk7_data %>% select(country, District, year, r539t, n, nobs_r539t, lrsmed_539t, prev_539t, predict_stan_prev_r539t, conf.low_prev_r539t, conf.high_prev_r539t) %>% mutate(Locus = "R539T")
+colnames(d2) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
+d3 <- pfk7_data %>% select(country, District, year, all_kelch, n, nobs_kelch, lrsmed_all_kelch, prev_all_kelch, predict_stan_prev_all_kelch, conf.low_prev_all_kelch, conf.high_prev_all_kelch) %>% mutate(Locus = "combined PfK13")
+colnames(d3) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
+prev_df <- rbind(d1, d2, d3)
+```
+
+#Plotting
+```{r}
+ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
+df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
+## PLOT FOR C580Y
+prev_c580y_plot <- 
+  ggplot() +
+  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_c580y, color = "true"), size = 1) + 
+  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year,predict , color = "predicted")) +
+  ggtitle("C580Y") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
+  facet_wrap(~country + District) +
+  scale_y_log10() +
+  #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
+  #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  scale_y_log10() +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+ 
+
+ex <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs)
+df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
+prev_r539t_plot <- 
+ ggplot() +
+  geom_line(data=ex %>% mutate(N = n+r539t), aes(year, predict_stan_r539t, color = "true"), size = 1) + 
+  geom_line(data=df_pred %>% filter(Locus == "R539T"), aes(year,predict , color = "predicted")) +
+  ggtitle("R539T") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
+  facet_wrap(~country + District) +
+  scale_y_log10() +
+  #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
+  #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  scale_y_log10() +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+
+ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs)
+df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
+prev_all_kelch_plot <- 
+  ggplot() +
+  geom_line(data=ex %>% mutate(N = n+all_kelch), aes(year, predict_stan_all_kelch, color = "true"), size = 1) + 
+  geom_line(data=df_pred %>% filter(Locus == "all_kelch"), aes(year,predict , color = "predicted")) +
+  ggtitle("All kelch13 mutations") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
+  facet_wrap(~country + District) +
+  #scale_y_log10() +
+  #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
+  #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  scale_y_log10() +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+
+# ggsave(paste0(fileLocManuscript_pfK7, "/predictions/C580Y_pred.jpeg"), prev_c580y_plot, width = 8, height = 8, dpi= 700)
+# ggsave(paste0(fileLocManuscript_pfK7, "/predictions/R539T_pred.jpeg"), prev_r539t_plot, width = 8, height = 8, dpi= 700)
+# ggsave(paste0(fileLocManuscript_pfK7, "/predictions/combinedPfK13_pred.jpeg"), prev_all_kelch_plot, width = 8, height = 8, dpi= 700)
+# 
+
+```
+
+
