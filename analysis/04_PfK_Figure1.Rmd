@@ -33,7 +33,7 @@ library(ggbreak)
 #load data
 ```{r}
 #load data
-pfk7_data <- read.table("data/pfk7_data.txt")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 

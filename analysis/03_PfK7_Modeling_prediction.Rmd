@@ -33,7 +33,7 @@ library(gt)
 #load data
 ```{r}
 #load data
-pfk7_data <- read.table("data/pfk7_data.txt")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -56,7 +56,7 @@ c580y_stanmod <- rstanarm::stan_glmer(
 
 c580y_pred <- rstanarm::stan_glmer(
   lrsmed_580y ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_c580y > numofobs, year >= min_year_c580y | year <= min_year_c580y+6),
+  data = pfk7_data %>% filter(nobs_c580y > numofobs, year >= min_year_c580y & year <= min_year_c580y+6),
   weights = wt_med_580y, adapt_delta = 0.9975
 )
 
@@ -91,7 +91,7 @@ r539t_stanmod <- rstanarm::stan_glmer(
 
 r539t_pred <- rstanarm::stan_glmer(
   lrsmed_539t ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_r539t > numofobs, year >= min_year_r539t | year <= min_year_r539t+6),
+  data = pfk7_data %>% filter(nobs_r539t > numofobs, year >= min_year_r539t & year <= min_year_r539t+6),
   weights = wt_med_539t, adapt_delta = 0.9975
 )
 
@@ -126,7 +126,7 @@ all_kelch_stanmod <- rstanarm::stan_glmer(
 
 all_kelch_pred <- rstanarm::stan_glmer(
   lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_kelch > numofobs, year >= min_year_all_kelch | year <= min_year_all_kelch+6),
+  data = pfk7_data %>% filter(nobs_kelch > numofobs, year >= min_year_all_kelch & year <= min_year_all_kelch+6),
   weights = wt_med_580y, adapt_delta = 0.9975
 )
 
@@ -172,10 +172,6 @@ pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r
 pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 ```
 
-### MANUSCRIPT PLOTS ###
-```{r}
-fileLocManuscript_pfK7 <- "~/Dropbox (Brown)/Brown/PhD/Rotations/JeffBailey/Kelch_Uganda_Modeling/Results/20230120_Manuscript/Pfk7/"
-```
 
 ## PLOT FOR ONLY BAYSIAN PREDICTION WITH CONF INTERVAL
 ```{r}
@@ -245,17 +241,17 @@ prev_c580y_plot <-
   ggplot() +
   geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_c580y, color = "true"), size = 1) + 
   geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year,predict , color = "predicted")) +
+  geom_vline(data=ex, aes(xintercept= min_year_c580y), linetype = "dashed") +
   ggtitle("C580Y") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
   facet_wrap(~country + District) +
-  scale_y_log10() +
+  #scale_y_log10() +
   #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
   #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
   ylab("Prevalence") +
   xlab("Year") +
-  scale_y_log10() +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
  
@@ -276,7 +272,7 @@ prev_r539t_plot <-
   #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
   ylab("Prevalence") +
   xlab("Year") +
-  scale_y_log10() +
+  #scale_y_log10() +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
@@ -296,7 +292,7 @@ prev_all_kelch_plot <-
   #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
   ylab("Prevalence") +
   xlab("Year") +
-  scale_y_log10() +
+  #scale_y_log10() +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 

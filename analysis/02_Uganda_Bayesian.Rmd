@@ -33,8 +33,9 @@ library(gt)
 #load data
 ```{r cars}
 #load data
-df<- read.table("data/Ugandan_data.txt")
-df_comb <- read.table("data/Ugandan_comb_data.txt")
+getwd()
+df<- read.table("data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -156,21 +157,6 @@ prev <- df %>%
   scale_fill_manual(values = c("#E69F00", "#0072B2", "#009E73")) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.85,0.15), legend.box = "horizontal")
 
-prev_Uganda <- df_comb %>%
-  filter(is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+comb) %>%
-  ggplot(aes(year, med*100)) +
-  geom_point(aes(size = N)) + 
-  labs(shape="Mutations", size = "Sample Size") +
-  facet_wrap(~District) +
-  theme_bw() +
-  geom_line(aes(year, exp(predict_stan_Uganda)*100/(1+exp(predict_stan_Uganda))), size = 1) + 
-  geom_ribbon(aes(ymin = exp(conf.low_uganda)*100/(1+exp(conf.low_uganda)), ymax = exp(conf.high_uganda)*100/(1+exp(conf.high_uganda))), alpha = 0.2,  show.legend = FALSE) +
-  scale_y_log10() +
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.85,0.15), legend.box = "horizontal")
-
 ggsave(paste0(fileLocManuscript, "/Figure2_prevalence.jpeg"), prev, width = 8, height = 5, dpi=700)
 pdf(paste0(fileLocManuscript, "/Figure2_prevalence.pdf"),  width = 8, height = 5,, paper = "USr")
 
@@ -267,18 +253,11 @@ selection_coef_bay <- ggplot() +
   theme_bw() +
   theme(legend.title=element_blank(), axis.line = element_line(), legend.position = "right", plot.title = element_text(hjust = 0.5, size = 20), axis.text = element_text(size = 14), axis.title=element_text(size=16), legend.text=element_text(size=16))
 
-effect_size_bay <- effect_size_bay %>% relocate(District, mutation)
+effect_size_bay <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 
 ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.jpeg"), selection_coef_bay,width = 8, height = 5, dpi=700)
 pdf(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), width = 8, height = 5)
-write.table(effect_size_bay, paste0(fileLocManuscript, "/SelectionCoefficients.txt"))
-effect_size_bay <- read.table(paste0(fileLocManuscript, "/SelectionCoefficients.txt"))
-
-gt_bay <- gt(effect_size_bay[,1:5])
-gt_bay <- gt_bay %>% tab_header(
-    title = md("**Selection Coefficient based on Baysian GLM**")
-  )
-gtsave(gt_bay, paste0(fileLocManuscript,"SelectionCoef_bay.png"))
+write.csv(effect_size_bay, paste0(fileLocManuscript, "/Uganda_selectioncoefficients.csv"), row.names = F,quote = F)
 ```
 
 #STATISTICAL ANLYSIS OF SELECTION CEOF
