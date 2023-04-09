@@ -234,7 +234,7 @@ prev_df <- rbind(d1, d2, d3)
 
 #Plotting
 ```{r}
-ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
+ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year > min_year_c580y)
 df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
 ## PLOT FOR C580Y
 prev_c580y_plot <- 
