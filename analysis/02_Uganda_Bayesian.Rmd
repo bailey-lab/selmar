@@ -251,12 +251,13 @@ selection_coef_bay <- ggplot() +
   scale_color_manual(values=c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499", "#44AA99", "black")) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_bw() +
+  xlim(-2,2) +
   theme(legend.title=element_blank(), axis.line = element_line(), legend.position = "right", plot.title = element_text(hjust = 0.5, size = 20), axis.text = element_text(size = 14), axis.title=element_text(size=16), legend.text=element_text(size=16))
 
 effect_size_bay <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 
 ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.jpeg"), selection_coef_bay,width = 8, height = 5, dpi=700)
-pdf(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), width = 8, height = 5)
+pdf(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), width = 9, height = 5)
 write.csv(effect_size_bay, paste0(fileLocManuscript, "/Uganda_selectioncoefficients.csv"), row.names = F,quote = F)
 ```
 

@@ -234,7 +234,7 @@ prev_df <- rbind(d1, d2, d3)
 
 #Plotting
 ```{r}
-ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year > min_year_c580y)
+ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year >= min_year_c580y)
 df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
 ## PLOT FOR C580Y
 prev_c580y_plot <- 
@@ -247,7 +247,7 @@ prev_c580y_plot <-
   theme_bw() +
   #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
   facet_wrap(~country + District) +
-  #scale_y_log10() +
+  scale_y_log10() +
   #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
   #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
   ylab("Prevalence") +
@@ -298,4 +298,31 @@ prev_all_kelch_plot <-
 
 ```
 
+#Prediction plot with points
+```{r}
+ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year >= min_year_c580y) %>% mutate(pt_color = case_when (year>min_year_c580y+6 ~ "#55C667FF", year <= min_year_c580y+6 ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
+## PLOT FOR C580Y
+prev_c580y_plot <- 
+  ggplot() +
+  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_c580y, color = "true"), size = 1) + 
+  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year,predict , color = "predicted"), size=1) +
+  geom_vline(data=ex, aes(xintercept= min_year_c580y), linetype = "dashed") +
+  geom_point(data = ex, aes(x=year, y=prev_580y), color = ex$pt_color) +
+  ggtitle("C580Y") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap(~country + District) +
+  #scale_y_log10() +
+  scale_color_manual(values=c("#440154FF", "#33638DFF")) + 
+  #scale_fill_manual(values=c("grey", "#0072B2", "red", "green")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+ 
+
+
+
+```
 
