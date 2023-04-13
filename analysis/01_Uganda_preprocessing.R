@@ -3,7 +3,7 @@ library(nlme)
 library(dplyr)
 library(tabulizer)
 
-#load data
+#load data from raw-data
 out2 <- tabulizer::extract_tables("analysis/data/data-raw/NEJM_submission.pdf", pages = 15, guess = TRUE, output = "data.frame")
 
 # get the data from the scraped table

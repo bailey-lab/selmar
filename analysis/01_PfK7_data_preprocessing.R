@@ -1,7 +1,7 @@
 library(dplyr)
 library(ggplot2)
 
-
+#data files in data-raw obtained from MalariaGen PfK7 database
 x<-read.csv("analysis/data/data-raw/Pf7-samples.csv")
 g<-read.delim("analysis/data/data-raw/genotypes.txt")
 names(g)[1]<-"sample_id"
