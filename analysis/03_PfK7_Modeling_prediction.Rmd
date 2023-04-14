@@ -305,10 +305,10 @@ df_pred <- df_predict %>% filter(District %in% unique(ex$District))
 ## PLOT FOR C580Y
 prev_c580y_plot <- 
   ggplot() +
-  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_c580y, color = "true"), size = 1) + 
-  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year,predict , color = "predicted"), size=1) +
-  geom_vline(data=ex, aes(xintercept= min_year_c580y), linetype = "dashed") +
-  geom_point(data = ex, aes(x=year, y=prev_580y), color = ex$pt_color) +
+  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_prev_c580y, color = "true"), size = 1) + 
+  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
+  geom_vline(data=ex, aes(xintercept= min_year_c580y+6), linetype = "dashed") +
+  geom_point(data = ex, aes(x=year, y=prev_580y*100), color = ex$pt_color) +
   ggtitle("C580Y") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
