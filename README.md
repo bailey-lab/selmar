@@ -5,7 +5,7 @@
 version](https://img.shields.io/badge/R%3E%3D-4.2.3-brightgreen.svg)](https://cran.r-project.org/)
 [![Licence](https://img.shields.io/github/license/mashape/apistatus.svg)](http://choosealicense.com/licenses/mit/)
 
-## Research compendium for alternative COVID-19 mortality analyses
+## Research compendium for selection coefficients of malaria drug resitance
 
 This is a working R compendium (think R package but for reproducible
 analysis). A good overview on research compendiums, see the [R for
