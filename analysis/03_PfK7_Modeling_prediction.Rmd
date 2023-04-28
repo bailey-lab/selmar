@@ -1,5 +1,5 @@
 ---
-title: "Kelch PfK7 Selection Coefficient Modeling - MANUSCRIPT"
+title: "Kelch PfK7 Prediction"
 output: html_document
 date: "2023-03-16"
 ---
@@ -328,7 +328,7 @@ prev_c580y_plot <-
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~country + District) +
-  scale_y_log10() +
+  #scale_y_log10() +
   scale_color_manual(values=c("#440154FF", "#33638DFF")) + 
   #scale_fill_manual(values=c("grey", "#0072B2", "red", "green")) + 
   ylab("Prevalence") +
@@ -341,7 +341,7 @@ df_pred <- df_predict %>% filter(District %in% unique(ex$District))
 prev_r539t_plot <- 
   ggplot() +
   geom_line(data=ex %>% mutate(N = n+r539t), aes(year, predict_stan_prev_r539t, color = "true"), size = 1) + 
-  geom_line(data=df_pred %>% filter(Locus == "R539T"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
+  #geom_line(data=df_pred %>% filter(Locus == "R539T"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
   geom_vline(data=ex, aes(xintercept= min_year_r539t+6), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_539t*100), color = ex$pt_color) +
   ggtitle("R539T") +
@@ -358,13 +358,13 @@ prev_r539t_plot <-
 
 ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs, year >= min_year_all_kelch) %>% mutate(pt_color = case_when (year>min_year_all_kelch+6 ~ "#55C667FF", year <= min_year_all_kelch+6 ~ "#DCE319FF"))
 df_pred <- df_predict %>% filter(District %in% unique(ex$District))  
-prev_r539t_plot <- 
+prev_all_kelch_plot <- 
   ggplot() +
   geom_line(data=ex %>% mutate(N = n+all_kelch), aes(year, predict_stan_prev_all_kelch, color = "true"), size = 1) + 
   geom_line(data=df_pred %>% filter(Locus == "all_kelch"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
   geom_vline(data=ex, aes(xintercept= min_year_all_kelch+6), linetype = "dashed") +
-  geom_point(data = ex, aes(x=year, y=prev_539t*100), color = ex$pt_color) +
-  ggtitle("R539T") +
+  geom_point(data = ex, aes(x=year, y=prev_all_kelch*100), color = ex$pt_color) +
+  ggtitle("PfK13") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~country + District) +

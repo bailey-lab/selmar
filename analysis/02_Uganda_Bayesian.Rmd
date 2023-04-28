@@ -33,9 +33,8 @@ library(gt)
 #load data
 ```{r cars}
 #load data
-getwd()
-df<- read.table("data/data-derived/Ugandan_data.txt")
-df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+df<- read.table("analysis/data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("analysis/data/data-derived/Ugandan_comb_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 

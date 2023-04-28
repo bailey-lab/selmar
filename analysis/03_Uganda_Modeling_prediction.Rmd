@@ -1,0 +1,266 @@
+---
+title: "Kelch Uganda Prediction"
+output: html_document
+date: "2023-04-26"
+---
+
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+
+```
+
+#load data
+```{r}
+#load data
+df<- read.table("data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures/"
+```
+
+# Bayesian stan model with slopes and intercepts
+```{r}
+# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+
+# ---- Model for Uganda (overall) -----
+Uganda_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df_comb %>% filter(nobs > numofobs) %>% mutate(adj_year = year - 2016),
+  weights = wt_med, adapt_delta = 0.9975
+)
+
+# forecasting
+# new_data <- df %>%
+#   filter(nobs > numofobs, is.finite(df$lrsmed)) %>% # this is for c469Y model 
+#   group_by(District, Locus) %>% # we group by the District and Locus 
+#   complete(year = seq(max(year), 2023, 1))%>% # this creates all the year values up to 2023
+#   mutate(adj_year = year - 2016) %>%
+#   select(adj_year,year, District, Locus)
+# 
+# predictions <- rstanarm::posterior_predict(Uganda_stanmod, type = "response", newdata = new_data) %>% colMeans
+# new_data$predict <- predictions
+# 
+# df_predict <- new_data
+
+# ---- Model for c469y -----
+c469y_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469Y" & nobs > numofobs) %>% mutate(adj_year = year - 2016),
+  weights = wt_med, adapt_delta = 0.9975
+)
+
+# forecasting
+new_data <- df %>%
+  filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "C469Y") %>% # this is for c469Y model 
+  group_by(District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(max(year), 2023, 1))%>% # this creates all the year values up to 2023
+  mutate(adj_year = year - 2016) %>%
+  select(adj_year,year, District, Locus)
+
+predictions <- rstanarm::posterior_predict(c469y_stanmod, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+
+df_predict <- new_data
+
+vals <- summary(c469y_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c469y_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c469y_stanmod$mutation <- rep("C469Y", dim(ranef_c469y_stanmod)[1])
+
+# ---- Model for a675v -----
+a675v_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "A675V" & nobs > numofobs) %>% mutate(adj_year = year - 2016),
+  weights = wt_med, adapt_delta = 0.9975
+  )
+
+# forecasting
+new_data <- df %>%
+  filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "A675V") %>% # this is for c469Y model 
+  group_by(District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(max(year), 2023, 1))%>% # this creates all the year values up to 2023
+  mutate(adj_year = year - 2016) %>%
+  select(adj_year,year, District, Locus)
+
+predictions <- rstanarm::posterior_predict(a675v_stanmod, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+
+df_predict <- rbind(df_predict, new_data)
+
+vals <- summary(a675v_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_a675v_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_a675v_stanmod$mutation <- rep("A675V", dim(ranef_a675v_stanmod)[1])
+
+# ---- Model for c469f -----
+c469f_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469F" & nobs > numofobs) %>% mutate(adj_year = year - 2016),
+  weights = wt_med, adapt_delta = 0.9975
+)
+
+# forecasting
+new_data <- df %>%
+  filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "C469F") %>% # this is for c469Y model 
+  group_by(District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(max(year), 2023, 1))%>% # this creates all the year values up to 2023
+  mutate(adj_year = year - 2016) %>%
+  select(adj_year,year, District, Locus)
+
+predictions <- rstanarm::posterior_predict(c469f_stanmod, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+
+df_predict <- rbind(df_predict, new_data)
+
+vals <- summary(c469f_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c469f_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c469f_stanmod$mutation <- rep("C469F", dim(ranef_c469f_stanmod)[1])
+
+# ---- combine selection coefficients -----
+ranef_stanmod <- rbind(ranef_c469y_stanmod, ranef_a675v_stanmod, ranef_c469f_stanmod)
+ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
+ranef_stanmod$site <- str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
+
+```
+
+#Predictions from modeling
+```{r}
+#  get model predictions for plotting
+df$predict_stan <- NA
+df_comb$predict_stan_Uganda <- NA
+
+df_comb$predict_stan_Uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- rstanarm::posterior_predict(Uganda_stanmod, type = "response") %>% colMeans
+
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <-  rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469f_stanmod, type = "response") %>% colMeans
+
+```
+
+## PLOT FOR ONLY BAYSIAN PREDICTION WITH CONF INTERVAL
+```{r}
+#  get model predictions for plotting
+df$conf.low <- NA
+df$conf.high <- NA
+df_comb$conf.low_uganda <- NA
+df_comb$conf.high_uganda <- NA
+
+c469y_conf <- rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+c469f_conf <- rstanarm::posterior_predict(c469f_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+a675v_conf <- rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+uganda_ceof <- rstanarm::posterior_predict(Uganda_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+
+# here just add predictions  for the c469Y rows
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[1,]
+df_comb$conf.low_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[1,]
+
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[2,]
+df_comb$conf.high_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[2,]
+```
+
+## PLOT PREDICTION ON PREVALENCE
+```{r}
+# Plot the predictions in each site with only Bayesian
+#convert to prevalence scale
+df$predict_stan_prev <- exp(df$predict_stan)*100/(1+exp(df$predict_stan))
+df$conf.high_prev <- exp(df$conf.high)*100/(1+exp(df$conf.high))
+df$conf.low_prev <- exp(df$conf.low)*100/(1+exp(df$conf.low))
+
+ex <- df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District), Locus == "A675V", year > 2020) 
+## PLOT FOR A675V
+pred_a675v<- ggplot() +
+  geom_line(data=ex %>% mutate(N = n+x), aes(year, predict_stan_prev, color = "true")) + 
+  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), color = "predicted"), linetype = "dashed") +
+  geom_vline(data=ex, aes(xintercept= 2021), linetype = "dashed") +
+  geom_point(data = ex, aes(x=year, y=med*100)) +
+  ggtitle("A675V") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap(~District) +
+  #scale_y_log10() +
+  scale_color_manual(values=c("#440154FF", "#33638DFF")) + 
+  #scale_fill_manual(values=c("grey", "#0072B2", "red", "green")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+
+ex <- df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District), Locus == "C469Y", year > 2020) 
+## PLOT FOR C469Y
+pred_c469y <- ggplot() +
+  geom_line(data=ex %>% mutate(N = n+x), aes(year, predict_stan_prev, color = "true")) + 
+  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), color = "predicted"), linetype = "dashed") +
+  geom_vline(data=ex, aes(xintercept= 2021), linetype = "dashed") +
+  geom_point(data = ex, aes(x=year, y=med*100)) +
+  ggtitle("C469Y") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap(~District) +
+  #scale_y_log10() +
+  scale_color_manual(values=c("#440154FF", "#33638DFF")) + 
+  #scale_fill_manual(values=c("grey", "#0072B2", "red", "green")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+
+ex <- df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District), Locus == "C469F", year > 2020) 
+## PLOT FOR C469F
+pred_c469f <- ggplot() +
+  geom_line(data=ex %>% mutate(N = n+x), aes(year, predict_stan_prev, color = "true")) + 
+  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), color = "predicted"), linetype = "dashed") +
+  geom_vline(data=ex, aes(xintercept= 2021), linetype = "dashed") +
+  geom_point(data = ex, aes(x=year, y=med*100)) +
+  ggtitle("C469F") +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap(~District) +
+  #scale_y_log10() +
+  scale_color_manual(values=c("#440154FF", "#33638DFF")) + 
+  #scale_fill_manual(values=c("grey", "#0072B2", "red", "green")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
+
+
+```
+
+
+
