@@ -46,17 +46,10 @@ pfk7_data <- pfk7_data %>%
 # Bayesian stan model with slopes and intercepts
 ```{r}
 # Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
-
 # ---- Model for c580y -----
 c580y_stanmod <- rstanarm::stan_glmer(
   lrsmed_580y ~ adj_year + (1 + adj_year | District),
   data = pfk7_data %>% filter(nobs_c580y > numofobs),
-  weights = wt_med_580y, adapt_delta = 0.9975
-)
-
-c580y_pred <- rstanarm::stan_glmer(
-  lrsmed_580y ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_c580y > numofobs, year >= min_year_c580y & year <= min_year_c580y+6),
   weights = wt_med_580y, adapt_delta = 0.9975
 )
 
@@ -66,37 +59,11 @@ ranef_c580y_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
 ranef_c580y_stanmod$mutation <- rep("c580y", dim(ranef_c580y_stanmod)[1])
 
-# forecasting
-new_data <- pfk7_data %>%
-  filter(nobs_c580y > numofobs, is.finite(pfk7_data$lrsmed_580y)) %>% # this is for c469Y model 
-  mutate(Locus = "C580Y") %>%
-  group_by(country, District, Locus) %>% # we group by the District and Locus 
-  complete(year = seq(min(min_year_c580y)+6, 2023, 1)) %>% # this creates all the year values up to 2023
-  #mutate(adj_year = year - min_year_c580y) %>%
-  select(adj_year,year, country, min_year_c580y, District, Locus) %>% # select just the columns needed for the model
-  mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0))
-
-new_data <- new_data %>%
-  group_by(country, District, Locus) %>%
-  mutate(adj_year = year - max(min_year_c580y)) %>%
-  select(!min_year_c580y)
-
-predictions <- rstanarm::posterior_predict(c580y_pred, type = "response", newdata = new_data) %>% colMeans
-new_data$predict <- predictions
-
-df_predict <- new_data
-
 # ---- Model for r539t -----
 
 r539t_stanmod <- rstanarm::stan_glmer(
   lrsmed_539t ~ adj_year + (1 + adj_year | District),
   data = pfk7_data %>% filter(nobs_r539t > numofobs),
-  weights = wt_med_539t, adapt_delta = 0.9975
-)
-
-r539t_pred <- rstanarm::stan_glmer(
-  lrsmed_539t ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_r539t > numofobs, year >= min_year_r539t & year <= min_year_r539t+6),
   weights = wt_med_539t, adapt_delta = 0.9975
 )
 
@@ -106,26 +73,6 @@ ranef_r539t_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
 ranef_r539t_stanmod$mutation <- rep("r539t", dim(ranef_r539t_stanmod)[1])
 
-# forecasting
-new_data <- pfk7_data %>%
-  filter(nobs_r539t > numofobs, is.finite(pfk7_data$lrsmed_539t)) %>% # this is for r539t model 
-  mutate(Locus = "R539T") %>%
-  group_by(country, District, Locus) %>%  # we group by the District and Locus 
-  complete(year = seq(min(min_year_r539t)+6, 2023, 1)) %>% # this creates all the year values up to 2023
-  #mutate(adj_year = year - min_year_c580y) %>%
-  select(adj_year,year, country, min_year_r539t, District, Locus) %>% # select just the columns needed for the model
-  mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0))
-
-new_data <- new_data %>%
-  group_by(country, District, Locus) %>%
-  mutate(adj_year = year - max(min_year_r539t)) %>%
-  select(!min_year_r539t)
-
-predictions <- rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% colMeans
-new_data$predict <- predictions
-
-df_predict <- rbind(df_predict, new_data)
-
 # ---- Model for combined kelch -----
 
 all_kelch_stanmod <- rstanarm::stan_glmer(
@@ -134,37 +81,12 @@ all_kelch_stanmod <- rstanarm::stan_glmer(
   weights = wt_med_all_kelch, adapt_delta = 0.9975
 )
 
-all_kelch_pred <- rstanarm::stan_glmer(
-  lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_kelch > numofobs, year >= min_year_all_kelch & year <= min_year_all_kelch+6),
-  weights = wt_med_580y, adapt_delta = 0.9975
-)
 
 vals <- summary(all_kelch_stanmod$stanfit)$summary[,1]
 vals <- vals[grep("^b", names(vals))]
 ranef_all_kelch_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
 ranef_all_kelch_stanmod$mutation <- rep("all_kelch", dim(ranef_all_kelch_stanmod)[1])
-
-# forecasting
-new_data <- pfk7_data %>%
-  filter(nobs_kelch > numofobs, is.finite(pfk7_data$lrsmed_all_kelch)) %>% # this is for c469Y model 
-  mutate(Locus = "all_kelch") %>%
-  group_by(country, District, Locus) %>% # we group by the District and Locus 
-  complete(year = seq(min(min_year_all_kelch)+6, 2023, 1))%>% # this creates all the year values up to 2023
-  #mutate(adj_year = year - min_year_c580y) %>%
-  select(adj_year,year, country, min_year_all_kelch, District, Locus) %>% # select just the columns needed for the model
-  mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0))
-
-new_data <- new_data %>%
-  group_by(country, District, Locus) %>%
-  mutate(adj_year = year - max(min_year_all_kelch)) %>%
-  select(!min_year_all_kelch)
-
-predictions <- rstanarm::posterior_predict(all_kelch_pred, type = "response", newdata = new_data) %>% colMeans
-new_data$predict <- predictions
-
-df_predict <- rbind(df_predict, new_data)
 
 ranef_stanmod <- rbind(ranef_c580y_stanmod, ranef_all_kelch_stanmod, ranef_r539t_stanmod)
 ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
@@ -174,6 +96,91 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 
 
 ``` 
+
+## PREDICTIONS 
+```{r}
+pred_year <- 2
+#------ Model prediction for C580Y ------
+c580y_pred <- rstanarm::stan_glmer(
+  lrsmed_580y ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_c580y > numofobs, year >= min_year_c580y & year <= min_year_c580y + pred_year),
+  weights = wt_med_580y, adapt_delta = 0.9975
+)
+
+# forecasting
+new_data <- pfk7_data %>%
+  filter(nobs_c580y > numofobs, is.finite(pfk7_data$lrsmed_580y)) %>% # this is for c469Y model 
+  mutate(Locus = "C580Y") %>%
+  group_by(country, District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(min(min_year_c580y)+ pred_year, 2023, 1)) %>% # this creates all the year values up to 2023
+  #mutate(adj_year = year - min_year_c580y) %>%
+  select(adj_year,year, country, min_year_c580y, District, Locus) %>% # select just the columns needed for the model
+  mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0))
+
+new_data <- new_data %>%
+  group_by(country, District, Locus) %>%
+  mutate(adj_year = year - max(min_year_c580y), min_year = min_year_c580y)
+
+predictions <- rstanarm::posterior_predict(c580y_pred, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+
+df_predict <- new_data
+
+#------ Model prediction for R539T ------
+
+r539t_pred <- rstanarm::stan_glmer(
+  lrsmed_539t ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_r539t > numofobs, year >= min_year_r539t & year <= min_year_r539t + pred_year),
+  weights = wt_med_539t, adapt_delta = 0.9975
+)
+
+# forecasting
+new_data <- pfk7_data %>%
+  filter(nobs_r539t > numofobs, is.finite(pfk7_data$lrsmed_539t)) %>% # this is for r539t model 
+  mutate(Locus = "R539T") %>%
+  group_by(country, District, Locus) %>%  # we group by the District and Locus 
+  complete(year = seq(min(min_year_r539t)+ pred_year, 2023, 1)) %>% # this creates all the year values up to 2023
+  #mutate(adj_year = year - min_year_c580y) %>%
+  select(adj_year,year, country, min_year_r539t, District, Locus) %>% # select just the columns needed for the model
+  mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0))
+
+new_data <- new_data %>%
+  group_by(country, District, Locus) %>%
+  mutate(adj_year = year - max(min_year_r539t), min_year = min_year_r539t)
+
+predictions <- rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+
+df_predict <- rbind(df_predict, new_data)
+
+#------ Model prediction for combined PfK13 mutations ------
+
+all_kelch_pred <- rstanarm::stan_glmer(
+  lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(nobs_kelch > numofobs, year >= min_year_all_kelch & year <= min_year_all_kelch + pred_year),
+  weights = wt_med_580y, adapt_delta = 0.9975
+)
+
+# forecasting
+new_data <- pfk7_data %>%
+  filter(nobs_kelch > numofobs, is.finite(pfk7_data$lrsmed_all_kelch)) %>% # this is for c469Y model 
+  mutate(Locus = "all_kelch") %>%
+  group_by(country, District, Locus) %>% # we group by the District and Locus 
+  complete(year = seq(min(min_year_all_kelch)+ pred_year, 2023, 1))%>% # this creates all the year values up to 2023
+  #mutate(adj_year = year - min_year_c580y) %>%
+  select(adj_year,year, country, min_year_all_kelch, District, Locus) %>% # select just the columns needed for the model
+  mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0))
+
+new_data <- new_data %>%
+  group_by(country, District, Locus) %>%
+  mutate(adj_year = year - max(min_year_all_kelch), min_year = min_year_all_kelch)
+
+predictions <- rstanarm::posterior_predict(all_kelch_pred, type = "response", newdata = new_data) %>% colMeans
+new_data$predict <- predictions
+
+df_predict <- rbind(df_predict, new_data)
+
+```
 
 #get model predictions
 ```{r}
@@ -248,81 +255,16 @@ prev_df <- rbind(d1, d2, d3)
 ```
 
 #Plotting
-```{r}
-ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year >= min_year_c580y)
-df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
-## PLOT FOR C580Y
-prev_c580y_plot <- 
-  ggplot() +
-  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_c580y, color = "true")) + 
-  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year,predict , color = "predicted")) +
-  geom_vline(data=ex, aes(xintercept= min_year_c580y+6), linetype = "dashed") +
-  ggtitle("C580Y") +
-  labs(shape="Mutations", size = "Sample Size") +
-  theme_bw() +
-  #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
-  facet_wrap(~country + District) +
-  #scale_y_log10() +
-  #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
-  #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
- 
-
-ex <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs)
-df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
-prev_r539t_plot <- 
- ggplot() +
-  geom_line(data=ex %>% mutate(N = n+r539t), aes(year, predict_stan_r539t, color = "true"), size = 1) + 
-  geom_line(data=df_pred %>% filter(Locus == "R539T"), aes(year,predict , color = "predicted")) +
-  ggtitle("R539T") +
-  labs(shape="Mutations", size = "Sample Size") +
-  theme_bw() +
-  #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
-  facet_wrap(~country + District) +
-  scale_y_log10() +
-  #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
-  #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
-  ylab("Prevalence") +
-  xlab("Year") +
-  #scale_y_log10() +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
-
-ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs)
-df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
-prev_all_kelch_plot <- 
-  ggplot() +
-  geom_line(data=ex %>% mutate(N = n+all_kelch), aes(year, predict_stan_all_kelch, color = "true"), size = 1) + 
-  geom_line(data=df_pred %>% filter(Locus == "all_kelch"), aes(year,predict , color = "predicted")) +
-  ggtitle("All kelch13 mutations") +
-  labs(shape="Mutations", size = "Sample Size") +
-  theme_bw() +
-  #geom_ribbon(aes(ymin = conf.low_c580y, ymax = conf.high_c580y, fill = country, color = country, group=country), alpha = 0.2,  show.legend = FALSE) +
-  facet_wrap(~country + District) +
-  #scale_y_log10() +
-  #scale_color_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
-  #scale_fill_manual(values=c("#009E73", "#0072B2", "#E69F00", "#56B4E9", "#F0E442")) + 
-  ylab("Prevalence") +
-  xlab("Year") +
-  #scale_y_log10() +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
-
-```
-
 #Prediction plot with points
 ```{r}
-ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year >= min_year_c580y) %>% mutate(pt_color = case_when (year>min_year_c580y+6 ~ "#55C667FF", year <= min_year_c580y+6 ~ "#DCE319FF"))
-df_pred <- df_predict %>% filter(District %in% unique(ex$District)) 
+ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, year >= min_year_c580y) %>% mutate(pt_color = case_when (year>min_year_c580y+ pred_year ~ "#55C667FF", year <= min_year_c580y+ pred_year ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District), year >= min_year +  pred_year) 
 ## PLOT FOR C580Y
 prev_c580y_plot <- 
   ggplot() +
-  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_prev_c580y, color = "true"), size = 1) + 
-  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
-  geom_vline(data=ex, aes(xintercept= min_year_c580y+6), linetype = "dashed") +
+  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_prev_c580y, color = "true")) + 
+  geom_line(data=df_pred %>% filter(Locus == "C580Y"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted")) +
+  geom_vline(data=ex, aes(xintercept= min_year_c580y + pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_580y*100), color = ex$pt_color) +
   ggtitle("C580Y") +
   labs(shape="Mutations", size = "Sample Size") +
@@ -336,13 +278,15 @@ prev_c580y_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ex <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs, year >= min_year_r539t) %>% mutate(pt_color = case_when (year>min_year_r539t+6 ~ "#55C667FF", year <= min_year_r539t+6 ~ "#DCE319FF"))
-df_pred <- df_predict %>% filter(District %in% unique(ex$District))  
+ggsave(paste0("figures/predictions/SEAsia_pred_C580Y_pred", pred_year, "y.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
+
+ex <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs, year >= min_year_r539t) %>% mutate(pt_color = case_when (year>min_year_r539t+ pred_year ~ "#55C667FF", year <= min_year_r539t+ pred_year ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District), year >= min_year +  pred_year)  
 prev_r539t_plot <- 
   ggplot() +
-  geom_line(data=ex %>% mutate(N = n+r539t), aes(year, predict_stan_prev_r539t, color = "true"), size = 1) + 
-  #geom_line(data=df_pred %>% filter(Locus == "R539T"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
-  geom_vline(data=ex, aes(xintercept= min_year_r539t+6), linetype = "dashed") +
+  geom_line(data=ex %>% mutate(N = n+r539t), aes(year, predict_stan_prev_r539t, color = "true")) + 
+  geom_line(data=df_pred %>% filter(Locus == "R539T"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted")) +
+  geom_vline(data=ex, aes(xintercept= min_year_r539t+ pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_539t*100), color = ex$pt_color) +
   ggtitle("R539T") +
   labs(shape="Mutations", size = "Sample Size") +
@@ -356,13 +300,15 @@ prev_r539t_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs, year >= min_year_all_kelch) %>% mutate(pt_color = case_when (year>min_year_all_kelch+6 ~ "#55C667FF", year <= min_year_all_kelch+6 ~ "#DCE319FF"))
-df_pred <- df_predict %>% filter(District %in% unique(ex$District))  
+ggsave(paste0("figures/predictions/SEAsia_pred_R539T_pred", pred_year, "y.jpeg"), prev_r539t_plot, width = 8, height = 5, dpi=700)
+
+ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs, year >= min_year_all_kelch) %>% mutate(pt_color = case_when (year>min_year_all_kelch+ pred_year ~ "#55C667FF", year <= min_year_all_kelch+ pred_year ~ "#DCE319FF"))
+df_pred <- df_predict %>% filter(District %in% unique(ex$District), year >= min_year +  pred_year)  
 prev_all_kelch_plot <- 
   ggplot() +
-  geom_line(data=ex %>% mutate(N = n+all_kelch), aes(year, predict_stan_prev_all_kelch, color = "true"), size = 1) + 
-  geom_line(data=df_pred %>% filter(Locus == "all_kelch"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted"), size=1) +
-  geom_vline(data=ex, aes(xintercept= min_year_all_kelch+6), linetype = "dashed") +
+  geom_line(data=ex %>% mutate(N = n+all_kelch), aes(year, predict_stan_prev_all_kelch, color = "true")) + 
+  geom_line(data=df_pred %>% filter(Locus == "all_kelch"), aes(year, exp(predict)*100/(1+exp(predict)) , color = "predicted")) +
+  geom_vline(data=ex, aes(xintercept= min_year_all_kelch+ pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_all_kelch*100), color = ex$pt_color) +
   ggtitle("PfK13") +
   labs(shape="Mutations", size = "Sample Size") +
@@ -375,9 +321,7 @@ prev_all_kelch_plot <-
   xlab("Year") +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
- 
 
-
-
+ggsave(paste0("figures/predictions/SEAsia_pred_Pfk13_pred", pred_year, "y.jpeg"), prev_all_kelch_plot, width = 8, height = 5, dpi=700)
 ```
 
