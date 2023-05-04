@@ -187,7 +187,7 @@ map_SEAsia <- ggplot() +
 ```{r}
 # make plot with wild_type
 map_SEAsia <- ggplot() +
-  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
+  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN %in% c("Laos", "Thailand", "Cambodia", "Vietnam", "Myanmar"), 'grey98', 'grey90')) +
   geom_sf(data=SE_asia, aes(fill = color)) +
   geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
   geom_sf(data=admin8, color="grey80", size= 0.6) +
