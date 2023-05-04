@@ -30,7 +30,7 @@ library(gt)
 
 ```
 
-#load data
+# Load data
 ```{r}
 #load data
 pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
@@ -43,7 +43,7 @@ pfk7_data <- pfk7_data %>%
   ungroup 
 ```
 
-# Bayesian stan model with slopes and intercepts
+# Bayesian GMM with slopes and intercepts
 ```{r}
 # Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
 # ---- Model for c580y -----
@@ -110,7 +110,7 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 
 
 ``` 
-#get model predictions
+## GMM posterior
 ```{r}
 #  get model predictions for plotting
 pfk7_data$predict_stan_c580y <- NA
@@ -122,7 +122,7 @@ pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r
 pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 ```
 
-## OBTAIN CONF INTERVAL
+## Obtain confidence interval of and posterior of posterior for each mutation
 ```{r}
 #  get model predictions for plotting
 pfk7_data$conf.low_c580y <- NA
@@ -146,7 +146,7 @@ pfk7_data$conf.high_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539
 pfk7_data$conf.high_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[2,]
 ```
 
-#GET MODEL PREDICTIONS
+## Obtain GMM posterior for each mutation in prevalence scale
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
@@ -172,7 +172,7 @@ pfk7_data$conf.low_prev_r539t <- exp(pfk7_data$conf.low_r539t)*100/(1+exp(pfk7_d
 pfk7_data$conf.low_prev_all_kelch <- exp(pfk7_data$conf.low_all_kelch)*100/(1+exp(pfk7_data$conf.low_all_kelch))
 ```
 
-## GET MODEL FOR FORECASTING IN TIME 
+# Forecasting Selection based on the first 2, 3, and 4 years
 ```{r}
 pred_year <- c(2, 3, 4)
 
@@ -291,7 +291,7 @@ for (i in pred_year) {
 df_predict_allyear <- rbind(df_predict_2year, df_predict_3year, df_predict_4year)
 ```
 
-#PLOTTING PREDICTION WITH FORECASTING
+## Plotting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year + pred_y, Locus == "C580Y") 
@@ -352,10 +352,10 @@ prev_all_kelch_plot <-
 ggsave("figures/predictions/SEAsia_pred_Pfk13_pred.jpeg", prev_all_kelch_plot, width = 8, height = 5, dpi=700)
 ```
 
-
-## GET MODEL FOR FORECASTING IN TIME WITH PREVALENCE CUT OFF OF 20%
+# Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off
 ```{r}
 pred_year <- c(2, 3, 4)
+prev_cutoff <- 0.1
 
 for (i in pred_year) {
   #------ Model prediction for C580Y ------
@@ -364,7 +364,7 @@ for (i in pred_year) {
     data = pfk7_data %>% filter(
       nobs_c580y > numofobs,
       year >= min_year_c580y & year <= min_year_c580y + i,
-      prev_580y < 0.2
+      prev_580y < prev_cutoff 
     ),
     weights = wt_med_580y,
     adapt_delta = 0.9975
@@ -399,7 +399,7 @@ for (i in pred_year) {
     data = pfk7_data %>% filter(
       nobs_r539t > numofobs,
       year >= min_year_r539t & year <= min_year_r539t + i,
-      prev_539t < 0.2
+      prev_539t < prev_cutoff 
     ),
     weights = wt_med_539t,
     adapt_delta = 0.9975
@@ -434,7 +434,7 @@ for (i in pred_year) {
     data = pfk7_data %>% filter(
       nobs_kelch > numofobs,
       year >= min_year_all_kelch & year <= min_year_all_kelch + i,
-      prev_all_kelch < 0.2
+      prev_all_kelch < prev_cutoff 
     ),
     weights = wt_med_580y,
     adapt_delta = 0.9975
@@ -475,8 +475,9 @@ for (i in pred_year) {
 df_predict_allyear <- rbind(df_predict_2year, df_predict_3year, df_predict_4year)
 ```
 
-#PLOTTING PREDICTION WITH FORECASTING WITH CUTOFF OF 20% PREVALENCE
+## Plotting forecasting of predictions for the first 2, 3, and 4 years with prevalence cut off
 ```{r}
+prev_cutoff_perc <- prev_cutoff *100
 ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year + pred_y, Locus == "C580Y") 
 ## PLOT FOR C580Y
@@ -486,7 +487,7 @@ prev_c580y_plot <-
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
   #geom_vline(data=ex, aes(xintercept= min_year_c580y + pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_580y*100)) +
-  ggtitle("C580Y - 20% prevanlence") +
+  ggtitle(paste0("C580Y - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~country + District) +
@@ -495,7 +496,7 @@ prev_c580y_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ggsave("figures/predictions/SEAsia_pred_C580Y_20prev_pred.jpeg", prev_c580y_plot, width = 8, height = 5, dpi=700)
+ggsave(paste0("figures/predictions/SEAsia_pred_C580Y_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
 
 ex <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs, year >= min_year_r539t)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year +  pred_y, Locus == "R539T")  
@@ -505,7 +506,7 @@ prev_r539t_plot <-
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
   #geom_vline(data=ex, aes(xintercept= min_year_r539t+ pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_539t*100)) +
-  ggtitle("R539T - 20% prevanlence") +
+  ggtitle(paste0("R539T - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~country + District) +
@@ -514,7 +515,7 @@ prev_r539t_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ggsave("figures/predictions/SEAsia_pred_R539T_20prev_pred.jpeg", prev_r539t_plot, width = 8, height = 5, dpi=700)
+ggsave(paste0("figures/predictions/SEAsia_pred_R539T_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
 
 ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs, year >= min_year_all_kelch)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year +  pred_y, Locus == "all_kelch")  
@@ -524,7 +525,7 @@ prev_all_kelch_plot <-
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
   #geom_vline(data=ex, aes(xintercept= min_year_all_kelch+ pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x=year, y=prev_all_kelch*100)) +
-  ggtitle("PfK13 - 20% prevanlence") +
+   ggtitle(paste0("PfK13 - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~country + District) +
@@ -533,6 +534,6 @@ prev_all_kelch_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ggsave("figures/predictions/SEAsia_pred_Pfk13_20prev_pred.jpeg", prev_all_kelch_plot, width = 8, height = 5, dpi=700)
+ggsave(paste0("figures/predictions/SEAsia_pred_PfK13_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
 ```
 
