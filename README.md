@@ -85,6 +85,7 @@ Week of Monday 05/08
 - [ ] Add forecasting to conclusion
 - [ ] Add forecasting to discussion
 - [ ] Update discussion
+- [ ] Update Figure 2
 - [ ] Finalize literature review
 - [x] Finalize supplement
 
