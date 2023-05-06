@@ -76,8 +76,8 @@ more information.
 
 ### To-Dos
 Week of Monday 05/08
-- [ ] Remove y-log and check figures Uganda
-- [ ] Remove y-log and check figures SE Asia
+- [x] Remove y-log and check figures Uganda
+- [x] Remove y-log and check figures SE Asia
 - [ ] Finalize the predictions for SE Asia
 - [ ] Finalize the predictions for Uganda
 - [ ] Finalize the metrics of predictions for SE Asia

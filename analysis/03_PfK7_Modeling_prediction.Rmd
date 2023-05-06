@@ -172,7 +172,9 @@ pfk7_data$conf.low_prev_r539t <- exp(pfk7_data$conf.low_r539t)*100/(1+exp(pfk7_d
 pfk7_data$conf.low_prev_all_kelch <- exp(pfk7_data$conf.low_all_kelch)*100/(1+exp(pfk7_data$conf.low_all_kelch))
 ```
 
-# Forecasting Selection based on the first 2, 3, and 4 years
+# Forecasting Selection 
+
+## Based on the first 2, 3, and 4 years
 ```{r}
 pred_year <- c(2, 3, 4)
 
@@ -291,7 +293,7 @@ for (i in pred_year) {
 df_predict_allyear <- rbind(df_predict_2year, df_predict_3year, df_predict_4year)
 ```
 
-## Ploting forecasting of predictions for the first 2, 3, and 4 years
+### Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year + pred_y, Locus == "C580Y") 
@@ -352,22 +354,21 @@ prev_all_kelch_plot <-
 ggsave("figures/predictions/SEAsia_pred_Pfk13_pred.jpeg", prev_all_kelch_plot, width = 8, height = 5, dpi=700)
 ```
 
-# Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off
+## Based on the first 2, 3, and 4 years with prevalence cut off
 ```{r}
 pred_year <- c(2, 3, 4)
 prev_cutoff <- 0.2
 
 for (i in pred_year) {
   #------ Model prediction for C580Y ------
-  data_c580y <- pfk7_data %>% filter(
-      nobs_c580y > numofobs,
-      year >= min_year_c580y & year <= min_year_c580y + i,
-      prev_580y < prev_cutoff)
+  data_c580y <- pfk7_data %>% filter(nobs_c580y > numofobs,
+                                     year >= min_year_c580y & year <= min_year_c580y + i)
   
-  val <- data_c580y[data_c580y$year == data_c580y$min_year,] 
-  selected_districts <- val$District[val$med <= prev_cutoff]
+  val <- data_c580y[data_c580y$year == data_c580y$min_year_c580y, ]
+  selected_districts <- val$District[val$prev_580y <= prev_cutoff]
   
-  data_c469y <- data_c469y %>% filter(District == selected_districts)
+  data_c580y <-
+    data_c580y %>% filter(District %in% selected_districts)
   
   c580y_pred <- rstanarm::stan_glmer(
     lrsmed_580y ~ adj_year + (1 + adj_year | District),
@@ -399,14 +400,18 @@ for (i in pred_year) {
   df_predict <- new_data
   
   #------ Model prediction for R539T ------
+  data_r539t <- pfk7_data %>% filter(nobs_r539t > numofobs,
+                                     year >= min_year_r539t & year <= min_year_r539t + i)
+  
+  val <- data_r539t[data_r539t$year == data_r539t$min_year_r539t, ]
+  selected_districts <- val$District[val$prev_539t <= prev_cutoff]
+  
+  data_r539t <-
+    data_r539t %>% filter(District %in% selected_districts)
   
   r539t_pred <- rstanarm::stan_glmer(
     lrsmed_539t ~ adj_year + (1 + adj_year | District),
-    data = pfk7_data %>% filter(
-      nobs_r539t > numofobs,
-      year >= min_year_r539t & year <= min_year_r539t + i,
-      prev_539t < prev_cutoff 
-    ),
+    data = data_r539t,
     weights = wt_med_539t,
     adapt_delta = 0.9975
   )
@@ -434,14 +439,18 @@ for (i in pred_year) {
   df_predict <- rbind(df_predict, new_data)
   
   #------ Model prediction for combined PfK13 mutations ------
+  data_all_kelch<- pfk7_data %>% filter(nobs_kelch > numofobs,
+                                     year >= min_year_all_kelch & year <= min_year_all_kelch + i)
+  
+  val <- data_all_kelch[data_all_kelch$year == data_all_kelch$min_year_all_kelch, ]
+  selected_districts <- val$District[val$prev_all_kelch <= prev_cutoff]
+  
+  data_all_kelch <-
+    data_all_kelch %>% filter(District %in% selected_districts)
   
   all_kelch_pred <- rstanarm::stan_glmer(
     lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
-    data = pfk7_data %>% filter(
-      nobs_kelch > numofobs,
-      year >= min_year_all_kelch & year <= min_year_all_kelch + i,
-      prev_all_kelch < prev_cutoff 
-    ),
+    data = data_all_kelch,
     weights = wt_med_580y,
     adapt_delta = 0.9975
   )
@@ -481,7 +490,7 @@ for (i in pred_year) {
 df_predict_allyear <- rbind(df_predict_2year, df_predict_3year, df_predict_4year)
 ```
 
-## Plotting forecasting of predictions for the first 2, 3, and 4 years with prevalence cut off
+### Plotting forecasting of predictions for the first 2, 3, and 4 years with prevalence cut off
 ```{r}
 prev_cutoff_perc <- prev_cutoff *100
 ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
