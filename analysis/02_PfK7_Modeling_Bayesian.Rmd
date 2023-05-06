@@ -170,7 +170,7 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
   theme_bw() +
   geom_line(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
   geom_ribbon(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
-  scale_y_log10() +
+  #scale_y_log10() +
   scale_color_manual(values=c("#56B4E9", "#E69F00", "#009E73"), name = "Mutations", labels = c("580Y", "combined PfK13", "539T")) + 
   scale_fill_manual(values=c("#56B4E9", "#E69F00", "#009E73")) + 
   ylab("Prevalence") +

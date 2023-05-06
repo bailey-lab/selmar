@@ -32,8 +32,8 @@ library(gt)
 # Load data
 ```{r cars}
 #load data
-df<- read.table("analysis/data/data-derived/Ugandan_data.txt")
-df_comb <- read.table("analysis/data/data-derived/Ugandan_comb_data.txt")
+df<- read.table("data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -147,7 +147,7 @@ prev <- df %>%
   geom_line(aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) + 
   geom_ribbon(aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
   facet_wrap(~District) +
-  scale_y_log10() +
+  #scale_y_log10() +
   ylab("Prevalence") +
   xlab("Year") +
   ggpubr::theme_pubclean(base_size = 12) +

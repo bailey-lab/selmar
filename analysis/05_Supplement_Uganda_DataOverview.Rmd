@@ -1,0 +1,120 @@
+---
+title: "Supplement -Klech Selection Coefficient Modeling"
+output: html_document
+date: "2023-05-06"
+---
+
+## load libraries
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+library(ggbreak) 
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+# Load Uganda data
+```{r}
+#load data
+df_uganda <- read.table("data/data-derived/Ugandan_data.txt")
+df_pfk7<- read.table("data/data-derived/pfk7_data.txt")
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures/"
+```
+
+# Overview of data plot
+## Uganda
+```{r}
+plot_overview_uganda <- df_uganda %>%
+  mutate(N = n + x) %>%
+  ggplot(aes(year, med * 100, group = Locus, color = Locus)) +
+  geom_point() +
+  labs(shape = "Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap( ~ District) +
+  ylab("Prevalence") +
+  xlab("Year") +
+  ylim(-1, 40) +
+  scale_color_manual(
+    values = c("#D55E00", "#0072B2", "#009E73", "#F0E442"),
+    labels = c("675V", "469F", "469Y", "561H")
+  ) +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 7),
+    strip.text.x = element_text(size = 12),
+    legend.title = element_text(size = 7),
+    legend.position = c(0.94, 0.07),
+    legend.box = "horizontal"
+  )
+
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Uganda_dataoverview.jpeg"),
+  plot_overview_uganda,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+```
+
+## PfK7
+```{r}
+d1 <- pfk7_data %>% select(country, District, year, c580y, nobs_c580y, n, prev_580y) %>% mutate(Locus = "C580Y") %>% rename(x = c580y, nobs = nobs_c580y, prev = prev_580y)
+d2 <- pfk7_data %>% select(country, District, year, r539t, nobs_r539t, n, prev_539t) %>% mutate(Locus = "R539T") %>% rename(x = r539t, nobs = nobs_r539t, prev = prev_539t)
+d3 <- pfk7_data %>% select(country, District, year, all_kelch, nobs_kelch, n, prev_all_kelch) %>% mutate(Locus = "all_kelch") %>% rename(x=all_kelch, nobs = nobs_kelch, prev = prev_all_kelch)
+prev_df <- rbind(d1, d2, d3)
+
+plot_overview_seAsia <- prev_df %>%
+  mutate(N = n + x) %>%
+  ggplot(aes(year, prev * 100, group = Locus, color = Locus)) +
+  geom_point() +
+  labs(shape = "Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap( ~ District) +
+  ylab("Prevalence") +
+  xlab("Year") +
+  ylim(-1, 40) +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"), labels = c("PfK13", "580Y", "539T"))  +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 7),
+    strip.text.x = element_text(size = 12),
+    legend.title = element_text(size = 7),
+    legend.position = c(0.92, 0.02),
+    legend.box = "horizontal"
+  )
+
+ggsave(
+  paste0(fileLocManuscript, "/supplement/PfK7_dataoverview.jpeg"),
+  plot_overview_seAsia,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+```

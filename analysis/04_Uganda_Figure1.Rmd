@@ -3,7 +3,7 @@ title: "Figure 1 - Kelch Selection Coefficient Modeling - MANUSCRIPT"
 output: html_document
 date: "2023-03-24"
 ---
-## load libraries
+
 ```{r setup, include=FALSE}
 library(lme4)
 library(nlme)
@@ -29,6 +29,7 @@ library(gt)
 ## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 ```
 
+#Load data
 ```{r}
 #load data
 df<- read.table("data/data-derived/Ugandan_data.txt")
@@ -64,7 +65,7 @@ df_comb$wt_med <- NA
 df_comb$wt_med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)] <- 1/(se_ln_ratio_noZeros(round(df_comb$med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]*df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]), df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)])^2)
 ```
 
-# PREVALENCE PLOT 
+# Prevalence plot
 ```{r}
 prev <- df %>% group_by(year, Locus) %>% 
   mutate(min_n = sum(n), mut_sample = sum(x)) %>% 
@@ -88,7 +89,7 @@ ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.png"), prev, width = 6, h
 
 
 
-## MAP OF UGANDA
+# Download and preprocessing for map of Uganda
 ```{r}
 #load base map layers
 admin8 <- ne_download(scale="large", type = "admin_1_states_provinces_lines",
@@ -159,7 +160,7 @@ pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-
 
 ```
 
-#Make maps
+# Plot map 
 ```{r}
 # make plot with wild_type
 map_wt <- ggplot() +
