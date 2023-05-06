@@ -426,21 +426,29 @@ ggsave(
 ```
 
 
-# Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off
+# Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off of the first year
 ```{r}
 pred_year <- c(2, 3, 4)
+prev_cutoff <- 0.2
 
 for (i in pred_year) {
   ## Model for C469Y for prediction
-  c469y_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = df %>% filter(
+  data_c469y <- df %>% filter(
       Locus == "C469Y" &
         nobs > numofobs &
         year >= min_year &
-        year <= min_year + i,
-      med < 0.2
-    ) %>% mutate(adj_year = year - 2016),
+        year <= min_year + i) %>%
+      group_by(District, Locus) %>%
+      mutate(adj_year = year - 2016)
+  
+  val <- data_c469y[data_c469y$year == data_c469y$min_year,] 
+  selected_districts <- val$District[val$med <= prev_cutoff]
+  
+  data_c469y <- data_c469y %>% filter(District == selected_districts)
+  
+  c469y_pred <- rstanarm::stan_glmer(
+    lrsmed ~ adj_year + (1 + adj_year | District),
+    data = data_c469y,
     weights = wt_med,
     adapt_delta = 0.9975
   )
@@ -460,15 +468,22 @@ for (i in pred_year) {
   df_predict <- new_data
   
   ## Model for A675V for prediction
-  a675v_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = df %>% filter(
+  data_a675v <- df %>% filter(
       Locus == "A675V" &
         nobs > numofobs &
         year >= min_year &
-        year <= min_year +  i,
-      med < 0.2
-    ) %>% mutate(adj_year = year - 2016),
+        year <= min_year + i) %>%
+      group_by(District, Locus) %>%
+      mutate(adj_year = year - 2016)
+  
+  val <- data_a675v[data_a675v$year == data_a675v$min_year,] 
+  selected_districts <- val$District[val$med <= prev_cutoff]
+  
+  data_a675v <- data_a675v %>% filter(District == selected_districts)
+  
+  a675v_pred <- rstanarm::stan_glmer(
+    lrsmed ~ adj_year + (1 + adj_year | District),
+    data = data_a675v,
     weights = wt_med,
     adapt_delta = 0.9975
   )
@@ -487,17 +502,23 @@ for (i in pred_year) {
   
   df_predict <- rbind(df_predict, new_data)
   
-  
   ## Model for C469F for prediction
-  c469f_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = df %>% filter(
+    data_c469f <- df %>% filter(
       Locus == "C469F" &
         nobs > numofobs &
         year >= min_year &
-        year <= min_year +  i,
-      med < 0.2
-    ) %>% mutate(adj_year = year - 2016),
+        year <= min_year + i) %>%
+      group_by(District, Locus) %>%
+      mutate(adj_year = year - 2016)
+  
+  val <- data_c469f[data_c469f$year == data_c469f$min_year,] 
+  selected_districts <- val$District[val$med <= prev_cutoff]
+  
+  data_c469f <- data_c469f %>% filter(District == selected_districts)
+  
+  c469f_pred <- rstanarm::stan_glmer(
+    lrsmed ~ adj_year + (1 + adj_year | District),
+    data = data_c469f,
     weights = wt_med,
     adapt_delta = 0.9975
   )
@@ -557,7 +578,7 @@ pred_a675v <- ggplot() +
   ) +
   #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x = year, y = med * 100)) +
-  ggtitle("A675V - 20% Prevalence") +
+  ggtitle(paste0("A675V - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape = "Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap( ~ District) +
@@ -601,7 +622,7 @@ pred_c469y <- ggplot() +
   ) +
   #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x = year, y = med * 100)) +
-  ggtitle("C469Y - 20% Prevalence") +
+  ggtitle(paste0("C469Y - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape = "Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap( ~ District) +
@@ -645,7 +666,7 @@ pred_c469f <- ggplot() +
   ) +
   #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
   geom_point(data = ex, aes(x = year, y = med * 100)) +
-  ggtitle("C469F - 20% Prevalence") +
+  ggtitle(paste0("C469F - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape = "Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap( ~ District) +
@@ -665,21 +686,22 @@ pred_c469f <- ggplot() +
   ) +  labs(color = NULL)
 
 ggsave(
-  "figures/predictions/Uganda_pred_A675V_20prev_pred.jpeg",
+  paste0("figures/predictions/Uganda_pred_A675V_", prev_cutoff_perc, "prev_pred.jpeg"),
   pred_a675v,
   width = 8,
   height = 5,
   dpi = 700
 )
+
 ggsave(
-  "figures/predictions/Uganda_pred_C469Y_20prev_pred.jpeg",
+  paste0("figures/predictions/Uganda_pred_C469Y_", prev_cutoff_perc, "prev_pred.jpeg"),
   pred_c469y,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda_pred_C469F_20prev_pred.jpeg",
+  paste0("figures/predictions/Uganda_pred_C469F_", prev_cutoff_perc, "prev_pred.jpeg"),
   pred_c469f,
   width = 8,
   height = 5,

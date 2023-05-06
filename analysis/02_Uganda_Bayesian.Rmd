@@ -4,7 +4,6 @@ output: html_document
 date: "2023-03-29"
 ---
 
-## load libraries
 ```{r setup, include=FALSE}
 library(lme4)
 library(nlme)
@@ -30,7 +29,7 @@ library(gt)
 ## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 ```
 
-#load data
+# Load data
 ```{r cars}
 #load data
 df<- read.table("analysis/data/data-derived/Ugandan_data.txt")
@@ -41,7 +40,7 @@ numofobs <- 2
 fileLocManuscript <- "figures/"
 ```
 
-#Modeling using stan - Baysian Generalized Linear Model
+# Bayesian GMM with slopes and intercepts
 ```{r}
 # Bayesian stan model with slopes and intercepts
 # Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
@@ -92,7 +91,7 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 ``` 
 
 
-#Predictions from modeling
+## Get posterior of the model
 ```{r}
 #  get model predictions for plotting
 df$predict_stan <- NA
@@ -106,7 +105,7 @@ df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs]
 
 ```
 
-## PLOT FOR ONLY BAYSIAN PREDICTION WITH CONF INTERVAL
+## Obtain confidence interval
 ```{r}
 #  get model predictions for plotting
 df$conf.low <- NA
@@ -131,7 +130,7 @@ df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <-
 df_comb$conf.high_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[2,]
 ```
 
-## PLOT PREDICTION ON PREVALENCE
+# Plot prevalence for all mutations
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
@@ -161,7 +160,7 @@ pdf(paste0(fileLocManuscript, "/Figure2_prevalence.pdf"),  width = 8, height = 5
 
 ```
 
-## PLOT FOR EFFECT SIZE _ ONLY BAYSIAN METHOD
+# Plot for selection coefficient 
 ```{r}
 # Plot the effect sizes
 uganda_selec_coef<- as.data.frame(t(data.frame(Uganda_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
@@ -260,7 +259,7 @@ pdf(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), width = 9, height = 5)
 write.csv(effect_size_bay, paste0(fileLocManuscript, "/Uganda_selectioncoefficients.csv"), row.names = F,quote = F)
 ```
 
-#STATISTICAL ANLYSIS OF SELECTION CEOF
+## Statistical analysis of selection coefficients
 ```{r}
 min_675V <- min(effect_size_bay %>% filter(mutation == "675V" & District != "Uganda") %>% pull(estimate))
 max_675V <- max(effect_size_bay %>% filter(mutation == "675V" & District != "Uganda") %>% pull(estimate))

@@ -3,7 +3,7 @@ title: "Figure 1 - Kelch Selection Coefficient Modeling - MANUSCRIPT"
 output: html_document
 date: "2023-03-24"
 ---
-## load libraries
+# Load libraries
 ```{r setup, include=FALSE}
 library(lme4)
 library(nlme)
@@ -30,7 +30,7 @@ library(ggbreak)
 ## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 ```
 
-#load data
+# Load data
 ```{r}
 #load data
 pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
@@ -40,7 +40,7 @@ numofobs <- 2
 fileLocManuscript_pfK7 <- "figures/"
 ```
 
-# PREVALENCE PLOT 
+# Prevalence plot
 ```{r}
 
 d1 <- pfk7_data %>% select(country, District, year, c580y, nobs_c580y, n) %>% mutate(Locus = "C580Y") %>% rename(x = c580y, nobs = nobs_c580y)
@@ -70,7 +70,7 @@ ggsave(paste0(fileLocManuscript_pfK7, "/SupplementFigure1A_PfK7_prevalence.jpeg"
 ```
 
 
-## MAP OF SE Asia
+# Download and preprocessing map of SE Asia
 ```{r}
 #load base map layers
 admin8 <- ne_download(scale="large", type = "admin_1_states_provinces_lines",
@@ -146,7 +146,7 @@ max_scale<-0.7 ## max in the new scale
 pie_data$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data$radius/(maxr-minr)
 ```
 
-## MAP WITH PIE CHARTS
+## Map with pie chart
 ```{r}
 # make plot with wild_type
 map_SEAsia <- ggplot() +
@@ -183,7 +183,7 @@ map_SEAsia <- ggplot() +
 ```
 
 
-#Make maps
+## Map of SE Asia
 ```{r}
 # make plot with wild_type
 map_SEAsia <- ggplot() +

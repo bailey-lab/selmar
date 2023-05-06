@@ -29,7 +29,7 @@ library(gt)
 ## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 ```
 
-#load data
+# Load data
 ```{r}
 #load data
 pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
@@ -39,7 +39,7 @@ numofobs <- 2
 fileLocManuscript_pfK7 <- "figures/"
 ```
 
-# Bayesian stan model with slopes and intercepts
+# Bayesian GMM with slopes and intercepts
 ```{r}
 # Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
 
@@ -89,7 +89,7 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
 ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 ``` 
 
-#get model predictions
+## Get posterior of the model
 ```{r}
 #  get model predictions for plotting
 pfk7_data$predict_stan_c580y <- NA
@@ -101,12 +101,7 @@ pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r
 pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 ```
 
-### MANUSCRIPT PLOTS ###
-```{r}
-fileLocManuscript_pfK7 <- "figures/"
-```
-
-## PLOT FOR ONLY BAYSIAN PREDICTION WITH CONF INTERVAL
+## Obtain confidence interval
 ```{r}
 #  get model predictions for plotting
 pfk7_data$conf.low_c580y <- NA
@@ -130,7 +125,7 @@ pfk7_data$conf.high_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539
 pfk7_data$conf.high_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[2,]
 ```
 
-## PLOT PREDICTION ON PREVALENCE
+# Plot prevalence for all mutations
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
@@ -187,7 +182,7 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
 ggsave(paste0(fileLocManuscript_pfK7, "/Pfk7_prevalence.jpeg"), prev_plot, width = 8, height = 5, dpi=700)
 ```
 
-## PLOT FOR EFFECT SIZE _ ONLY BAYSIAN METHOD
+# Plot for selection coefficient 
 ```{r}
 # Plot the effect sizes
 stan_eff <- as.data.frame(t(data.frame(c580y_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
@@ -276,7 +271,7 @@ write.csv(effect_size_bay2, paste0(fileLocManuscript_pfK7, "/PfK7_selectioncoeff
 ```
 
 
-#STATISTICAL ANLYSIS OF SELECTION CEOF
+## Statistical analysis of selection coefficients
 ```{r}
 min_580Y <- min(effect_size_bay %>% filter(mutation == "580Y" & District != "Southeast Asia") %>% pull(estimate))
 max_580Y <- max(effect_size_bay %>% filter(mutation == "580Y" & District != "Southeast Asia") %>% pull(estimate))

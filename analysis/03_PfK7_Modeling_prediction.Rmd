@@ -291,7 +291,7 @@ for (i in pred_year) {
 df_predict_allyear <- rbind(df_predict_2year, df_predict_3year, df_predict_4year)
 ```
 
-## Plotting forecasting of predictions for the first 2, 3, and 4 years
+## Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ex <- pfk7_data %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year + pred_y, Locus == "C580Y") 
@@ -355,17 +355,23 @@ ggsave("figures/predictions/SEAsia_pred_Pfk13_pred.jpeg", prev_all_kelch_plot, w
 # Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off
 ```{r}
 pred_year <- c(2, 3, 4)
-prev_cutoff <- 0.1
+prev_cutoff <- 0.2
 
 for (i in pred_year) {
   #------ Model prediction for C580Y ------
-  c580y_pred <- rstanarm::stan_glmer(
-    lrsmed_580y ~ adj_year + (1 + adj_year | District),
-    data = pfk7_data %>% filter(
+  data_c580y <- pfk7_data %>% filter(
       nobs_c580y > numofobs,
       year >= min_year_c580y & year <= min_year_c580y + i,
-      prev_580y < prev_cutoff 
-    ),
+      prev_580y < prev_cutoff)
+  
+  val <- data_c580y[data_c580y$year == data_c580y$min_year,] 
+  selected_districts <- val$District[val$med <= prev_cutoff]
+  
+  data_c469y <- data_c469y %>% filter(District == selected_districts)
+  
+  c580y_pred <- rstanarm::stan_glmer(
+    lrsmed_580y ~ adj_year + (1 + adj_year | District),
+    data = data_c580y,
     weights = wt_med_580y,
     adapt_delta = 0.9975
   )
