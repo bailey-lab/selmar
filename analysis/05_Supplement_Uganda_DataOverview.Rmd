@@ -160,7 +160,7 @@ prev <- prev_df %>%
 ggsave(
   paste0(fileLocManuscript, "/supplement/PfK7_prevalence.jpeg"),
   prev,
-  width = 8,
+  width = 7,
   height = 5,
   dpi = 700
 )

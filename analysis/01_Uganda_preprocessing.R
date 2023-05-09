@@ -32,7 +32,7 @@ df <- df %>% pivot_longer(cols = `2016`:`2021`) %>%
   mutate(nobs = sum(x>0)) %>%
   ungroup
 
-# lucys log ratio function
+# log ratio function
 se_ln_ratio_noZeros<-function(x,N) {
   inds<-which(x==0)
   x[inds]<-0.5

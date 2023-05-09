@@ -85,9 +85,11 @@ Week of Monday 05/08
 - [ ] Add forecasting to conclusion
 - [ ] Add forecasting to discussion
 - [ ] Update discussion
-- [ ] Update Figure 2
+- [x] Update Figure 2
 - [ ] Finalize literature review
-- [x] Finalize supplement
+- [x] Finalize supplement figure 1
+- [x] Finalize all data figure SE Asia (supplement)
+- [x] Finalize all data figure Uganda (supplement)
 
 Week of Monday 05/08
 - [ ] Polishing Manuscript

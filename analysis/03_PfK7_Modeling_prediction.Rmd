@@ -33,12 +33,12 @@ library(gt)
 # Load data
 ```{r}
 #load data
-pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
+pfk7_data <- read.table("data/data-derived/pfk7_country_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
 pfk7_data <- pfk7_data %>%
-  group_by(District) %>%
+  group_by(country) %>%
   mutate(min_year_c580y = min(year[c580y>0]), min_year_r539t = min(year[r539t>0]), min_year_all_kelch = min(year[all_kelch>0])) %>%
   ungroup 
 ```
@@ -48,7 +48,7 @@ pfk7_data <- pfk7_data %>%
 # Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
 # ---- Model for c580y -----
 c580y_stanmod <- rstanarm::stan_glmer(
-  lrsmed_580y ~ adj_year + (1 + adj_year | District),
+  lrsmed_580y ~ adj_year + (1 + adj_year | country),
   data = pfk7_data %>% filter(nobs_c580y > numofobs),
   weights = wt_med_580y,
   adapt_delta = 0.9975
@@ -65,7 +65,7 @@ ranef_c580y_stanmod$mutation <-
 # ---- Model for r539t -----
 
 r539t_stanmod <- rstanarm::stan_glmer(
-  lrsmed_539t ~ adj_year + (1 + adj_year | District),
+  lrsmed_539t ~ adj_year + (1 + adj_year | country),
   data = pfk7_data %>% filter(nobs_r539t > numofobs),
   weights = wt_med_539t,
   adapt_delta = 0.9975
@@ -82,7 +82,7 @@ ranef_r539t_stanmod$mutation <-
 # ---- Model for combined kelch -----
 
 all_kelch_stanmod <- rstanarm::stan_glmer(
-  lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
+  lrsmed_all_kelch ~ adj_year + (1 + adj_year | country),
   data = pfk7_data %>% filter(nobs_kelch > numofobs),
   weights = wt_med_all_kelch,
   adapt_delta = 0.9975
@@ -105,7 +105,7 @@ ranef_stanmod$site <-
   str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
 ranef_stanmod$site <-
   str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
-ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b country:")
 ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 
 
@@ -254,7 +254,7 @@ for (i in pred_year) {
       nobs_kelch > numofobs,
       year >= min_year_all_kelch & year <= min_year_all_kelch + i
     ),
-    weights = wt_med_580y,
+    weights = wt_med_all_kelch,
     adapt_delta = 0.9975
   )
   
@@ -354,7 +354,7 @@ prev_all_kelch_plot <-
 ggsave("figures/predictions/SEAsia_pred_Pfk13_pred.jpeg", prev_all_kelch_plot, width = 8, height = 5, dpi=700)
 ```
 
-## Based on the first 2, 3, and 4 years with prevalence cut off
+## Based on the first 2, 3, and 4 years with prevalence cut off per country
 ```{r}
 pred_year <- c(2, 3, 4)
 prev_cutoff <- 0.2
@@ -371,7 +371,7 @@ for (i in pred_year) {
     data_c580y %>% filter(District %in% selected_districts)
   
   c580y_pred <- rstanarm::stan_glmer(
-    lrsmed_580y ~ adj_year + (1 + adj_year | District),
+    lrsmed_580y ~ adj_year + (1 + adj_year | country),
     data = data_c580y,
     weights = wt_med_580y,
     adapt_delta = 0.9975
@@ -379,19 +379,22 @@ for (i in pred_year) {
   
   # forecasting
   new_data <- pfk7_data %>%
-    filter(nobs_c580y > numofobs, is.finite(pfk7_data$lrsmed_580y)) %>% # this is for c469Y model
+    filter(nobs_c580y > numofobs, is.finite(pfk7_data$lrsmed_539t)) %>% # this is for c580y model
     mutate(Locus = "C580Y") %>%
-    group_by(country, District, Locus) %>% # we group by the District and Locus
+    group_by(country, District, Locus) %>%  # we group by the District and Locus
     complete(year = seq(min(min_year_c580y) + i, 2023, 1)) %>% # this creates all the year values up to 2023
-    #mutate(adj_year = year - min_year_c580y) %>%
-    select(adj_year, year, country, min_year_c580y, District, Locus) %>% # select just the columns needed for the model
-    mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0))
+    ungroup() %>% 
+    select(adj_year, year, country, min_year_c580y, Locus) %>% # select just the columns needed for the model
+    mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0)) %>%
+    group_by(country) %>%
+    distinct(year, .keep_all = TRUE)
   
   new_data <- new_data %>%
-    group_by(country, District, Locus) %>%
+    group_by(country, Locus) %>%
     mutate(adj_year = year - max(min_year_c580y),
            min_year = min_year_c580y) %>%
-    select(!min_year_c580y)
+    select(!min_year_c580y) %>% 
+    arrange(year)
   
   predictions <-
     rstanarm::posterior_predict(c580y_pred, type = "response", newdata = new_data) %>% colMeans
@@ -410,7 +413,7 @@ for (i in pred_year) {
     data_r539t %>% filter(District %in% selected_districts)
   
   r539t_pred <- rstanarm::stan_glmer(
-    lrsmed_539t ~ adj_year + (1 + adj_year | District),
+    lrsmed_539t ~ adj_year + (1 + adj_year | country),
     data = data_r539t,
     weights = wt_med_539t,
     adapt_delta = 0.9975
@@ -422,15 +425,18 @@ for (i in pred_year) {
     mutate(Locus = "R539T") %>%
     group_by(country, District, Locus) %>%  # we group by the District and Locus
     complete(year = seq(min(min_year_r539t) + i, 2023, 1)) %>% # this creates all the year values up to 2023
-    #mutate(adj_year = year - min_year_c580y) %>%
-    select(adj_year, year, country, min_year_r539t, District, Locus) %>% # select just the columns needed for the model
-    mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0))
+    ungroup() %>% 
+    select(adj_year, year, country, min_year_r539t, Locus) %>% # select just the columns needed for the model
+    mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0)) %>%
+    group_by(country) %>%
+    distinct(year, .keep_all = TRUE)
   
   new_data <- new_data %>%
-    group_by(country, District, Locus) %>%
+    group_by(country, Locus) %>%
     mutate(adj_year = year - max(min_year_r539t),
            min_year = min_year_r539t) %>%
-    select(!min_year_r539t)
+    select(!min_year_r539t) %>% 
+    arrange(year)
   
   predictions <-
     rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% colMeans
@@ -439,7 +445,7 @@ for (i in pred_year) {
   df_predict <- rbind(df_predict, new_data)
   
   #------ Model prediction for combined PfK13 mutations ------
-  data_all_kelch<- pfk7_data %>% filter(nobs_kelch > numofobs,
+  data_all_kelch <- pfk7_data %>% filter(nobs_kelch > numofobs,
                                      year >= min_year_all_kelch & year <= min_year_all_kelch + i)
   
   val <- data_all_kelch[data_all_kelch$year == data_all_kelch$min_year_all_kelch, ]
@@ -449,9 +455,9 @@ for (i in pred_year) {
     data_all_kelch %>% filter(District %in% selected_districts)
   
   all_kelch_pred <- rstanarm::stan_glmer(
-    lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
+    lrsmed_all_kelch ~ adj_year + (1 + adj_year | country),
     data = data_all_kelch,
-    weights = wt_med_580y,
+    weights = wt_med_all_kelch,
     adapt_delta = 0.9975
   )
   
@@ -461,15 +467,19 @@ for (i in pred_year) {
     mutate(Locus = "all_kelch") %>%
     group_by(country, District, Locus) %>% # we group by the District and Locus
     complete(year = seq(min(min_year_all_kelch) + i, 2023, 1)) %>% # this creates all the year values up to 2023
-    #mutate(adj_year = year - min_year_c580y) %>%
+    ungroup() %>% 
     select(adj_year, year, country, min_year_all_kelch, District, Locus) %>% # select just the columns needed for the model
-    mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0))
+    mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0)) %>%
+    group_by(country) %>%
+    distinct(year, .keep_all = TRUE)
+    
   
   new_data <- new_data %>%
-    group_by(country, District, Locus) %>%
+    group_by(country, Locus) %>%
     mutate(adj_year = year - max(min_year_all_kelch),
            min_year = min_year_all_kelch) %>%
-    select(!min_year_all_kelch)
+    select(!min_year_all_kelch) %>% 
+    arrange(year)
   
   predictions <-
     rstanarm::posterior_predict(all_kelch_pred, type = "response", newdata = new_data) %>% colMeans
@@ -505,13 +515,13 @@ prev_c580y_plot <-
   ggtitle(paste0("C580Y - ", prev_cutoff_perc, "% prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  facet_wrap(~country + District) +
+  facet_wrap(~country) +
   ylab("Prevalence") +
   xlab("Year") +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ggsave(paste0("figures/predictions/SEAsia_pred_C580Y_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
+#ggsave(paste0("figures/predictions/SEAsia_pred_C580Y_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
 
 ex <- pfk7_data %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs, year >= min_year_r539t)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year +  pred_y, Locus == "R539T")  
@@ -530,7 +540,7 @@ prev_r539t_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ggsave(paste0("figures/predictions/SEAsia_pred_R539T_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
+#ggsave(paste0("figures/predictions/SEAsia_pred_R539T_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
 
 ex <- pfk7_data %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs, year >= min_year_all_kelch)
 df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District), year >= min_year +  pred_y, Locus == "all_kelch")  
@@ -549,6 +559,14 @@ prev_all_kelch_plot <-
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ggsave(paste0("figures/predictions/SEAsia_pred_PfK13_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
+#ggsave(paste0("figures/predictions/SEAsia_pred_PfK13_", prev_cutoff_perc, "prev_pred.jpeg"), prev_c580y_plot, width = 8, height = 5, dpi=700)
+```
+
+# Metric of prediction
+```{r}
+## Correlation plot for 
+
+
+
 ```
 
