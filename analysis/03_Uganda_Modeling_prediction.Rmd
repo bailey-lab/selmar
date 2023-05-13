@@ -271,7 +271,9 @@ df_predict_allyear <-
 ## Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
+  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V") 
+ex_pt <-
+  df %>% filter(nobs > numofobs, Locus == "A675V") 
 df_pred <-
   df_predict_allyear %>% filter(District %in% unique(ex$District),
                                 Locus == "A675V",
@@ -281,90 +283,67 @@ pred_a675v <- ggplot() +
   geom_line(
     data = ex %>% mutate(N = n + x),
     aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1
-  ) +
+    linewidth = 1) +
   geom_line(
     data = df_pred,
     aes(
       year,
       exp(predict) * 100 / (1 + exp(predict)),
       group = label,
-      color = label
-    ),
-    linetype = "dashed"
-  ) +
-  #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
-  geom_point(data = ex, aes(x = year, y = med * 100)) +
+      color = label),
+    linetype = "dashed") +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
   ggtitle("A675V") +
-  labs(shape = "Mutations", size = "Sample Size") +
+  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  facet_wrap( ~ District) +
+  facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
   ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.direction = "vertical",
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5)
-  ) +  labs(color = NULL)
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12),
+        legend.text=element_text(size=12), strip.text.x = element_text(size = 12), 
+        legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", 
+        plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
-df_pred <-
-  df_predict_allyear %>% filter(District %in% unique(ex$District),
+## PLOT FOR C469Y
+ex <-df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y") 
+ex_pt <-df %>% filter(nobs > numofobs, Locus == "C469Y") 
+df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District),
                                 Locus == "C469Y",
                                 year >= min_year + pred_y)
-## PLOT FOR C469Y
 pred_c469y <- ggplot() +
   geom_line(
     data = ex %>% mutate(N = n + x),
     aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1
-  ) +
+    linewidth = 1) +
   geom_line(
     data = df_pred,
     aes(
       year,
       exp(predict) * 100 / (1 + exp(predict)),
       group = label,
-      color = label
-    ),
+      color = label),
     linetype = "dashed"
   ) +
-  #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
-  geom_point(data = ex, aes(x = year, y = med * 100)) +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
   ggtitle("C469Y") +
-  labs(shape = "Mutations", size = "Sample Size") +
+  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  facet_wrap( ~ District) +
+  facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
   ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.direction = "vertical",
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5)
-  ) +  labs(color = NULL)
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12),
+        legend.text=element_text(size=12), strip.text.x = element_text(size = 12), 
+        legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", 
+        plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
-ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
-df_pred <-
-  df_predict_allyear %>% filter(District %in% unique(ex$District),
+## PLOT FOR C469F
+ex <-df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F") 
+ex_pt <-df %>% filter(nobs > numofobs, Locus == "C469F") 
+df_pred <-df_predict_allyear %>% filter(District %in% unique(ex$District),
                                 Locus == "C469F",
                                 year >= min_year + pred_y)
-## PLOT FOR C469F
 pred_c469f <- ggplot() +
   geom_line(
     data = ex %>% mutate(N = n + x),
@@ -381,43 +360,35 @@ pred_c469f <- ggplot() +
     ),
     linetype = "dashed"
   ) +
-  #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
-  geom_point(data = ex, aes(x = year, y = med * 100)) +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
   ggtitle("C469F") +
-  labs(shape = "Mutations", size = "Sample Size") +
+  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  facet_wrap( ~ District) +
+  facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
   ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.direction = "vertical",
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5)
-  ) +  labs(color = NULL)
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12),
+        legend.text=element_text(size=12), strip.text.x = element_text(size = 12), 
+        legend.title = element_text(size=12), legend.direction = "vertical", legend.position = "right", 
+        plot.title = element_text(hjust = 0.5)) +  labs(color=NULL)
 
 ggsave(
-  "figures/predictions/Uganda_pred_A675V_pred.jpeg",
+  "figures/predictions/Uganda_pred_A675V_pred.png",
   pred_a675v,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda_pred_C469Y_pred.jpeg",
+  "figures/predictions/Uganda_pred_C469Y_pred.png",
   pred_c469y,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda_pred_C469F_pred.jpeg",
+  "figures/predictions/Uganda_pred_C469F_pred.png",
   pred_c469f,
   width = 8,
   height = 5,
@@ -425,7 +396,7 @@ ggsave(
 )
 ```
 
-
+# WRONG BELOW
 # Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off of the first year
 ```{r}
 pred_year <- c(2, 3, 4)

@@ -10,10 +10,11 @@ library(ggplot2)
 pfk7_data <- read.table("analysis/data/data-derived/pfk7_data.txt")
 
 pfk7_country_data <-
-  pfk7_data %>% select(country, District, year, n, c580y, r539t, all_kelch) %>% group_by(country, year) %>% mutate(
-    c580y = sum(c580y),
+  pfk7_data %>% select(country, District, year, n, c580y, r539t, all_kelch) %>% group_by(country, year) %>%
+  mutate(c580y = sum(c580y),
     r539t = sum(r539t),
-    all_kelch = sum(all_kelch)) %>%
+    all_kelch = sum(all_kelch),
+    n = sum(n)) %>%
   distinct(year, .keep_all = TRUE) %>%
   select(!District) %>%
   mutate(prev_580y = c580y / n,
@@ -21,9 +22,9 @@ pfk7_country_data <-
     prev_all_kelch = all_kelch / n) %>%
   group_by(country) %>%
   mutate(min_year = min(year)) %>%
-  mutate(nobs_c580y = sum(c580y > 0)) %>%
-  mutate(nobs_r539t = sum(r539t > 0)) %>%
-  mutate(nobs_kelch = sum(all_kelch > 0))
+  mutate(nobs_c580y = sum(c580y > 0),
+         nobs_r539t = sum(r539t > 0),
+         nobs_kelch = sum(all_kelch > 0))
 
 #log ratio function
 se_ln_ratio_noZeros <- function(x, N) {

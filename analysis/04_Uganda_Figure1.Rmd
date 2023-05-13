@@ -79,11 +79,12 @@ prev <- df %>% group_by(year, Locus) %>%
   ylab("Allele frequency") + 
   ylim(0, 1) +
   scale_x_continuous("Year", labels = as.character(df$year), breaks = df$year) +
-  theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(.2 , .95), legend.justification = c("right", "top"), legend.box.just = "right", legend.margin = margin(1, 1, 1, 1))
+  theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(.25 , .97), legend.justification = c("right", "top"), legend.box.just = "right", legend.margin = margin(1, 1, 1, 1))
 
-print(prev, width = 5, height = 6)
+print(prev, width = 4, height =  6.5)
 
-ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.png"), prev, width = 6, height = 3, , dpi= 700)
+ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.pdf"), prev, width = 4, height = 5.5, , dpi= 700)
+ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.png"), prev, width = 4, height = 5.5, , dpi= 700)
 
 ```
 
@@ -163,42 +164,6 @@ pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-
 # Plot map 
 ```{r}
 # make plot with wild_type
-map_wt <- ggplot() +
-  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
-  geom_sf(data=uganda, fill = "pink") +
-  geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
-  geom_sf(data=admin8, color="grey80", size= 0.6) +
-  geom_sf(data=admin110, color="grey80", size= 0.4) +
-  annotation_scale(location = "bl", width_hint = 0.3, height = unit(0.1, "cm")) +
-  annotation_north_arrow(location = "bl", which_north = "true",
-                         pad_x = unit(0.25, "in"), pad_y = unit(0.15, "in"),
-                         style = north_arrow_fancy_orienteering, height = unit(1, "cm"), width = unit(1, "cm")) +
-  coord_sf(xlim = c(28.5, 35), ylim = c(4 ,-2), expand = TRUE) +
-  annotate("text", x = 34.8, y = 0.5, label = "Kenya",
-           color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 29.7, y = 1, label = "Democratic Republic \n of the Congo",
-           color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 30.2, y = -1.7, label = "Rwanda",
-           color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 32, y = 3.95, label = "South Sudan",
-           color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 34.5, y = -2, label = "Tanzania",
-           color="grey50", size=4 , fontface="italic") +
-  theme_minimal() + 
-  annotate(geom = "text", x = 31, y = -0.5, label = "Uganda", fontface = "bold", color = "black", size = 7) +
-  annotate(geom = "text", x = 33, y = -1, label = "Lake Victoria", 
-           fontface = "italic", color = "grey50", size = 4) +
-  xlab("") +
-  ylab("") +
-  geom_scatterpie(data = pie_data2, aes(x=long, y=lat, group=District, r = 0.23), cols=c("A675V", "C469F", "C469Y", "R561H", "WildType")) +
-  scale_fill_manual(values = c("#D55E00", "#56B4E9", "#009E73", "#F0E442", "grey70"), labels = c("A675V", "C469F", "C469Y", "R561H", "Wild-Type"), name = "") +
-  theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.12,0.9))
-
-print(map_wt,width = 6, height = 7)
-
-ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda_wild_type.png"), width = 6.5, height = 8)
-
-# make plot with wild_type
 map <- ggplot() +
   geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
   geom_sf(data=uganda, fill = "moccasin") +
@@ -233,6 +198,6 @@ map <- ggplot() +
 
 print(map,width = 5.5, height = 6.5)
 
-ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.png"), map, width = 6.2, height = 6.5, dpi= 700)
-
+ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.pdf"), map, width = 6, height = 5.5, dpi= 700)
+ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.png"), map, width = 6, height = 5.5, dpi= 700)
 ```

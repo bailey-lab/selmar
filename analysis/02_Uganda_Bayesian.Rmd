@@ -155,8 +155,8 @@ prev <- df %>%
   scale_fill_manual(values = c("#E69F00", "#0072B2", "#009E73")) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.85,0.15), legend.box = "horizontal")
 
-ggsave(paste0(fileLocManuscript, "/Figure2_prevalence.jpeg"), prev, width = 8, height = 5, dpi=700)
-pdf(paste0(fileLocManuscript, "/Figure2_prevalence.pdf"),  width = 8, height = 5,, paper = "USr")
+ggsave(paste0(fileLocManuscript, "/Figure2_prevalence.png"), prev, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript, "/Figure2_prevalence.pdf"), prev, width = 8, height = 5, dpi=700)
 
 ```
 
@@ -254,8 +254,8 @@ selection_coef_bay <- ggplot() +
 
 effect_size_bay <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 
-ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.jpeg"), selection_coef_bay,width = 8, height = 5, dpi=700)
-pdf(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), width = 9, height = 5)
+ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.png"), selection_coef_bay,width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), selection_coef_bay,width = 8, height = 5, dpi=700)
 write.csv(effect_size_bay, paste0(fileLocManuscript, "/Uganda_selectioncoefficients.csv"), row.names = F,quote = F)
 ```
 
