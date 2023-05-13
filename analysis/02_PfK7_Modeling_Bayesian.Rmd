@@ -89,7 +89,7 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
 ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 ``` 
 
-## Get posterior of the model
+## Posterior of the model
 ```{r}
 #  get model predictions for plotting
 pfk7_data$predict_stan_c580y <- NA
@@ -101,7 +101,7 @@ pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r
 pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 ```
 
-## Obtain confidence interval
+## Confidence interval
 ```{r}
 #  get model predictions for plotting
 pfk7_data$conf.low_c580y <- NA
@@ -125,17 +125,13 @@ pfk7_data$conf.high_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539
 pfk7_data$conf.high_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[2,]
 ```
 
-# Plot prevalence for all mutations
+## Prevalence scale
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
-pfk7_data$predict_stan_c580y <- NA
-pfk7_data$predict_stan_r539t <- NA
-pfk7_data$predict_stan_all_kelch <- NA
-
-pfk7_data$predict_stan_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan_prev_c580y <- NA
+pfk7_data$predict_stan_prev_r539t <- NA
+pfk7_data$predict_stan_prev_all_kelch <- NA
 
 pfk7_data$predict_stan_prev_c580y <- exp(pfk7_data$predict_stan_c580y)*100/(1+exp(pfk7_data$predict_stan_c580y))
 pfk7_data$predict_stan_prev_r539t <- exp(pfk7_data$predict_stan_r539t)*100/(1+exp(pfk7_data$predict_stan_r539t))
@@ -148,7 +144,11 @@ pfk7_data$conf.high_prev_all_kelch <- exp(pfk7_data$conf.high_all_kelch)*100/(1+
 pfk7_data$conf.low_prev_c580y <- exp(pfk7_data$conf.low_c580y)*100/(1+exp(pfk7_data$conf.low_c580y))
 pfk7_data$conf.low_prev_r539t <- exp(pfk7_data$conf.low_r539t)*100/(1+exp(pfk7_data$conf.low_r539t))
 pfk7_data$conf.low_prev_all_kelch <- exp(pfk7_data$conf.low_all_kelch)*100/(1+exp(pfk7_data$conf.low_all_kelch))
+```
 
+# Plot prevalence for all mutations
+## Preprocessing
+```{r}
 d1 <- pfk7_data %>% select(country, District, year, c580y, n, nobs_c580y, lrsmed_580y, prev_580y, predict_stan_prev_c580y, conf.low_prev_c580y, conf.high_prev_c580y) %>% mutate(Locus = "C580Y")
 colnames(d1) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
 d2 <- pfk7_data %>% select(country, District, year, r539t, n, nobs_r539t, lrsmed_539t, prev_539t, predict_stan_prev_r539t, conf.low_prev_r539t, conf.high_prev_r539t) %>% mutate(Locus = "R539T")
@@ -159,8 +159,10 @@ prev_df <- rbind(d1, d2, d3)
 
 prev_df2 <- prev_df %>% filter(nobs > numofobs)
 prev_df <- rbind(prev_df2, prev_df %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan"))
+```
 
-## PLOT Overall
+## Plot
+```{r}
 prev_plot <- prev_df  %>% mutate(N = n+x) %>%
   ggplot(aes(year, prev*100, group = Locus, color = Locus)) +
   geom_point(aes(size = N, group = Locus, color = Locus)) +
@@ -179,11 +181,12 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
   ggpubr::theme_pubclean(base_size = 12)+
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.8,0.05), legend.margin = margin(-0.5,0,0,0, unit="cm"), legend.box = "horizontal")
 
-ggsave(paste0(fileLocManuscript_pfK7, "/Pfk7_prevalence.png"), prev_plot, width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript_pfK7, "/Pfk7_prevalence.pdf"), prev_plot, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.png"), prev_plot, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.pdf"), prev_plot, width = 8, height = 5, dpi=700)
 ```
 
-# Plot for selection coefficient 
+# Plot selection coefficient 
+## Preprocessing
 ```{r}
 # Plot the effect sizes
 stan_eff <- as.data.frame(t(data.frame(c580y_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
@@ -252,7 +255,10 @@ effect_size_bay <- rbind(effect_size_bay, selec_coef)
 effect_size_bay <- effect_size_bay %>% group_by(mutation) %>% arrange(District)
 
 effect_size_bay <- effect_size_bay %>% mutate(mutation = replace(mutation, mutation == "C580Y", "580Y"), mutation = replace(mutation, mutation == "R539T", "539T")) 
+```
 
+## Plot
+```{r}
 selection_coef_bay <- ggplot() +
   geom_pointrange(data = effect_size_bay, aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District), position=position_dodge(width = 0.6), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
   ylab("Mutation") +
@@ -267,9 +273,9 @@ selection_coef_bay <- ggplot() +
 
 effect_size_bay2 <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 
-ggsave(paste0(fileLocManuscript_pfK7, "/PfK7_Baysian_Effectsize.png"), width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript_pfK7, "/PfK7_Baysian_Effectsize.pdf"), width = 8, height = 5, dpi=700)
-write.csv(effect_size_bay2, paste0(fileLocManuscript_pfK7, "/PfK7_selectioncoefficients.csv"), row.names = F,quote = F)
+ggsave(paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.png"), selection_coef_bay, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.pdf"), selection_coef_bay, width = 8, height = 5, dpi=700)
+write.csv(effect_size_bay2, paste0(fileLocManuscript_pfK7, "/SEAsia_selectioncoefficients.csv"), row.names = F,quote = F)
 ```
 
 

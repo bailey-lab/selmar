@@ -91,7 +91,7 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 ``` 
 
 
-## Get posterior of the model
+## Posterior of the model
 ```{r}
 #  get model predictions for plotting
 df$predict_stan <- NA
@@ -105,7 +105,7 @@ df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs]
 
 ```
 
-## Obtain confidence interval
+## Confidence interval
 ```{r}
 #  get model predictions for plotting
 df$conf.low <- NA
@@ -130,14 +130,21 @@ df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <-
 df_comb$conf.high_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[2,]
 ```
 
-# Plot prevalence for all mutations
+## Convert to prevalence
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
+df$predict_stan_prev <- NA
+df$conf.high_prev <- NA
+df$conf.low_prev <- NA
+
 df$predict_stan_prev <- exp(df$predict_stan)*100/(1+exp(df$predict_stan))
 df$conf.high_prev <- exp(df$conf.high)*100/(1+exp(df$conf.high))
 df$conf.low_prev <- exp(df$conf.low)*100/(1+exp(df$conf.low))
+```
 
+# Plot prevalence for all mutations
+```{r}
 prev <- df %>%
   filter(is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x) %>%
   ggplot(aes(year, med*100, group = Locus, color = Locus)) +
@@ -155,12 +162,13 @@ prev <- df %>%
   scale_fill_manual(values = c("#E69F00", "#0072B2", "#009E73")) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.85,0.15), legend.box = "horizontal")
 
-ggsave(paste0(fileLocManuscript, "/Figure2_prevalence.png"), prev, width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript, "/Figure2_prevalence.pdf"), prev, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript, "/Figure2_Uganda_prevalence.png"), prev, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript, "/Figure2_Uganda_prevalence.pdf"), prev, width = 8, height = 5, dpi=700)
 
 ```
 
 # Plot for selection coefficient 
+## Preprocessing
 ```{r}
 # Plot the effect sizes
 uganda_selec_coef<- as.data.frame(t(data.frame(Uganda_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
@@ -241,7 +249,10 @@ effect_size_bay <- effect_size_bay %>% mutate(mutation = replace(mutation, mutat
   mutate(mutation = replace(mutation, mutation == "C469F", "469F"))
 
 effect_size_bay <- rbind(effect_size_bay, uganda_selec_coef)
+```
 
+## Plot
+```{r}
 selection_coef_bay <- ggplot() +
   geom_pointrange(data = effect_size_bay, aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District), position=position_dodge(width = 0.6), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
   ylab("Mutation") +
@@ -254,8 +265,8 @@ selection_coef_bay <- ggplot() +
 
 effect_size_bay <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 
-ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.png"), selection_coef_bay,width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript, "/Figure3_Effectsize.pdf"), selection_coef_bay,width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript, "/Figure3_Uganda_Effectsize.png"), selection_coef_bay,width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript, "/Figure3_Uganda_Effectsize.pdf"), selection_coef_bay,width = 8, height = 5, dpi=700)
 write.csv(effect_size_bay, paste0(fileLocManuscript, "/Uganda_selectioncoefficients.csv"), row.names = F,quote = F)
 ```
 
