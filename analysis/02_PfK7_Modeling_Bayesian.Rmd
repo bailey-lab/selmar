@@ -181,8 +181,8 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
   ggpubr::theme_pubclean(base_size = 12)+
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.8,0.05), legend.margin = margin(-0.5,0,0,0, unit="cm"), legend.box = "horizontal")
 
-ggsave(paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.png"), prev_plot, width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.pdf"), prev_plot, width = 8, height = 5, dpi=700)
+ggsave(paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.png"), prev_plot, width = 8, height = 8, dpi=700)
+ggsave(paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.pdf"), prev_plot, width = 8, height = 8, dpi=700)
 ```
 
 # Plot selection coefficient 
@@ -260,22 +260,64 @@ effect_size_bay <- effect_size_bay %>% mutate(mutation = replace(mutation, mutat
 ## Plot
 ```{r}
 selection_coef_bay <- ggplot() +
-  geom_pointrange(data = effect_size_bay, aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District), position=position_dodge(width = 0.6), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
-  ylab("Mutation") +
-  xlab("Selection Coefficient") +
-  #ggtitle("Baysian Selection Estimates") +
-  scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#422CB2", "#6B990F", "black",  "#B2E5FF")) +
+  geom_pointrange(data = effect_size_bay, 
+                  aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
+                  position=position_dodge(width = 0.6), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_discrete(labels = c("539T", "580Y", "PfK13")) +
+  ylab("Mutation") +
+  xlab("Selection Coefficient") +
   xlim(-2,2) +
+  scale_color_manual(
+    values = c(
+      "#999999",
+      "#E69F00",
+      "#56B4E9",
+      "#009E73",
+      "#F0E442",
+      "#0072B2",
+      "#D55E00",
+      "#CC79A7",
+      "#422CB2",
+      "#6B990F",
+      "black",
+      "#B2E5FF")) +
   theme_bw() +
-  theme(legend.title=element_blank(), axis.line = element_line(), legend.position = "right", plot.title = element_text(hjust = 0.5, size = 20), axis.text = element_text(size = 14), axis.title=element_text(size=16), legend.text=element_text(size=10))
+  theme(
+    legend.title = element_blank(),
+    axis.line = element_line(),
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5, size = 20),
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 10)
+  )
 
-effect_size_bay2 <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
+effect_size_bay2 <- effect_size_bay %>% 
+  relocate(District, mutation) %>% 
+  select(!(s:sizes)) %>% 
+  mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 
-ggsave(paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.png"), selection_coef_bay, width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.pdf"), selection_coef_bay, width = 8, height = 5, dpi=700)
-write.csv(effect_size_bay2, paste0(fileLocManuscript_pfK7, "/SEAsia_selectioncoefficients.csv"), row.names = F,quote = F)
+ggsave(
+  paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.png"),
+  selection_coef_bay,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.pdf"),
+  selection_coef_bay,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+write.csv(
+  effect_size_bay2,
+  paste0(fileLocManuscript_pfK7, "/SEAsia_selectioncoefficients.csv"),
+  row.names = F,
+  quote = F
+)
 ```
 
 
