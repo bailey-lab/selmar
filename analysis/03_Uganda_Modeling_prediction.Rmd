@@ -293,12 +293,13 @@ pred_a675v <- ggplot() +
       color = label),
     linetype = "dashed") +
   geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
-  ggtitle("A675V") +
+  #ggtitle("A675V") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
+  scale_color_manual(values=c("#E69F00", "#56B4E9", "#0072B2", "grey"), name = "Mutations", labels = c("2 years", "3 years", "4 years", "true")) + 
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12),
         legend.text=element_text(size=12), strip.text.x = element_text(size = 12), 
@@ -326,12 +327,13 @@ pred_c469y <- ggplot() +
     linetype = "dashed"
   ) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
-  ggtitle("C469Y") +
+  #ggtitle("C469Y") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
+  scale_color_manual(values=c("#E69F00", "#56B4E9", "#0072B2", "grey"), name = "Mutations", labels = c("2 years", "3 years", "4 years", "true")) + 
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12),
         legend.text=element_text(size=12), strip.text.x = element_text(size = 12), 
@@ -361,12 +363,13 @@ pred_c469f <- ggplot() +
     linetype = "dashed"
   ) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
-  ggtitle("C469F") +
+  #ggtitle("C469F") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
+  scale_color_manual(values=c("#E69F00", "#56B4E9", "#0072B2", "grey"), name = "Mutations", labels = c("2 years", "3 years", "4 years", "true")) + 
   ggpubr::theme_pubclean(base_size = 12) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12),
         legend.text=element_text(size=12), strip.text.x = element_text(size = 12), 
@@ -389,6 +392,28 @@ ggsave(
 )
 ggsave(
   "figures/predictions/Uganda_pred_C469F_pred.png",
+  pred_c469f,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+
+ggsave(
+  "figures/predictions/Uganda_pred_A675V_pred.pdf",
+  pred_a675v,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  "figures/predictions/Uganda_pred_C469Y_pred.pdf",
+  pred_c469y,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  "figures/predictions/Uganda_pred_C469F_pred.pdf",
   pred_c469f,
   width = 8,
   height = 5,
@@ -657,7 +682,7 @@ pred_c469f <- ggplot() +
   ) +  labs(color = NULL)
 
 ggsave(
-  paste0("figures/predictions/Uganda_pred_A675V_", prev_cutoff_perc, "prev_pred.jpeg"),
+  paste0("figures/predictions/Uganda_pred_A675V_", prev_cutoff_perc, "prev_pred.png"),
   pred_a675v,
   width = 8,
   height = 5,
@@ -665,14 +690,37 @@ ggsave(
 )
 
 ggsave(
-  paste0("figures/predictions/Uganda_pred_C469Y_", prev_cutoff_perc, "prev_pred.jpeg"),
+  paste0("figures/predictions/Uganda_pred_C469Y_", prev_cutoff_perc, "prev_pred.png"),
   pred_c469y,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  paste0("figures/predictions/Uganda_pred_C469F_", prev_cutoff_perc, "prev_pred.jpeg"),
+  paste0("figures/predictions/Uganda_pred_C469F_", prev_cutoff_perc, "prev_pred.png"),
+  pred_c469f,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+
+ggsave(
+  paste0("figures/predictions/Uganda_pred_A675V_", prev_cutoff_perc, "prev_pred.pdf"),
+  pred_a675v,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+
+ggsave(
+  paste0("figures/predictions/Uganda_pred_C469Y_", prev_cutoff_perc, "prev_pred.pdf"),
+  pred_c469y,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0("figures/predictions/Uganda_pred_C469F_", prev_cutoff_perc, "prev_pred.pdf"),
   pred_c469f,
   width = 8,
   height = 5,
