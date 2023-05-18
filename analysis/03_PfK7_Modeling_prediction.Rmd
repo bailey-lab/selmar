@@ -1082,7 +1082,7 @@ ggsave(
 )
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_country/per_country/20_avg/SEAsia_pred_PfK13_",
+    "figures/predictions/SE_Asia/per_country/20_avg/SEAsia_pred_PfK13_",
     prev_cutoff_perc,
     "avg_prev_pred.pdf"
   ),

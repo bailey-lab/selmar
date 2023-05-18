@@ -1157,7 +1157,7 @@ write.table(df_predict_avg_allyear, paste0(
     "predict_avg_allyears.txt"))
 ```
 
-# Metric of prediction
+# Comparison to predictions without restrictions
 ## Pf7 Data preprocessing
 ```{r}
 corr_df_cutoff <- NULL
@@ -1209,7 +1209,7 @@ corr_df_avg <- corr_df_avg %>% mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp
 ## Plotting
 ```{r}
 ## Correlation plot for 20% cutoff in first year
-correlation_plot_cutoff <- ggplot(corr_df_cutoff, aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
+correlation_pred_plot_cutoff <- ggplot(corr_df_cutoff, aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
   geom_point() +
   geom_smooth(method=lm, se=FALSE) +
   stat_cor(aes(color = label), label.x = 20, size = 2) +
@@ -1234,7 +1234,7 @@ correlation_plot_cutoff <- ggplot(corr_df_cutoff, aes(x = t_pred_prev, y = p_pre
   ) +  labs(color = NULL)
 
 ## Correlation plot for 20% avg
-correlation_plot_avg <- ggplot(corr_df_avg, aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
+correlation_pred_plot_avg <- ggplot(corr_df_avg, aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
   geom_point() +
   geom_smooth(method=lm, se=FALSE) +
   stat_cor(aes(color = label), label.x = 30, , size = 2) +
@@ -1263,22 +1263,22 @@ correlation_plot_avg <- ggplot(corr_df_avg, aes(x = t_pred_prev, y = p_pred_prev
 ```{r}
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_district/20_cutoff_firstobs/SEAsia_correlation_",
+    "figures/predictions/SE_Asia/per_district/20_cutoff_firstobs/correlation/prev/SEAsia_correlation_pred_",
     prev_cutoff_perc,
     "cutoff_prev.png"
   ),
-  correlation_plot_cutoff,
+  correlation_pred_plot_cutoff,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_district/20_cutoff_firstobs/SEAsia_correlation_",
+    "figures/predictions/SE_Asia/per_district/20_cutoff_firstobs/correlation/prev/SEAsia_correlation_pred_",
     prev_cutoff_perc,
     "cutoff_prev.pdf"
   ),
-  correlation_plot_cutoff,
+  correlation_pred_plot_cutoff,
   width = 8,
   height = 5,
   dpi = 700
@@ -1286,24 +1286,244 @@ ggsave(
 
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_district/20_avg/SEAsia_correlation_",
+    "figures/predictions/SE_Asia/per_district/20_avg/correlation/prev/SEAsia_correlation_pred_",
     prev_cutoff_perc,
     "avg_prev.png"
   ),
-  correlation_plot_avg,
+  correlation_pred_plot_avg,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_district/20_avg/SEAsia_correlation_",
+    "figures/predictions/SE_Asia/per_district/20_avg/correlation/prev/SEAsia_correlation_pred_",
     prev_cutoff_perc,
     "avg_prev.pdf"
   ),
-  correlation_plot_avg,
+  correlation_pred_plot_avg,
   width = 8,
   height = 5,
   dpi = 700
 )
 ```
+
+
+# Comparison to raw data
+## Pf7 Data preprocessing
+```{r}
+d1 <-
+  pfk7_data %>% select(
+    country,
+    District,
+    year,
+    min_year_c580y,
+    c580y,
+    nobs_c580y,
+    n,
+    predict_stan_c580y,
+    predict_stan_prev_c580y) %>% 
+  mutate(Locus = "C580Y") %>% 
+  rename(
+    x = c580y,
+    nobs = nobs_c580y,
+    min_year = min_year_c580y,
+    predict_stan = predict_stan_c580y,
+    predict_stan_prev = predict_stan_prev_c580y
+  )
+d2 <-
+  pfk7_data %>% select(
+    country,
+    District,
+    year,
+    min_year_r539t,
+    r539t,
+    nobs_r539t,
+    n,
+    predict_stan_r539t,
+    predict_stan_prev_r539t) %>% 
+  mutate(Locus = "R539T") %>% 
+  rename(
+    x = r539t,
+    nobs = nobs_r539t,
+    min_year = min_year_r539t,
+    predict_stan = predict_stan_r539t,
+    predict_stan_prev = predict_stan_prev_r539t
+  )
+d3 <-
+  pfk7_data %>% select(
+    country,
+    District,
+    year,
+    min_year_all_kelch,
+    all_kelch,
+    nobs_kelch,
+    n,
+    predict_stan_all_kelch,
+    predict_stan_prev_all_kelch) %>% 
+  mutate(Locus = "all_kelch") %>% 
+  rename(
+    x = all_kelch,
+    nobs = nobs_kelch,
+    min_year = min_year_all_kelch,
+    predict_stan = predict_stan_all_kelch,
+    predict_stan_prev = predict_stan_prev_all_kelch
+  )
+
+true <- rbind(d1, d2, d3)
+
+corr_df_cutoff <- NULL
+for(l in unique(df_predict_cutoff_allyear$label)) {
+  pred <- df_predict_cutoff_allyear %>%
+    filter(label == l) %>%
+    mutate(val = paste0(year, District, Locus, min_year)) %>%
+    arrange(val) %>%
+    rename(p_pred = predict) 
+  true <- rbind(d1, d2, d3)
+  true <- true %>%
+    mutate(val = paste0(year, District, Locus, min_year),
+           Locus = str_replace(Locus, "all_kelch", "PfK13")) %>%
+    arrange(val) %>%
+    filter(val %in% pred$val)
+  pred <- pred %>% filter(val %in% true$val)
+  df <- cbind(true, pred$p_pred, pred$label)
+  colnames(df)[ncol(df)-1] <- "p_pred"
+  colnames(df)[ncol(df)] <- "label"
+  corr_df_cutoff <- rbind(corr_df_cutoff, df)
+}
+
+corr_df_cutoff <- corr_df_cutoff %>% 
+  filter(is.finite(predict_stan)) %>%
+  mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
+  rename(t_pred_prev= predict_stan_prev, t_pred = predict_stan)
+                                            
+
+corr_df_avg <- NULL
+for(l in unique(df_predict_avg_allyear$label)) {
+  pred <- df_predict_avg_allyear %>%
+    filter(label == l) %>%
+    mutate(val = paste0(year, District, Locus, min_year)) %>%
+    arrange(val) %>%
+    rename(p_pred = predict)
+  true <- rbind(d1, d2, d3)
+  true <- true %>%
+    mutate(val = paste0(year, District, Locus, min_year),
+           Locus = str_replace(Locus, "all_kelch", "PfK13")) %>%
+    arrange(val) %>%
+    filter(val %in% pred$val)
+  pred <- pred %>% filter(val %in% true$val)
+  df <- cbind(true, pred$p_pred, pred$label)
+  colnames(df)[ncol(df)-1] <- "p_pred"
+  colnames(df)[ncol(df)] <- "label"
+  corr_df_avg <- rbind(corr_df_avg, df)
+}
+
+corr_df_avg <- corr_df_avg %>% 
+  filter(is.finite(predict_stan)) %>%
+  mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
+  rename(t_pred_prev= predict_stan_prev, t_pred = predict_stan)
+```
+
+## Plotting
+```{r}
+## Correlation plot for 20% cutoff in first year
+correlation_raw_plot_cutoff <- ggplot(corr_df_cutoff, aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE) +
+  stat_cor(aes(color = label), label.x = 20, size = 2) +
+  facet_wrap(~ District + Locus) +
+  xlab("true") +
+  ylab("predicted") +
+  #ggtitle("20% cutoff in first year") +
+  scale_color_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2"),
+    labels = c("2 years", "3 years", "4 years")
+  ) + 
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.direction = "vertical",
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5)
+  ) +  labs(color = NULL)
+
+## Correlation plot for 20% avg
+correlation_raw_plot_avg <- ggplot(corr_df_avg, aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
+  geom_point() +
+  geom_smooth(method=lm, se=FALSE) +
+  stat_cor(aes(color = label), label.x = 30, , size = 2) +
+  facet_wrap(~ District + Locus) +
+  xlab("true") +
+  ylab("predicted") +
+  #ggtitle("20% average across years") +
+  scale_color_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2"),
+    labels = c("2 years", "3 years", "4 years")
+  ) + 
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.direction = "vertical",
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5)
+  ) +  labs(color = NULL)
+```
+
+## Saving plots
+```{r}
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/20_cutoff_firstobs/correlation/raw/SEAsia_correlation_raw_",
+    prev_cutoff_perc,
+    "cutoff_prev.png"
+  ),
+  correlation_raw_plot_cutoff,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/20_cutoff_firstobs/correlation/raw/SEAsia_correlation_raw_",
+    prev_cutoff_perc,
+    "cutoff_prev.pdf"
+  ),
+  correlation_raw_plot_cutoff,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/20_avg/correlation/raw/SEAsia_correlation_raw_",
+    prev_cutoff_perc,
+    "avg_prev.png"
+  ),
+  correlation_raw_plot_avg,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/20_avg/correlation/raw/SEAsia_correlation_raw_",
+    prev_cutoff_perc,
+    "avg_prev.pdf"
+  ),
+  correlation_raw_plot_avg,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+```
+
+
