@@ -259,6 +259,8 @@ for (i in pred_year) {
   new_data$conf.low <- conf_val[1,]
   new_data$conf.high <- conf_val[2,] 
   
+  df_predict <- rbind(df_predict, new_data)
+  
   df_predict <-
     df_predict %>% group_by(District, Locus) %>% mutate(min_year = replace_na(min_year, 0),
                                                         min_year = max(min_year)) %>% mutate(label = paste0(i, "year"),  pred_y = i)
@@ -273,46 +275,35 @@ df_predict_allyear <-
   rbind(df_predict_2year, df_predict_3year, df_predict_4year)
 ```
 
-## Obtain confidence interval for forecasting
+##Convert to prevalence
 ```{r}
-#  get model predictions for plotting
-df_predict_allyear$conf.low <- NA
-df_predict_allyear$conf.high <- NA
-
-c469y_conf <- df_predict_allyear$predict %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-c469f_conf <- rstanarm::posterior_predict(c469f_pred, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-a675v_conf <- rstanarm::posterior_predict(a675v_pred, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-
-# here just add predictions  for the c469Y rows
-df_predict_allyear$conf.low[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[1,]
-df_predict_allyear$conf.low[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[1,]
-df_predict_allyear$conf.low[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[1,]
-
-df_predict_allyear$conf.high[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[2,]
-df_predict_allyear$conf.high[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[2,]
-df_predict_allyear$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[2,]
+df_predict_allyear <- df_predict_allyear %>% mutate(predict_prev = exp(predict)*100/(1+exp(predict)),
+                                                    conf.low_prev = exp(conf.low)*100/(1+exp(conf.low)),
+                                                    conf.high_prev = exp(conf.high)*100/(1+exp(conf.high)))
 ```
 
 ## Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ################ PLOT FOR A675V ################
-ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V") 
-ex_pt <-
-  df %>% filter(nobs > numofobs, Locus == "A675V") 
-df_pred <-
-  df_predict_allyear %>% filter(District %in% unique(ex$District),
-                                Locus == "A675V",
-                                year >= min_year + pred_y)
+df_pred <- df_predict_allyear %>% 
+  filter(Locus == "A675V", year >= min_year + pred_y)
+ex <- df %>% 
+  filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V", District %in% unique(df_pred$District))
+ex_pt <- df %>% 
+  filter(nobs > numofobs, Locus == "A675V", District %in% unique(df_pred$District)) %>%
+   mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
+                               year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
+                               year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
+                               year > min_year + 4 ~ "black",
+                               year < min_year ~ "black")) 
 
 pred_a675v <- ggplot() +
   geom_line(data = ex %>% mutate(N = n + x),
     aes(year, predict_stan_prev, color = "true"),
     linewidth = 1) +
-  geom_line(data = df_pred,
-    aes(year, exp(predict) * 100 / (1 + exp(predict)), group = label, color = label),
-    linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
+  geom_line(data = df_pred, aes(year, predict_prev, group = label, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, group = label, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100), color = ex_pt$point_col) +
   #ggtitle("A675V") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
@@ -320,6 +311,10 @@ pred_a675v <- ggplot() +
   ylab("Prevalence") +
   xlab("Year") +
   scale_color_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
+    labels = c("2 years", "3 years", "4 years", "true")
+  ) +
+  scale_fill_manual(
     values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
     labels = c("2 years", "3 years", "4 years", "true")
   ) +
@@ -337,19 +332,22 @@ pred_a675v <- ggplot() +
   ) +  labs(color = NULL)
 
 ################ PLOT FOR C469Y ################
-ex <-df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y") 
-ex_pt <-df %>% filter(nobs > numofobs, Locus == "C469Y") 
-df_pred <- df_predict_allyear %>% filter(District %in% unique(ex$District),
-                                Locus == "C469Y",
-                                year >= min_year + pred_y)
+df_pred <- df_predict_allyear %>% filter(Locus == "C469Y", year >= min_year + pred_y)
+ex <-df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y", District %in% unique(df_pred$District)) 
+ex_pt <-df %>% 
+  filter(nobs > numofobs, Locus == "C469Y", District %in% unique(df_pred$District)) %>%
+   mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
+                               year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
+                               year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
+                               year > min_year + 4 ~ "black",
+                               year < min_year ~ "black")) 
 pred_c469y <- ggplot() +
   geom_line(data = ex %>% mutate(N = n + x),
     aes(year, predict_stan_prev, color = "true"),
     linewidth = 1) +
-  geom_line(data = df_pred, aes(year, exp(predict) * 100 / (1 + exp(predict)), group = label, color = label),
-    linetype = "dashed"
-  ) +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
+  geom_line(data = df_pred, aes(year,predict_prev, group = label, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, group = label, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100), color = ex_pt$point_col) +
   #ggtitle("C469Y") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
@@ -360,36 +358,44 @@ pred_c469y <- ggplot() +
     values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
     labels = c("2 years", "3 years", "4 years", "true")
   ) +
+  scale_fill_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
+    labels = c("2 years", "3 years", "4 years", "true")
+  ) +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
     legend.direction = "vertical",
     legend.position = "right",
     plot.title = element_text(hjust = 0.5)
   ) +  labs(color = NULL)
 
 ################ PLOT FOR C469F ################
-ex <-df %>% 
-  filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F") 
-ex_pt <-df %>% 
-  filter(nobs > numofobs, Locus == "C469F") 
 df_pred <-df_predict_allyear %>% 
-  filter(District %in% unique(ex$District), Locus == "C469F", year >= min_year + pred_y)
+  filter(Locus == "C469F", year >= min_year + pred_y)
+ex <-df %>% 
+  filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F", District %in% unique(df_pred$District)) 
+ex_pt <-df %>% 
+  filter(nobs > numofobs, Locus == "C469F", District %in% unique(df_pred$District)) %>%
+  mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
+                               year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
+                               year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
+                               year > min_year + 4 ~ "black",
+                               year < min_year ~ "black")) 
 
 pred_c469f <- ggplot() +
   geom_line(data = ex %>% mutate(N = n + x),
     aes(year, predict_stan_prev, color = "true"),
     linewidth = 1
   ) +
-  geom_line(data = df_pred,
-            aes(year, exp(predict) * 100 / (1 + exp(predict)), group = label, color = label), 
-            linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100)) +
+  geom_line(data = df_pred, aes(year,predict_prev, group = label, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, group = label, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100), color = ex_pt$point_col) +
   #ggtitle("C469F") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
@@ -397,6 +403,10 @@ pred_c469f <- ggplot() +
   ylab("Prevalence") +
   xlab("Year") +
   scale_color_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
+    labels = c("2 years", "3 years", "4 years", "true")
+  ) +
+  scale_fill_manual(
     values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
     labels = c("2 years", "3 years", "4 years", "true")
   ) +
@@ -460,311 +470,3 @@ ggsave(
   dpi = 700
 )
 ```
-
-# WRONG BELOW
-# Forecasting Selection based on the first 2, 3, and 4 years with prevalence cut off of the first year
-```{r}
-pred_year <- c(2, 3, 4)
-prev_cutoff <- 0.2
-
-for (i in pred_year) {
-  ## Model for C469Y for prediction
-  data_c469y <- df %>% filter(
-      Locus == "C469Y" &
-        nobs > numofobs &
-        year >= min_year &
-        year <= min_year + i) %>%
-      group_by(District, Locus) %>%
-      mutate(adj_year = year - 2016)
-  
-  val <- data_c469y[data_c469y$year == data_c469y$min_year,] 
-  selected_districts <- val$District[val$med <= prev_cutoff]
-  
-  data_c469y <- data_c469y %>% filter(District == selected_districts)
-  
-  c469y_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = data_c469y,
-    weights = wt_med,
-    adapt_delta = 0.9975
-  )
-  
-  # forecasting for C469Y
-  new_data <- df %>%
-    filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "C469Y") %>% # this is for c469Y model
-    group_by(District, Locus) %>% # we group by the District and Locus
-    complete(year = seq(max(year), 2023, 1)) %>% # this creates all the year values up to 2023
-    mutate(adj_year = year - 2016) %>%
-    select(adj_year, year, District, Locus, min_year)
-  
-  predictions <-
-    rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
-  new_data$predict <- predictions
-  
-  df_predict <- new_data
-  
-  ## Model for A675V for prediction
-  data_a675v <- df %>% filter(
-      Locus == "A675V" &
-        nobs > numofobs &
-        year >= min_year &
-        year <= min_year + i) %>%
-      group_by(District, Locus) %>%
-      mutate(adj_year = year - 2016)
-  
-  val <- data_a675v[data_a675v$year == data_a675v$min_year,] 
-  selected_districts <- val$District[val$med <= prev_cutoff]
-  
-  data_a675v <- data_a675v %>% filter(District == selected_districts)
-  
-  a675v_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = data_a675v,
-    weights = wt_med,
-    adapt_delta = 0.9975
-  )
-  
-  # forecasting for A467V
-  new_data <- df %>%
-    filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "A675V") %>% # this is for c469Y model
-    group_by(District, Locus) %>% # we group by the District and Locus
-    complete(year = seq(max(year), 2023, 1)) %>% # this creates all the year values up to 2023
-    mutate(adj_year = year - 2016) %>%
-    select(adj_year, year, District, Locus, min_year)
-  
-  predictions <-
-    rstanarm::posterior_predict(a675v_pred, type = "response", newdata = new_data) %>% colMeans
-  new_data$predict <- predictions
-  
-  df_predict <- rbind(df_predict, new_data)
-  
-  ## Model for C469F for prediction
-    data_c469f <- df %>% filter(
-      Locus == "C469F" &
-        nobs > numofobs &
-        year >= min_year &
-        year <= min_year + i) %>%
-      group_by(District, Locus) %>%
-      mutate(adj_year = year - 2016)
-  
-  val <- data_c469f[data_c469f$year == data_c469f$min_year,] 
-  selected_districts <- val$District[val$med <= prev_cutoff]
-  
-  data_c469f <- data_c469f %>% filter(District == selected_districts)
-  
-  c469f_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = data_c469f,
-    weights = wt_med,
-    adapt_delta = 0.9975
-  )
-  
-  
-  # forecasting for C469F
-  new_data <- df %>%
-    filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "C469F") %>% # this is for c469Y model
-    group_by(District, Locus) %>% # we group by the District and Locus
-    complete(year = seq(max(year), 2023, 1)) %>% # this creates all the year values up to 2023
-    mutate(adj_year = year - 2016) %>%
-    select(adj_year, year, District, Locus, min_year)
-  
-  predictions <-
-    rstanarm::posterior_predict(c469f_pred, type = "response", newdata = new_data) %>% colMeans
-  new_data$predict <- predictions
-  df_predict <- rbind(df_predict, new_data)
-  
-  df_predict <-
-    df_predict %>% group_by(District, Locus) %>% mutate(min_year = replace_na(min_year, 0),
-                                                        min_year = max(min_year)) %>% mutate(label = paste0(i, "year"),  pred_y = i)
-  
-  #Assigning df_predict to variables
-  var_name <- paste0("df_predict_", i, "year")
-  assign(var_name, df_predict)
-}
-
-#combine forecasting predictions for all years
-df_predict_allyear <-
-  rbind(df_predict_2year, df_predict_3year, df_predict_4year)
-```
-
-## Plotting forecasting of predictions for the first 2, 3, and 4 years with prevalence cut off
-```{r}
-ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
-df_pred <-
-  df_predict_allyear %>% filter(District %in% unique(ex$District),
-                                Locus == "A675V",
-                                year >= min_year + pred_y)
-## PLOT FOR A675V
-pred_a675v <- ggplot() +
-  geom_line(
-    data = ex %>% mutate(N = n + x),
-    aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1
-  ) +
-  geom_line(
-    data = df_pred,
-    aes(
-      year,
-      exp(predict) * 100 / (1 + exp(predict)),
-      group = label,
-      color = label
-    ),
-    linetype = "dashed"
-  ) +
-  #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
-  geom_point(data = ex, aes(x = year, y = med * 100)) +
-  ggtitle(paste0("A675V - ", prev_cutoff_perc, "% prevanlence")) +
-  labs(shape = "Mutations", size = "Sample Size") +
-  theme_bw() +
-  facet_wrap( ~ District) +
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.direction = "vertical",
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5)
-  ) +  labs(color = NULL)
-
-ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
-df_pred <-
-  df_predict_allyear %>% filter(District %in% unique(ex$District),
-                                Locus == "C469Y",
-                                year >= min_year + pred_y)
-## PLOT FOR C469Y
-pred_c469y <- ggplot() +
-  geom_line(
-    data = ex %>% mutate(N = n + x),
-    aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1
-  ) +
-  geom_line(
-    data = df_pred,
-    aes(
-      year,
-      exp(predict) * 100 / (1 + exp(predict)),
-      group = label,
-      color = label
-    ),
-    linetype = "dashed"
-  ) +
-  #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
-  geom_point(data = ex, aes(x = year, y = med * 100)) +
-  ggtitle(paste0("C469Y - ", prev_cutoff_perc, "% prevanlence")) +
-  labs(shape = "Mutations", size = "Sample Size") +
-  theme_bw() +
-  facet_wrap( ~ District) +
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.direction = "vertical",
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5)
-  ) +  labs(color = NULL)
-
-ex <-
-  df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F") #%>% mutate(pt_color = case_when (Locus == "A675V" ~ "#55C667FF", Locus == "C469F" ~ "#DCE319FF"))
-df_pred <-
-  df_predict_allyear %>% filter(District %in% unique(ex$District),
-                                Locus == "C469F",
-                                year >= min_year + pred_y)
-## PLOT FOR C469F
-pred_c469f <- ggplot() +
-  geom_line(
-    data = ex %>% mutate(N = n + x),
-    aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1
-  ) +
-  geom_line(
-    data = df_pred,
-    aes(
-      year,
-      exp(predict) * 100 / (1 + exp(predict)),
-      group = label,
-      color = label
-    ),
-    linetype = "dashed"
-  ) +
-  #geom_vline(data=ex, aes(xintercept = min_year + pred_year), linetype = "dashed") +
-  geom_point(data = ex, aes(x = year, y = med * 100)) +
-  ggtitle(paste0("C469F - ", prev_cutoff_perc, "% prevanlence")) +
-  labs(shape = "Mutations", size = "Sample Size") +
-  theme_bw() +
-  facet_wrap( ~ District) +
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.title = element_text(size = 12),
-    legend.direction = "vertical",
-    legend.position = "right",
-    plot.title = element_text(hjust = 0.5)
-  ) +  labs(color = NULL)
-
-ggsave(
-  paste0("figures/predictions/Uganda_pred_A675V_", prev_cutoff_perc, "prev_pred.png"),
-  pred_a675v,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-
-ggsave(
-  paste0("figures/predictions/Uganda_pred_C469Y_", prev_cutoff_perc, "prev_pred.png"),
-  pred_c469y,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-ggsave(
-  paste0("figures/predictions/Uganda_pred_C469F_", prev_cutoff_perc, "prev_pred.png"),
-  pred_c469f,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-
-ggsave(
-  paste0("figures/predictions/Uganda_pred_A675V_", prev_cutoff_perc, "prev_pred.pdf"),
-  pred_a675v,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-
-ggsave(
-  paste0("figures/predictions/Uganda_pred_C469Y_", prev_cutoff_perc, "prev_pred.pdf"),
-  pred_c469y,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-ggsave(
-  paste0("figures/predictions/Uganda_pred_C469F_", prev_cutoff_perc, "prev_pred.pdf"),
-  pred_c469f,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-```
-
