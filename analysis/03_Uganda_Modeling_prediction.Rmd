@@ -47,131 +47,8 @@ df <- df %>%
   ungroup 
 ```
 
-# Bayesian GMM with slopes and intercepts
-```{r}
-# ---- Model for Uganda (overall) -----
-Uganda_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = df_comb %>% filter(nobs > numofobs) %>% mutate(adj_year = year - 2016),
-  weights = wt_med,
-  adapt_delta = 0.9975
-)
-
-# ---- Model for c469y -----
-c469y_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = df %>% 
-    filter(Locus == "C469Y" & nobs > numofobs) %>% 
-    mutate(adj_year = year - 2016),
-  weights = wt_med,
-  adapt_delta = 0.9975
-)
-
-vals <- summary(c469y_stanmod$stanfit)$summary[, 1]
-vals <- vals[grep("^b", names(vals))]
-ranef_c469y_stanmod <-
-  data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
-             "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_c469y_stanmod$mutation <-
-  rep("C469Y", dim(ranef_c469y_stanmod)[1])
-
-# ---- Model for a675v -----
-a675v_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = df %>% filter(Locus == "A675V" &
-                         nobs > numofobs) %>% mutate(adj_year = year - 2016),
-  weights = wt_med,
-  adapt_delta = 0.9975
-)
-
-vals <- summary(a675v_stanmod$stanfit)$summary[, 1]
-vals <- vals[grep("^b", names(vals))]
-ranef_a675v_stanmod <-
-  data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
-             "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_a675v_stanmod$mutation <-
-  rep("A675V", dim(ranef_a675v_stanmod)[1])
-
-# ---- Model for c469f -----
-c469f_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = df %>% filter(Locus == "C469F" &
-                         nobs > numofobs) %>% mutate(adj_year = year - 2016),
-  weights = wt_med,
-  adapt_delta = 0.9975
-)
-
-vals <- summary(c469f_stanmod$stanfit)$summary[, 1]
-vals <- vals[grep("^b", names(vals))]
-ranef_c469f_stanmod <-
-  data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
-             "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_c469f_stanmod$mutation <-
-  rep("C469F", dim(ranef_c469f_stanmod)[1])
-
-# ---- combine selection coefficients -----
-ranef_stanmod <-
-  rbind(ranef_c469y_stanmod,
-        ranef_a675v_stanmod,
-        ranef_c469f_stanmod)
-ranef_stanmod$site <-
-  str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
-ranef_stanmod$site <-
-  str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
-ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
-ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
-```
-
-## GMM posterior
-```{r}
-df$predict_stan <- NA
-df_comb$predict_stan_Uganda <- NA
-
-df_comb$predict_stan_Uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- rstanarm::posterior_predict(Uganda_stanmod, type = "response") %>% colMeans
-
-df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% colMeans
-df$predict_stan[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <-  rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% colMeans
-df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469f_stanmod, type = "response") %>% colMeans
-
-```
-
-## Obtain confidence interval of and posterior of posterior for each mutation
-```{r}
-#  get model predictions for plotting
-df$conf.low <- NA
-df$conf.high <- NA
-df_comb$conf.low_uganda <- NA
-df_comb$conf.high_uganda <- NA
-
-c469y_conf <- rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-c469f_conf <- rstanarm::posterior_predict(c469f_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-a675v_conf <- rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-uganda_ceof <- rstanarm::posterior_predict(Uganda_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-
-# here just add predictions  for the c469Y rows
-df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[1,]
-df$conf.low[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[1,]
-df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[1,]
-df_comb$conf.low_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[1,]
-
-df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[2,]
-df$conf.high[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[2,]
-df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[2,]
-df_comb$conf.high_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[2,]
-```
-
-## Obtain GMM posterior for each mutation in prevalence scale
-```{r}
-df$predict_stan_prev <-
-  exp(df$predict_stan) * 100 / (1 + exp(df$predict_stan))
-df$conf.high_prev <- exp(df$conf.high) * 100 / (1 + exp(df$conf.high))
-df$conf.low_prev <- exp(df$conf.low) * 100 / (1 + exp(df$conf.low))
-```
-
-
 # Forecasting selection up until 2023
 ```{r}
-
 #------ Model prediction for C469Y ------
 c469y_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
@@ -268,19 +145,21 @@ df_predict_allyear <- df_predict_allyear %>% mutate(predict_prev = exp(predict)*
 ## Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ################ PLOT FOR A675V ################
+df_true <- df_predict_allyear %>% 
+  filter(Locus == "A675V", 
+         year <= max_year) %>%
+  mutate(label = "true")
 df_pred <- df_predict_allyear %>% 
-  filter(Locus == "A675V", year >= max_year)
-ex <- df %>% 
-  filter(is.finite(lrsmed), nobs > numofobs, Locus == "A675V", District %in% unique(df_pred$District))
+  filter(Locus == "A675V",
+         year >= max_year) %>%
+  mutate(label = "predicted")
 ex_pt <- df %>% 
   filter(nobs > numofobs, Locus == "A675V", District %in% unique(df_pred$District))
 
 pred_a675v <- ggplot() +
-  geom_line(data = ex %>% mutate(N = n + x),
-    aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1) +
-  geom_line(data = df_pred, aes(year, predict_prev, , color = "forecasting")) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+  geom_line(data = df_true, aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
   #ggtitle("A675V") +
   labs(shape="Mutations", size = "Sample Size") +
@@ -306,17 +185,21 @@ pred_a675v <- ggplot() +
   ) +  labs(color = NULL)
 
 ################ PLOT FOR C469Y ################
-df_pred <- df_predict_allyear %>% filter(Locus == "C469Y", year >= max_year)
-ex <-df %>% filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469Y", District %in% unique(df_pred$District)) 
+df_true <- df_predict_allyear %>% 
+  filter(Locus == "C469Y", 
+         year <= max_year) %>%
+  mutate(label = "true")
+df_pred <- df_predict_allyear %>% 
+  filter(Locus == "C469Y",
+         year >= max_year) %>%
+  mutate(label = "predicted")
 ex_pt <-df %>% 
   filter(nobs > numofobs, Locus == "C469Y", District %in% unique(df_pred$District)) 
 
 pred_c469y <- ggplot() +
-  geom_line(data = ex %>% mutate(N = n + x),
-    aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1) +
-  geom_line(data = df_pred, aes(year,predict_prev, color = "predicted")) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "predicted", fill = "predicted"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+  geom_line(data = df_true, aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
   #ggtitle("C469Y") +
   labs(shape="Mutations", size = "Sample Size") +
@@ -342,20 +225,21 @@ pred_c469y <- ggplot() +
   ) +  labs(color = NULL)
 
 ################ PLOT FOR C469F ################
-df_pred <-df_predict_allyear %>% 
-  filter(Locus == "C469F")
-ex <-df %>% 
-  filter(is.finite(lrsmed), nobs > numofobs, Locus == "C469F", District %in% unique(df_pred$District)) 
+df_true <- df_predict_allyear %>% 
+  filter(Locus == "C469F", 
+         year <= max_year) %>%
+  mutate(label = "true")
+df_pred <- df_predict_allyear %>% 
+  filter(Locus == "C469F",
+         year >= max_year) %>%
+  mutate(label = "predicted")
 ex_pt <-df %>% 
   filter(nobs > numofobs, Locus == "C469F", District %in% unique(df_pred$District)) 
 
 pred_c469f <- ggplot() +
-  geom_line(data = ex %>% mutate(N = n + x),
-    aes(year, predict_stan_prev, color = "true"),
-    linewidth = 1
-  ) +
-  geom_line(data = df_pred, aes(year,predict_prev, color = "predicted")) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "predicted", fill = "predicted"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+  geom_line(data = df_true, aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
   #ggtitle("C469F") +
   labs(shape="Mutations", size = "Sample Size") +
