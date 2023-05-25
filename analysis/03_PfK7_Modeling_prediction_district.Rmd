@@ -127,10 +127,11 @@ pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_da
 ```{r}
 #  get model predictions for plotting
 pfk7_data$conf.low_c580y <- NA
-pfk7_data$conf.high_c580y <- NA
 pfk7_data$conf.low_r539t <- NA
-pfk7_data$conf.high_r539t <- NA
 pfk7_data$conf.low_all_kelch <- NA
+
+pfk7_data$conf.high_c580y <- NA
+pfk7_data$conf.high_r539t <- NA
 pfk7_data$conf.high_all_kelch <- NA
 
 c580y_conf <- rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
@@ -152,10 +153,6 @@ pfk7_data$conf.high_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$
 pfk7_data$predict_stan_prev_c580y <- NA
 pfk7_data$predict_stan_prev_r539t <- NA
 pfk7_data$predict_stan_prev_all_kelch <- NA
-
-# pfk7_data$predict_stan_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
-# pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
-# pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 
 pfk7_data$predict_stan_prev_c580y <- exp(pfk7_data$predict_stan_c580y)*100/(1+exp(pfk7_data$predict_stan_c580y))
 pfk7_data$predict_stan_prev_r539t <- exp(pfk7_data$predict_stan_r539t)*100/(1+exp(pfk7_data$predict_stan_r539t))
@@ -198,15 +195,14 @@ for (i in pred_year) {
     ungroup() %>% 
     select(adj_year_c580y, year, District, country, min_year_c580y, Locus) %>%
     mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE) %>%
     ungroup
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_c580y),
-      adj_year_c580y = year - min_year) %>%
-    arrange(Locus, District, year) %>%
+      adj_year_c580y = year - min_year,
+      country = unique(na.omit(country))) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_c580y) %>% 
     ungroup
   
@@ -239,14 +235,14 @@ for (i in pred_year) {
     ungroup() %>% 
     select(adj_year_r539t, year, District, country, min_year_r539t, Locus) %>%
     mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    ungroup
 
 new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_r539t),
-      adj_year_r539t = year - min_year) %>%
-    arrange(Locus, District, year) %>%
+      adj_year_r539t = year - min_year,
+      country = unique(na.omit(country))) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_r539t) %>% 
     ungroup
   
@@ -280,14 +276,14 @@ new_data <- new_data %>%
     ungroup() %>% 
     select(adj_year_all_kelch, year, District, country, min_year_all_kelch, Locus) %>%
     mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    ungroup
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_all_kelch),
-      adj_year_all_kelch = year - min_year) %>%
-    arrange(Locus, District, year) %>%
+      adj_year_all_kelch = year - min_year,
+      country = unique(na.omit(country))) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_all_kelch) %>% 
     ungroup
   
@@ -533,7 +529,8 @@ for (i in pred_year) {
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_c580y),
-      adj_year_c580y = year - min_year) %>%
+      adj_year_c580y = year - min_year,
+      country = unique(na.omit(country))), %>%
     arrange(Locus, District, year) %>%
     select(!min_year_c580y) %>% 
     ungroup
@@ -581,7 +578,8 @@ for (i in pred_year) {
 new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_r539t),
-      adj_year_r539t = year - min_year) %>%
+      adj_year_r539t = year - min_year,
+      country = unique(na.omit(country))) %>%
     arrange(Locus, District, year) %>%
     select(!min_year_r539t) %>% 
     ungroup
@@ -630,7 +628,8 @@ new_data <- new_data %>%
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_all_kelch),
-      adj_year_all_kelch = year - min_year) %>%
+      adj_year_all_kelch = year - min_year,
+      country = unique(na.omit(country))) %>%
     arrange(Locus, District, year) %>%
     select(!min_year_all_kelch) %>% 
     ungroup
