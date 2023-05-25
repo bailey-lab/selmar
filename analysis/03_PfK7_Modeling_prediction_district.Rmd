@@ -521,16 +521,13 @@ for (i in pred_year) {
     complete(year = seq(min(min_year_c580y) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
     select(adj_year_c580y, year, District, country, min_year_c580y, Locus) %>%
-    mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE) %>%
-    ungroup
+    mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0)) 
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_c580y),
       adj_year_c580y = year - min_year,
-      country = unique(na.omit(country))), %>%
+      country = unique(na.omit(country))) %>%
     arrange(Locus, District, year) %>%
     select(!min_year_c580y) %>% 
     ungroup
@@ -571,9 +568,7 @@ for (i in pred_year) {
     complete(year = seq(min(min_year_r539t) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
     select(adj_year_r539t, year, District, country, min_year_r539t, Locus) %>%
-    mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0))
 
 new_data <- new_data %>%
     group_by(District, Locus) %>%
@@ -621,9 +616,7 @@ new_data <- new_data %>%
     complete(year = seq(min(min_year_all_kelch) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
     select(adj_year_all_kelch, year, District, country, min_year_all_kelch, Locus) %>%
-    mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0))
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
@@ -874,7 +867,7 @@ for (i in pred_year) {
            year >= min_year_c580y & year <= min_year_c580y + i,
            adj_year_c580y >= 0) %>%
     group_by(District) %>%
-    filter(mean(prev_580y) <= 0.2) 
+    filter(mean(prev_580y) <= prev_cutoff) 
   
   c580y_pred <- rstanarm::stan_glmer(
     lrsmed_580y ~ adj_year_c580y + (1 + adj_year_c580y | District),
@@ -890,16 +883,15 @@ for (i in pred_year) {
     group_by(District, Locus) %>%  # we group by District and Locus
     complete(year = seq(min(min_year_c580y) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
-    select(adj_year_c580y, year, District, min_year_c580y, Locus) %>% # select just the columns needed for the model
-    mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    select(adj_year_c580y, year, country, District, min_year_c580y, Locus) %>% # select just the columns needed for the model
+    mutate(min_year_c580y = replace(min_year_c580y, is.na(min_year_c580y), 0))
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_c580y),
-      adj_year_c580y = year - min_year) %>%
-    arrange(Locus, District, year) %>%
+      adj_year_c580y = year - min_year,
+      country = unique(na.omit(country))) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_c580y) %>% 
     ungroup
   
@@ -933,16 +925,15 @@ for (i in pred_year) {
     group_by(District, Locus) %>%  # we group by District and Locus
     complete(year = seq(min(min_year_r539t) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
-    select(adj_year_r539t, year, District, min_year_r539t, Locus) %>% # select just the columns needed for the model
-    mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    select(adj_year_r539t, year, country, District, min_year_r539t, Locus) %>% # select just the columns needed for the model
+    mutate(min_year_r539t = replace(min_year_r539t, is.na(min_year_r539t), 0))
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_r539t),
-      adj_year_r539t = year - min_year) %>%
-    arrange(Locus, District, year) %>%
+      adj_year_r539t = year - min_year,
+      country = unique(na.omit(country))) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_r539t) %>% 
     ungroup
   
@@ -976,16 +967,15 @@ for (i in pred_year) {
     group_by(District, Locus) %>% # we group by District and Locus
     complete(year = seq(min(min_year_all_kelch) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
-    select(adj_year_all_kelch, year, District, min_year_all_kelch, Locus) %>% # select just the columns needed for the model
-    mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0)) %>%
-    group_by(District) %>%
-    distinct(year, .keep_all = TRUE)
+    select(adj_year_all_kelch, year, country, District, min_year_all_kelch, Locus) %>% # select just the columns needed for the model
+    mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0))
   
   new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year_all_kelch),
-      adj_year_all_kelch = year - min_year) %>%
-    arrange(Locus, District, year) %>%
+      adj_year_all_kelch = year - min_year,
+      country = unique(na.omit(country))) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_all_kelch) %>% 
     ungroup
   
@@ -1047,8 +1037,8 @@ prev_avg_c580y_plot <-
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
     legend.position = "none",
   ) +  labs(color = NULL)
 
@@ -1074,6 +1064,7 @@ prev_avg_r539t_plot <- ggplot() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
+  ylim(0,100) +
   ggpubr::theme_pubclean(base_size = 12) +
   scale_color_manual(
     values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
@@ -1082,8 +1073,8 @@ prev_avg_r539t_plot <- ggplot() +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
     legend.position = "none",
   ) +  labs(color = NULL)
 
@@ -1117,8 +1108,8 @@ prev_avg_all_kelch_plot <-
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
     legend.position = "none"
   ) +  labs(color = NULL)
 ```
@@ -1133,8 +1124,8 @@ ggsave(
     "avg_prev_pred.png"
   ),
   prev_avg_c580y_plot,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ggsave(
@@ -1144,8 +1135,8 @@ ggsave(
     "avg_prev_pred.pdf"
   ),
   prev_avg_c580y_plot,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 
@@ -1156,7 +1147,7 @@ ggsave(
     "avg_prev_pred.png"
   ),
   prev_avg_r539t_plot,
-  width = 4,
+  width = 6,
   height = 1.5,
   dpi = 700
 )
@@ -1167,7 +1158,7 @@ ggsave(
     "avg_prev_pred.pdf"
   ),
   prev_avg_r539t_plot,
-  width = 4,
+  width = 6,
   height = 1.5,
   dpi = 700
 )
@@ -1179,8 +1170,8 @@ ggsave(
     "avg_prev_pred.png"
   ),
   prev_avg_all_kelch_plot,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ggsave(
@@ -1190,8 +1181,8 @@ ggsave(
     "avg_prev_pred.pdf"
   ),
   prev_avg_all_kelch_plot,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 
@@ -1290,7 +1281,9 @@ for(l in unique(df_predict_cutoff_allyear$label)) {
 corr_df_cutoff <- corr_df_cutoff %>% 
   filter(is.finite(predict_stan)) %>%
   mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
-  rename(t_pred_prev= predict_stan_prev, t_pred = predict_stan)
+  rename(t_pred_prev= predict_stan_prev, t_pred = predict_stan) %>%
+  mutate(error = (p_pred - t_pred)/t_pred) %>%
+  group_by(country, District, label)
                                             
 
 corr_df_avg <- NULL
@@ -1316,7 +1309,10 @@ for(l in unique(df_predict_avg_allyear$label)) {
 corr_df_avg <- corr_df_avg %>% 
   filter(is.finite(predict_stan)) %>%
   mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
-  rename(t_pred_prev= predict_stan_prev, t_pred = predict_stan)
+  rename(t_pred_prev= predict_stan_prev, t_pred = predict_stan) %>%
+  mutate(error = (p_pred - t_pred)/t_pred) %>%
+  group_by(label) %>%
+  mutate(mean_error = mean(error))
 ```
 
 ## Plotting
@@ -1327,6 +1323,7 @@ for (mu in unique(corr_df_cutoff$Locus)){
     ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
     geom_point() +
     geom_smooth(method=lm, se=FALSE) +
+    geom_abline(slope = 1, intercept = 0, color = "grey", linetype = "dashed") +
     #stat_cor(aes(color = label), label.x = 10, size = 3) +
     facet_wrap(~ District) +
     theme_bw() +
@@ -1344,8 +1341,8 @@ for (mu in unique(corr_df_cutoff$Locus)){
     theme(
       axis.line = element_line(),
       axis.text = element_text(size = 6),
-      axis.title = element_text(size = 12),
-      strip.text.x = element_text(size = 12),
+      axis.title = element_text(size = 10),
+      strip.text.x = element_text(size = 10),
       legend.position = "none"
     ) +  labs(color = NULL)
   
@@ -1359,7 +1356,7 @@ for (mu in unique(corr_df_avg$Locus)){
     ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
     geom_point() +
     geom_smooth(method=lm, se=FALSE) +
-    #geom_line(data = None, aes(y=1:80, x=1:80), color = "grey", linetype = "dashed") + 
+    geom_abline(slope = 1, intercept = 0, color = "grey", linetype = "dashed") +
     #stat_cor(aes(color = label), label.x = 10, , size = 3) +
     facet_wrap(~ District) +
     theme_bw() +
@@ -1377,8 +1374,8 @@ for (mu in unique(corr_df_avg$Locus)){
     theme(
       axis.line = element_line(),
       axis.text = element_text(size = 6),
-      axis.title = element_text(size = 12),
-      strip.text.x = element_text(size = 12),
+      axis.title = element_text(size = 10),
+      strip.text.x = element_text(size = 10),
       legend.position = "none"
     )
   
@@ -1398,8 +1395,8 @@ ggsave(
     "cutoff_prev.png"
   ),
   C580Y_correlation_raw_plot_cutoff,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ggsave(
@@ -1409,8 +1406,8 @@ ggsave(
     "cutoff_prev.pdf"
   ),
   C580Y_correlation_raw_plot_cutoff,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 
@@ -1421,8 +1418,8 @@ ggsave(
     "avg_prev.png"
   ),
   C580Y_correlation_raw_plot_avg,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ggsave(
@@ -1432,8 +1429,8 @@ ggsave(
     "avg_prev.pdf"
   ),
   C580Y_correlation_raw_plot_avg,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 
@@ -1445,7 +1442,7 @@ ggsave(
     "cutoff_prev.png"
   ),
   R539T_correlation_raw_plot_cutoff,
-  width = 4,
+  width = 6,
   height = 1.5,
   dpi = 700
 )
@@ -1456,7 +1453,7 @@ ggsave(
     "cutoff_prev.pdf"
   ),
   R539T_correlation_raw_plot_cutoff,
-  width = 4,
+  width = 6,
   height = 1.5,
   dpi = 700
 )
@@ -1468,7 +1465,7 @@ ggsave(
     "avg_prev.png"
   ),
   R539T_correlation_raw_plot_avg,
-  width = 4,
+  width = 6,
   height = 1.5,
   dpi = 700
 )
@@ -1479,7 +1476,7 @@ ggsave(
     "avg_prev.pdf"
   ),
   R539T_correlation_raw_plot_avg,
-  width = 4,
+  width = 6,
   height = 1.5,
   dpi = 700
 )
@@ -1493,8 +1490,8 @@ ggsave(
     "cutoff_prev.png"
   ),
   PfK13_correlation_raw_plot_cutoff,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ggsave(
@@ -1504,8 +1501,8 @@ ggsave(
     "cutoff_prev.pdf"
   ),
   PfK13_correlation_raw_plot_cutoff,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 
@@ -1516,8 +1513,8 @@ ggsave(
     "avg_prev.png"
   ),
   PfK13_correlation_raw_plot_avg,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ggsave(
@@ -1527,8 +1524,8 @@ ggsave(
     "avg_prev.pdf"
   ),
   PfK13_correlation_raw_plot_avg,
-  width = 4,
-  height = 3,
+  width = 6,
+  height = 2.5,
   dpi = 700
 )
 ```
