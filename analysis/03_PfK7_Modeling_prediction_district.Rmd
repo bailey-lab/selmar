@@ -615,7 +615,7 @@ new_data <- new_data %>%
     group_by(District, Locus) %>% 
     complete(year = seq(min(min_year_all_kelch) + i, 2023, 1)) %>% # this creates all the year values up to 2023
     ungroup() %>% 
-    select(adj_year_all_kelch, year, District, country, min_year_all_kelch, Locus) %>%
+    select(adj_year_all_kelch, year, country, District, min_year_all_kelch, Locus) %>%
     mutate(min_year_all_kelch = replace(min_year_all_kelch, is.na(min_year_all_kelch), 0))
   
   new_data <- new_data %>%
@@ -623,7 +623,7 @@ new_data <- new_data %>%
     mutate(min_year = max(min_year_all_kelch),
       adj_year_all_kelch = year - min_year,
       country = unique(na.omit(country))) %>%
-    arrange(Locus, District, year) %>%
+    arrange(Locus, country, District, year) %>%
     select(!min_year_all_kelch) %>% 
     ungroup
   
