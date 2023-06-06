@@ -168,7 +168,6 @@ pfk7_data$conf.low_prev_all_kelch <- exp(pfk7_data$conf.low_all_kelch)*100/(1+ex
 ```
 
 # Forecasting Selection 
-
 ## Based on the first 2, 3, and 4 years
 ```{r}
 pred_year <- c(2, 3, 4)
@@ -1001,6 +1000,10 @@ for (i in pred_year) {
 #combine forecasting predictions for all years
 df_predict_avg_allyear <- rbind(df_predict_avg_2year, df_predict_avg_3year, df_predict_avg_4year)
 ```
+### Prevalence conversion
+```{r}
+df_predict_avg_allyear <- df_predict_avg_allyear %>% mutate(predict_prev = exp(predict)*100/(1+exp(predict)))
+```
 
 ### Plotting forecasting of predictions for the first 2, 3, and 4 years with avg of prevalence
 ```{r}
@@ -1021,9 +1024,8 @@ ex_pt <- pfk7_data %>%
 prev_avg_c580y_plot <- 
   ggplot() +
   geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_prev_c580y, color = "true"), linewidth = 1) + 
-  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
+  geom_line(data=df_pred, aes(year, predict_prev, group = label, color = label), linetype = "dashed") +
   geom_point(data = ex_pt, aes(x=year, y=prev_580y*100), color = ex_pt$point_col) +
-  #ggtitle(paste0("C580Y - ", prev_cutoff_perc, "% avg prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -1056,9 +1058,8 @@ ex_pt <- pfk7_data %>%
                                year < min_year_r539t ~ "black")) 
 prev_avg_r539t_plot <- ggplot() +
   geom_line(data=ex %>% mutate(N = n+r539t), aes(year, predict_stan_prev_r539t, color = "true"), linewidth = 1) + 
-  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
+  geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
   geom_point(data = ex_pt, aes(x=year, y=prev_539t*100), color = ex_pt$point_col) +
-  #ggtitle(paste0("R539T - ", prev_cutoff_perc, "% avg prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -1092,9 +1093,8 @@ ex_pt <- pfk7_data %>%
 prev_avg_all_kelch_plot <- 
   ggplot() +
   geom_line(data=ex %>% mutate(N = n+all_kelch), aes(year, predict_stan_prev_all_kelch, color = "true"), linewidth = 1) + 
-  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
+  geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
   geom_point(data = ex_pt, aes(x=year, y=prev_all_kelch*100), color = ex_pt$point_col) +
-  #ggtitle(paste0("PfK13 - ", prev_cutoff_perc, "% avg prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -1691,10 +1691,61 @@ prev_BinhPuoc <- pfk7_data %>%
   select(country, District, year, c580y, n, nobs_c580y, lrsmed_580y, prev_580y, predict_stan_prev_c580y, conf.low_prev_c580y, conf.high_prev_c580y) %>% 
   mutate(Locus = "C580Y") %>% 
   filter(District == "Binh Phuoc")
-colnames(d1) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
-prev_df <- d1
+colnames(prev_BinhPuoc ) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
 
-prev_df2 <- prev_df %>% filter(nobs > numofobs)
+prev_BinhPuoc <- prev_BinhPuoc  %>% filter(nobs > numofobs)
+```
+
+### Ploting
+```{r}
+df_BinhPhuoc_pred <- df_predict_avg_allyear %>% 
+  filter(year <= min_year + pred_y, Locus == "C580Y", District == "Binh Phuoc") 
+ex_pt <- pfk7_data %>% 
+  filter(nobs_c580y > numofobs, District == "Binh Phuoc") %>%
+  mutate(point_col = case_when(year >= min_year_c580y & year <= min_year_c580y + 2 ~ "#E69F00",
+                               year > min_year_c580y + 2 & year <= min_year_c580y + 3 ~ "#56B4E9",
+                               year > min_year_c580y + 3 & year <= min_year_c580y + 4 ~ "#0072B2",
+                               year > min_year_c580y + 4 ~ "black",
+                               year < min_year_c580y ~ "black")) 
+prev_BinhPuoc_plot <- ggplot() +
+  geom_line(data = df_BinhPhuoc_pred, aes(year, predict_prev, group = label, color = label)) +
+  geom_point(data = ex_pt, aes(x=year, y=prev_580y*100), color = ex_pt$point_col) +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(min(ex_pt$year), max(ex_pt$year), by = 1)) +
+  scale_color_manual(
+    values=c("#E69F00", "#56B4E9", "#0072B2"), 
+    name = "Mutations", 
+    labels = c("580Y", "combined PfK13", "539T")) + 
+  ylab("Prevalence") +
+  xlab("Year") +
+  ylim(-1, 101)+
+  ggpubr::theme_pubclean(base_size = 12)+
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 8),
+    legend.text = element_text(size = 8),
+    strip.text.x = element_text(size = 8),
+    legend.title = element_text(size = 8),
+    legend.position = "none"
+  )
+```
+
+### Saving
+```{r}
+ggsave("figures/Figure4_BinhPuoc_model.png",
+  prev_BinhPuoc_plot,
+  width = 3.5,
+  height = 3,
+  dpi = 700
+)
+ggsave("figures/Figure4_BinhPuoc_model.pdf",
+  prev_BinhPuoc_plot,
+  width = 3.5,
+  height = 3,
+  dpi = 700
+)
 ```
 
 ## Figure 4: Preah Vihear - Avg Forecasting 
@@ -1717,6 +1768,7 @@ prev_avg_c580y_BinhPhuoc_plot <-
   geom_point(data = ex_pt, aes(x=year, y=prev_580y*100), color = ex_pt$point_col) +
   #ggtitle(paste0("C580Y - ", prev_cutoff_perc, "% avg prevanlence")) +
   labs(shape="Mutations", size = "Sample Size") +
+  scale_x_continuous(breaks = seq(min(ex_pt$year), max(df_pred$year), by = 2)) +
   theme_bw() +
   ylab("Prevalence") +
   xlab("Year") +
@@ -1728,8 +1780,8 @@ prev_avg_c580y_BinhPhuoc_plot <-
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 10),
-    strip.text.x = element_text(size = 10),
+    axis.title = element_text(size = 8),
+    strip.text.x = element_text(size = 8),
     legend.position = "none",
   ) +  labs(color = NULL)
 
@@ -1740,8 +1792,8 @@ ggsave(
     "avg_prev_pred.png"
   ),
   prev_avg_c580y_BinhPhuoc_plot,
-  width = 2.5,
-  height = 2.5,
+  width = 3,
+  height = 3,
   dpi = 700
 )
 
@@ -1752,8 +1804,8 @@ ggsave(
     "avg_prev_pred.pdf"
   ),
   prev_avg_c580y_BinhPhuoc_plot,
-  width = 2.8,
-  height = 2.8,
+  width = 3.5,
+  height = 3.5,
   dpi = 700
 )
 
