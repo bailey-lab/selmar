@@ -497,11 +497,11 @@ for (i in pred_year) {
            year >= min_year_c580y & year <= min_year_c580y + i, 
            adj_year_c580y >= 0)
   
-  val <- data_c580y[data_c580y$year == data_c580y$min_year_c580y, ]
-  selected_district <- val$District[val$prev_580y <= prev_cutoff]
+  val <- data_c580y[data_c580y$year == data_c580y$min_year_c580y, ] #obtain first year with non-zero prevalence
+  selected_district <- val$District[val$prev_580y <= prev_cutoff] #check if the prevalence in the first year observed is less than cutoff
   
   data_c580y <- data_c580y %>% 
-    filter(District %in% selected_district)
+    filter(District %in% selected_district) #keep only the district that satisfy filtering
   
   c580y_pred <- rstanarm::stan_glmer(
     lrsmed_580y ~ adj_year_c580y + (1 + adj_year_c580y | District),
@@ -545,8 +545,8 @@ for (i in pred_year) {
            year >= min_year_r539t & year <= min_year_r539t + i,
            adj_year_r539t >= 0)
   
-  val <- data_r539t[data_r539t$year == data_r539t$min_year_r539t, ]
-  selected_district <- val$District[val$prev_539t <= prev_cutoff]
+  val <- data_r539t[data_r539t$year == data_r539t$min_year_r539t, ] #obtain first year with non-zero prevalence
+  selected_district <- val$District[val$prev_539t <= prev_cutoff] #check if the prevalence in the first year observed is less
   
   data_r539t <- data_r539t %>% 
     filter(District %in% selected_district)
@@ -592,8 +592,8 @@ new_data <- new_data %>%
            year >= min_year_all_kelch & year <= min_year_all_kelch + i,
            adj_year_all_kelch >= 0)
   
-  val <- data_all_kelch[data_all_kelch$year == data_all_kelch$min_year_all_kelch, ]
-  selected_district <- val$District[val$prev_all_kelch <= prev_cutoff]
+  val <- data_all_kelch[data_all_kelch$year == data_all_kelch$min_year_all_kelch, ] #obtain first year with non-zero prevalence
+  selected_district <- val$District[val$prev_all_kelch <= prev_cutoff] #check if the prevalence in the first year observed is less
   
   data_all_kelch <- data_all_kelch %>% 
     filter(District %in% selected_district)
@@ -1539,7 +1539,6 @@ ggsave(
 )
 ```
 
-
 ## Combined District: plotting for avg
 ```{r}
 ## Correlation plot for 20% avg
@@ -1547,7 +1546,7 @@ for (mu in unique(corr_df_avg$Locus)){
   correlation_raw_plot_avg <- corr_df_avg %>% 
     filter(Locus == mu) %>% 
     rename("Mutation" = "Locus") %>%
-  ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
+  ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, shape = District)) +
   geom_point() +
   geom_smooth(method=lm, se=FALSE) +
   geom_abline(slope = 1, intercept = 0, color = "grey", linetype = "dashed") +
@@ -1555,8 +1554,8 @@ for (mu in unique(corr_df_avg$Locus)){
   ggpubr::theme_pubclean(base_size = 12) +
   xlab("True") +
   ylab("Predicted") +
-  xlim(0,95) +
-  ylim(0,95) +
+  ylim(-5, 95) +
+  xlim(0, 95) +
   #ggtitle("20% average across years") +
   scale_color_manual(
     values = c("#E69F00", "#56B4E9", "#0072B2"),
@@ -1569,7 +1568,7 @@ for (mu in unique(corr_df_avg$Locus)){
     axis.text = element_text(size = 6),
     axis.title = element_text(size = 10),
     strip.text.x = element_text(size = 10),
-    legend.position = "none"
+    legend.position = "right"
   )
   
     #Assigning df_predict to variables
@@ -1684,7 +1683,78 @@ correlation_raw_plot_avg <- corr_df_avg %>% rename("Mutation" = "Locus") %>%
 ```
 
 # Supplement Figure 
-## Figure 4: Preah Vihear - Model
+
+## Figure 4 (A): Binh Phuoc - Avg Forecasting 
+### Preprocessing
+```{r}
+df_pred <- df_predict_avg_allyear %>% 
+  filter(year >= min_year + pred_y, Locus == "C580Y", District == "Binh Phuoc") 
+ex <- pfk7_data %>% 
+  filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, District %in% unique(df_pred$District))
+ex_pt <- pfk7_data %>% 
+  filter(nobs_c580y > numofobs, District %in% unique(df_pred$District)) %>%
+  mutate(point_col = case_when(year >= min_year_c580y & year <= min_year_c580y + 2 ~ "#E69F00",
+                               year > min_year_c580y + 2 & year <= min_year_c580y + 3 ~ "#56B4E9",
+                               year > min_year_c580y + 3 & year <= min_year_c580y + 4 ~ "#0072B2",
+                               year > min_year_c580y + 4 ~ "black",
+                               year < min_year_c580y ~ "black")) 
+```
+
+### Plotting
+```{r}
+prev_avg_c580y_BinhPhuoc_plot <- 
+  ggplot() +
+  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_prev_c580y, color = "true"), linewidth = 1) + 
+  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
+  geom_point(data = ex_pt, aes(x=year, y=prev_580y*100), color = ex_pt$point_col) +
+  #ggtitle(paste0("C580Y - ", prev_cutoff_perc, "% avg prevanlence")) +
+  labs(shape="Mutations", size = "Sample Size") +
+  scale_x_continuous(breaks = seq(min(ex_pt$year), max(df_pred$year), by = 2)) +
+  theme_bw() +
+  ylab("Prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
+    labels = c("2 years", "3 years", "4 years", "true")
+  ) + 
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 8),
+    strip.text.x = element_text(size = 8),
+    legend.position = "none",
+  ) +  labs(color = NULL)
+```
+
+### Saving
+```{r}
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/20_avg/SEAsia_avg_pred_C580Y_BinhPhuoc_",
+    prev_cutoff_perc,
+    "avg_prev_pred.png"
+  ),
+  prev_avg_c580y_BinhPhuoc_plot,
+  width = 3,
+  height = 3,
+  dpi = 700
+)
+
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/20_avg/SEAsia_avg_pred_C580Y_BinhPhuoc_",
+    prev_cutoff_perc,
+    "avg_prev_pred.pdf"
+  ),
+  prev_avg_c580y_BinhPhuoc_plot,
+  width = 3.5,
+  height = 3.5,
+  dpi = 700
+)
+```
+
+## Figure 4 (B): Binh Phuoc - Model
 ### Preprocessing
 ```{r}
 prev_BinhPuoc <- pfk7_data %>% 
@@ -1712,7 +1782,7 @@ prev_BinhPuoc_plot <- ggplot() +
   geom_point(data = ex_pt, aes(x=year, y=prev_580y*100), color = ex_pt$point_col) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  scale_x_continuous(breaks = seq(min(ex_pt$year), max(ex_pt$year), by = 1)) +
+  scale_x_continuous(breaks = seq(min(ex_pt$year), max(ex_pt$year), by = 2)) +
   scale_color_manual(
     values=c("#E69F00", "#56B4E9", "#0072B2"), 
     name = "Mutations", 
@@ -1746,67 +1816,4 @@ ggsave("figures/Figure4_BinhPuoc_model.pdf",
   height = 3,
   dpi = 700
 )
-```
-
-## Figure 4: Preah Vihear - Avg Forecasting 
-```{r}
-df_pred <- df_predict_avg_allyear %>% 
-  filter(year >= min_year + pred_y, Locus == "C580Y", District == "Binh Phuoc") 
-ex <- pfk7_data %>% 
-  filter(is.finite(lrsmed_580y), nobs_c580y > numofobs, District %in% unique(df_pred$District))
-ex_pt <- pfk7_data %>% 
-  filter(nobs_c580y > numofobs, District %in% unique(df_pred$District)) %>%
-  mutate(point_col = case_when(year >= min_year_c580y & year <= min_year_c580y + 2 ~ "#E69F00",
-                               year > min_year_c580y + 2 & year <= min_year_c580y + 3 ~ "#56B4E9",
-                               year > min_year_c580y + 3 & year <= min_year_c580y + 4 ~ "#0072B2",
-                               year > min_year_c580y + 4 ~ "black",
-                               year < min_year_c580y ~ "black")) 
-prev_avg_c580y_BinhPhuoc_plot <- 
-  ggplot() +
-  geom_line(data=ex %>% mutate(N = n+c580y), aes(year, predict_stan_prev_c580y, color = "true"), linewidth = 1) + 
-  geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev_580y*100), color = ex_pt$point_col) +
-  #ggtitle(paste0("C580Y - ", prev_cutoff_perc, "% avg prevanlence")) +
-  labs(shape="Mutations", size = "Sample Size") +
-  scale_x_continuous(breaks = seq(min(ex_pt$year), max(df_pred$year), by = 2)) +
-  theme_bw() +
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  scale_color_manual(
-    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
-    labels = c("2 years", "3 years", "4 years", "true")
-  ) + 
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 6),
-    axis.title = element_text(size = 8),
-    strip.text.x = element_text(size = 8),
-    legend.position = "none",
-  ) +  labs(color = NULL)
-
-ggsave(
-  paste0(
-    "figures/predictions/SE_Asia/per_district/20_avg/SEAsia_avg_pred_C580Y_BinhPhuoc_",
-    prev_cutoff_perc,
-    "avg_prev_pred.png"
-  ),
-  prev_avg_c580y_BinhPhuoc_plot,
-  width = 3,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/predictions/SE_Asia/per_district/20_avg/SEAsia_avg_pred_C580Y_BinhPhuoc_",
-    prev_cutoff_perc,
-    "avg_prev_pred.pdf"
-  ),
-  prev_avg_c580y_BinhPhuoc_plot,
-  width = 3.5,
-  height = 3.5,
-  dpi = 700
-)
-
 ```

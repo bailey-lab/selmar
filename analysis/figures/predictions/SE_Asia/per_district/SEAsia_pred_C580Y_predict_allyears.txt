@@ -1,931 +1,931 @@
 "adj_year" "year" "District" "country" "Locus" "min_year" "predict" "label" "pred_y"
-"1" 0 2008 "Pailin" "Cambodia" "C580Y" 2008 -0.622983664035472 "2year" 2
-"2" 1 2009 "Pailin" "Cambodia" "C580Y" 2008 -0.16809782081483 "2year" 2
-"3" 2 2010 "Pailin" "Cambodia" "C580Y" 2008 0.300534394677083 "2year" 2
-"4" 3 2011 "Pailin" "Cambodia" "C580Y" 2008 0.756490048540371 "2year" 2
-"5" 4 2012 "Pailin" "Cambodia" "C580Y" 2008 1.22325369255032 "2year" 2
-"6" 5 2013 "Pailin" "Cambodia" "C580Y" 2008 1.6659670187973 "2year" 2
-"7" 6 2014 "Pailin" "Cambodia" "C580Y" 2008 2.11745959718449 "2year" 2
-"8" 7 2015 "Pailin" "Cambodia" "C580Y" 2008 2.57348413507323 "2year" 2
-"9" 8 2016 "Pailin" "Cambodia" "C580Y" 2008 3.04639679430736 "2year" 2
-"10" 9 2017 "Pailin" "Cambodia" "C580Y" 2008 3.49944713934283 "2year" 2
-"11" 10 2018 "Pailin" "Cambodia" "C580Y" 2008 3.94545799367146 "2year" 2
-"12" 11 2019 "Pailin" "Cambodia" "C580Y" 2008 4.40986464376258 "2year" 2
-"13" 12 2020 "Pailin" "Cambodia" "C580Y" 2008 4.87762898567308 "2year" 2
-"14" 13 2021 "Pailin" "Cambodia" "C580Y" 2008 5.32808231406659 "2year" 2
-"15" 14 2022 "Pailin" "Cambodia" "C580Y" 2008 5.7778337976285 "2year" 2
-"16" 15 2023 "Pailin" "Cambodia" "C580Y" 2008 6.23599891727828 "2year" 2
-"17" 0 2011 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.95937126409091 "2year" 2
-"18" 1 2012 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.66149516220658 "2year" 2
-"19" 2 2013 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.37867517630938 "2year" 2
-"20" 3 2014 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.09777101804575 "2year" 2
-"21" 4 2015 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.806575978256003 "2year" 2
-"22" 5 2016 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.537145644032751 "2year" 2
-"23" 6 2017 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.232090513330119 "2year" 2
-"24" 7 2018 "Preah Vihear" "Cambodia" "C580Y" 2011 0.0485513357587355 "2year" 2
-"25" 8 2019 "Preah Vihear" "Cambodia" "C580Y" 2011 0.329599535300452 "2year" 2
-"26" 9 2020 "Preah Vihear" "Cambodia" "C580Y" 2011 0.635318763585624 "2year" 2
-"27" 10 2021 "Preah Vihear" "Cambodia" "C580Y" 2011 0.90991824598088 "2year" 2
-"28" 11 2022 "Preah Vihear" "Cambodia" "C580Y" 2011 1.20517021113385 "2year" 2
-"29" 12 2023 "Preah Vihear" "Cambodia" "C580Y" 2011 1.49045040914474 "2year" 2
-"30" 0 2007 "Pursat" "Cambodia" "C580Y" 2007 -2.45910256131427 "2year" 2
-"31" 2 2009 "Pursat" "Cambodia" "C580Y" 2007 -1.39577531721059 "2year" 2
-"32" 3 2010 "Pursat" "Cambodia" "C580Y" 2007 -0.869917365762675 "2year" 2
-"33" 4 2011 "Pursat" "Cambodia" "C580Y" 2007 -0.325251305700341 "2year" 2
-"34" 5 2012 "Pursat" "Cambodia" "C580Y" 2007 0.20441613408533 "2year" 2
-"35" 6 2013 "Pursat" "Cambodia" "C580Y" 2007 0.742913541704682 "2year" 2
-"36" 7 2014 "Pursat" "Cambodia" "C580Y" 2007 1.26099059707083 "2year" 2
-"37" 8 2015 "Pursat" "Cambodia" "C580Y" 2007 1.79687562284153 "2year" 2
-"38" 9 2016 "Pursat" "Cambodia" "C580Y" 2007 2.31633169190929 "2year" 2
-"39" 10 2017 "Pursat" "Cambodia" "C580Y" 2007 2.85653935061916 "2year" 2
-"40" 11 2018 "Pursat" "Cambodia" "C580Y" 2007 3.38878996328279 "2year" 2
-"41" 12 2019 "Pursat" "Cambodia" "C580Y" 2007 3.90290981936357 "2year" 2
-"42" 13 2020 "Pursat" "Cambodia" "C580Y" 2007 4.44048622029737 "2year" 2
-"43" 14 2021 "Pursat" "Cambodia" "C580Y" 2007 4.9786077123819 "2year" 2
-"44" 15 2022 "Pursat" "Cambodia" "C580Y" 2007 5.4988983530569 "2year" 2
-"45" 16 2023 "Pursat" "Cambodia" "C580Y" 2007 6.04246175749576 "2year" 2
-"46" 0 2011 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.31236434951616 "2year" 2
-"47" 1 2012 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.13013059867689 "2year" 2
-"48" 2 2013 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.92002577777024 "2year" 2
-"49" 3 2014 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.71331944432003 "2year" 2
-"50" 4 2015 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.50893794091769 "2year" 2
-"51" 5 2016 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.30191754294649 "2year" 2
-"52" 6 2017 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.11396937965088 "2year" 2
-"53" 7 2018 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.91193365519453 "2year" 2
-"54" 8 2019 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.70338193022556 "2year" 2
-"55" 9 2020 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.49838349911449 "2year" 2
-"56" 10 2021 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.29519347752164 "2year" 2
-"57" 11 2022 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.09722894082703 "2year" 2
-"58" 12 2023 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.913010464886046 "2year" 2
-"59" 0 2011 "Sisakhet" "Thailand" "C580Y" 2011 -0.19113244566332 "2year" 2
-"60" 1 2012 "Sisakhet" "Thailand" "C580Y" 2011 -2.25067486826316 "2year" 2
-"61" 2 2013 "Sisakhet" "Thailand" "C580Y" 2011 -4.31473801554946 "2year" 2
-"62" 3 2014 "Sisakhet" "Thailand" "C580Y" 2011 -6.37507601729135 "2year" 2
-"63" 4 2015 "Sisakhet" "Thailand" "C580Y" 2011 -8.42008418935666 "2year" 2
-"64" 5 2016 "Sisakhet" "Thailand" "C580Y" 2011 -10.5013934592162 "2year" 2
-"65" 6 2017 "Sisakhet" "Thailand" "C580Y" 2011 -12.5607291337287 "2year" 2
-"66" 7 2018 "Sisakhet" "Thailand" "C580Y" 2011 -14.6289744474575 "2year" 2
-"67" 8 2019 "Sisakhet" "Thailand" "C580Y" 2011 -16.6717889605444 "2year" 2
-"68" 9 2020 "Sisakhet" "Thailand" "C580Y" 2011 -18.7435795951609 "2year" 2
-"69" 10 2021 "Sisakhet" "Thailand" "C580Y" 2011 -20.7963097348103 "2year" 2
-"70" 11 2022 "Sisakhet" "Thailand" "C580Y" 2011 -22.8509285519902 "2year" 2
-"71" 12 2023 "Sisakhet" "Thailand" "C580Y" 2011 -24.9099924527066 "2year" 2
-"72" 0 2011 "Tak" "Thailand" "C580Y" 2011 -2.24582846331111 "2year" 2
-"73" 1 2012 "Tak" "Thailand" "C580Y" 2011 -1.19879307200615 "2year" 2
-"74" 2 2013 "Tak" "Thailand" "C580Y" 2011 -0.155127039498736 "2year" 2
-"75" 3 2014 "Tak" "Thailand" "C580Y" 2011 0.879640600430484 "2year" 2
-"76" 4 2015 "Tak" "Thailand" "C580Y" 2011 1.91908013590556 "2year" 2
-"77" 5 2016 "Tak" "Thailand" "C580Y" 2011 2.96926760443748 "2year" 2
-"78" 6 2017 "Tak" "Thailand" "C580Y" 2011 4.01769372610216 "2year" 2
-"79" 7 2018 "Tak" "Thailand" "C580Y" 2011 5.06128069875015 "2year" 2
-"80" 8 2019 "Tak" "Thailand" "C580Y" 2011 6.09108078317848 "2year" 2
-"81" 9 2020 "Tak" "Thailand" "C580Y" 2011 7.14535567170586 "2year" 2
-"82" 10 2021 "Tak" "Thailand" "C580Y" 2011 8.19059922517718 "2year" 2
-"83" 11 2022 "Tak" "Thailand" "C580Y" 2011 9.23517240509934 "2year" 2
-"84" 12 2023 "Tak" "Thailand" "C580Y" 2011 10.2822463028875 "2year" 2
-"85" 0 2010 "Binh Phuoc" "Vietnam" "C580Y" 2010 -3.28609805732963 "2year" 2
-"86" 1 2011 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.9141273599842 "2year" 2
-"87" 2 2012 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.52753108468068 "2year" 2
-"88" 3 2013 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.12652980784626 "2year" 2
-"89" 4 2014 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.73520302078572 "2year" 2
-"90" 5 2015 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.35585681108768 "2year" 2
-"91" 6 2016 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.973748397542611 "2year" 2
-"92" 7 2017 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.590337498622662 "2year" 2
-"93" 8 2018 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.208895455858592 "2year" 2
-"94" 9 2019 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.188229386516126 "2year" 2
-"95" 10 2020 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.586986466587112 "2year" 2
-"96" 11 2021 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.942034806357621 "2year" 2
-"97" 12 2022 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.33436672346241 "2year" 2
-"98" 13 2023 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.73928866849808 "2year" 2
-"99" 0 2015 "Gia Lai" "Vietnam" "C580Y" 2015 -0.299155848568142 "2year" 2
-"100" 1 2016 "Gia Lai" "Vietnam" "C580Y" 2015 -0.0965107586976296 "2year" 2
-"101" 2 2017 "Gia Lai" "Vietnam" "C580Y" 2015 0.108394640865068 "2year" 2
-"102" 3 2018 "Gia Lai" "Vietnam" "C580Y" 2015 0.321303185025325 "2year" 2
-"103" 4 2019 "Gia Lai" "Vietnam" "C580Y" 2015 0.508857654458282 "2year" 2
-"104" 5 2020 "Gia Lai" "Vietnam" "C580Y" 2015 0.720612173126401 "2year" 2
-"105" 6 2021 "Gia Lai" "Vietnam" "C580Y" 2015 0.935932928095486 "2year" 2
-"106" 7 2022 "Gia Lai" "Vietnam" "C580Y" 2015 1.14182197089546 "2year" 2
-"107" 8 2023 "Gia Lai" "Vietnam" "C580Y" 2015 1.33838781588393 "2year" 2
-"108" 0 2007 "Pailin" "Cambodia" "R539T" 2007 -1.70145748802554 "2year" 2
-"109" 1 2008 "Pailin" "Cambodia" "R539T" 2007 -1.77840246244811 "2year" 2
-"110" 2 2009 "Pailin" "Cambodia" "R539T" 2007 -1.76592159739164 "2year" 2
-"111" 3 2010 "Pailin" "Cambodia" "R539T" 2007 -1.83051781170408 "2year" 2
-"112" 4 2011 "Pailin" "Cambodia" "R539T" 2007 -1.89384931174293 "2year" 2
-"113" 5 2012 "Pailin" "Cambodia" "R539T" 2007 -1.97015322122247 "2year" 2
-"114" 6 2013 "Pailin" "Cambodia" "R539T" 2007 -2.01102836193367 "2year" 2
-"115" 7 2014 "Pailin" "Cambodia" "R539T" 2007 -2.08185715350615 "2year" 2
-"116" 8 2015 "Pailin" "Cambodia" "R539T" 2007 -2.06170929437949 "2year" 2
-"117" 9 2016 "Pailin" "Cambodia" "R539T" 2007 -2.0948521769752 "2year" 2
-"118" 10 2017 "Pailin" "Cambodia" "R539T" 2007 -2.17592188533373 "2year" 2
-"119" 11 2018 "Pailin" "Cambodia" "R539T" 2007 -2.22937245134321 "2year" 2
-"120" 12 2019 "Pailin" "Cambodia" "R539T" 2007 -2.22637965870271 "2year" 2
-"121" 13 2020 "Pailin" "Cambodia" "R539T" 2007 -2.27753354475974 "2year" 2
-"122" 14 2021 "Pailin" "Cambodia" "R539T" 2007 -2.36033856510136 "2year" 2
-"123" 15 2022 "Pailin" "Cambodia" "R539T" 2007 -2.3959506017986 "2year" 2
-"124" 16 2023 "Pailin" "Cambodia" "R539T" 2007 -2.47854040233055 "2year" 2
-"125" 0 2007 "Pursat" "Cambodia" "R539T" 2007 -2.95251734131741 "2year" 2
-"126" 2 2009 "Pursat" "Cambodia" "R539T" 2007 -2.8354852627186 "2year" 2
-"127" 3 2010 "Pursat" "Cambodia" "R539T" 2007 -2.78326048580033 "2year" 2
-"128" 4 2011 "Pursat" "Cambodia" "R539T" 2007 -2.68778236533136 "2year" 2
-"129" 5 2012 "Pursat" "Cambodia" "R539T" 2007 -2.5997811955322 "2year" 2
-"130" 6 2013 "Pursat" "Cambodia" "R539T" 2007 -2.60454422360883 "2year" 2
-"131" 7 2014 "Pursat" "Cambodia" "R539T" 2007 -2.55123898603569 "2year" 2
-"132" 8 2015 "Pursat" "Cambodia" "R539T" 2007 -2.46065244878774 "2year" 2
-"133" 9 2016 "Pursat" "Cambodia" "R539T" 2007 -2.46644401903584 "2year" 2
-"134" 10 2017 "Pursat" "Cambodia" "R539T" 2007 -2.40125167825318 "2year" 2
-"135" 11 2018 "Pursat" "Cambodia" "R539T" 2007 -2.29811698361205 "2year" 2
-"136" 12 2019 "Pursat" "Cambodia" "R539T" 2007 -2.27343606752245 "2year" 2
-"137" 13 2020 "Pursat" "Cambodia" "R539T" 2007 -2.1772768746987 "2year" 2
-"138" 14 2021 "Pursat" "Cambodia" "R539T" 2007 -2.12762874556881 "2year" 2
-"139" 15 2022 "Pursat" "Cambodia" "R539T" 2007 -2.07053895803 "2year" 2
-"140" 16 2023 "Pursat" "Cambodia" "R539T" 2007 -1.99340305383482 "2year" 2
-"141" 0 2011 "Attapeu" "Laos" "R539T" 2011 -3.08737320423536 "2year" 2
-"142" 1 2012 "Attapeu" "Laos" "R539T" 2011 -3.009804692463 "2year" 2
-"143" 2 2013 "Attapeu" "Laos" "R539T" 2011 -2.83982243841884 "2year" 2
-"144" 3 2014 "Attapeu" "Laos" "R539T" 2011 -2.72779836293044 "2year" 2
-"145" 4 2015 "Attapeu" "Laos" "R539T" 2011 -2.60822919853663 "2year" 2
-"146" 5 2016 "Attapeu" "Laos" "R539T" 2011 -2.47383461778895 "2year" 2
-"147" 6 2017 "Attapeu" "Laos" "R539T" 2011 -2.36421615517367 "2year" 2
-"148" 7 2018 "Attapeu" "Laos" "R539T" 2011 -2.22725198638162 "2year" 2
-"149" 8 2019 "Attapeu" "Laos" "R539T" 2011 -2.10213735635333 "2year" 2
-"150" 9 2020 "Attapeu" "Laos" "R539T" 2011 -1.96100547903658 "2year" 2
-"151" 10 2021 "Attapeu" "Laos" "R539T" 2011 -1.81231105582428 "2year" 2
-"152" 11 2022 "Attapeu" "Laos" "R539T" 2011 -1.70336387053191 "2year" 2
-"153" 12 2023 "Attapeu" "Laos" "R539T" 2011 -1.57237977521788 "2year" 2
-"154" 0 2011 "Sisakhet" "Thailand" "R539T" 2011 -0.791896472108488 "2year" 2
-"155" 1 2012 "Sisakhet" "Thailand" "R539T" 2011 -0.395783167320541 "2year" 2
-"156" 2 2013 "Sisakhet" "Thailand" "R539T" 2011 -0.0850665194628956 "2year" 2
-"157" 3 2014 "Sisakhet" "Thailand" "R539T" 2011 0.320177608671448 "2year" 2
-"158" 4 2015 "Sisakhet" "Thailand" "R539T" 2011 0.630771135235626 "2year" 2
-"159" 5 2016 "Sisakhet" "Thailand" "R539T" 2011 0.990460088793829 "2year" 2
-"160" 6 2017 "Sisakhet" "Thailand" "R539T" 2011 1.33725443912311 "2year" 2
-"161" 7 2018 "Sisakhet" "Thailand" "R539T" 2011 1.69267020308372 "2year" 2
-"162" 8 2019 "Sisakhet" "Thailand" "R539T" 2011 2.03955964855684 "2year" 2
-"163" 9 2020 "Sisakhet" "Thailand" "R539T" 2011 2.41897966712017 "2year" 2
-"164" 10 2021 "Sisakhet" "Thailand" "R539T" 2011 2.73159566254239 "2year" 2
-"165" 11 2022 "Sisakhet" "Thailand" "R539T" 2011 3.1045343836793 "2year" 2
-"166" 12 2023 "Sisakhet" "Thailand" "R539T" 2011 3.4698478914611 "2year" 2
-"167" 0 2007 "Pailin" "Cambodia" "all_kelch" 2007 0.362215781511911 "2year" 2
-"168" 1 2008 "Pailin" "Cambodia" "all_kelch" 2007 0.252152614581546 "2year" 2
-"169" 2 2009 "Pailin" "Cambodia" "all_kelch" 2007 0.124014455710469 "2year" 2
-"170" 3 2010 "Pailin" "Cambodia" "all_kelch" 2007 0.0028512808528453 "2year" 2
-"171" 4 2011 "Pailin" "Cambodia" "all_kelch" 2007 -0.11469913619931 "2year" 2
-"172" 5 2012 "Pailin" "Cambodia" "all_kelch" 2007 -0.229195893325257 "2year" 2
-"173" 6 2013 "Pailin" "Cambodia" "all_kelch" 2007 -0.375374547664353 "2year" 2
-"174" 7 2014 "Pailin" "Cambodia" "all_kelch" 2007 -0.481815968359744 "2year" 2
-"175" 8 2015 "Pailin" "Cambodia" "all_kelch" 2007 -0.611926491053972 "2year" 2
-"176" 9 2016 "Pailin" "Cambodia" "all_kelch" 2007 -0.725596790340868 "2year" 2
-"177" 10 2017 "Pailin" "Cambodia" "all_kelch" 2007 -0.854525843526708 "2year" 2
-"178" 11 2018 "Pailin" "Cambodia" "all_kelch" 2007 -0.97261821229746 "2year" 2
-"179" 12 2019 "Pailin" "Cambodia" "all_kelch" 2007 -1.09624149293308 "2year" 2
-"180" 13 2020 "Pailin" "Cambodia" "all_kelch" 2007 -1.21250089617446 "2year" 2
-"181" 14 2021 "Pailin" "Cambodia" "all_kelch" 2007 -1.33836839441746 "2year" 2
-"182" 15 2022 "Pailin" "Cambodia" "all_kelch" 2007 -1.4544105781867 "2year" 2
-"183" 16 2023 "Pailin" "Cambodia" "all_kelch" 2007 -1.57520275146898 "2year" 2
-"184" 0 2011 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.44688629702021 "2year" 2
-"185" 1 2012 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.4242587235836 "2year" 2
-"186" 2 2013 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.40332529426847 "2year" 2
-"187" 3 2014 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.3723784632091 "2year" 2
-"188" 4 2015 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.36388694561238 "2year" 2
-"189" 5 2016 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.33180504272314 "2year" 2
-"190" 6 2017 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.31863884457737 "2year" 2
-"191" 7 2018 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.28753281546402 "2year" 2
-"192" 8 2019 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.25396517993153 "2year" 2
-"193" 9 2020 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.23523847082654 "2year" 2
-"194" 10 2021 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.22725449587461 "2year" 2
-"195" 11 2022 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.18937182103932 "2year" 2
-"196" 12 2023 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.18319630650448 "2year" 2
-"197" 0 2007 "Pursat" "Cambodia" "all_kelch" 2007 -1.03291015308311 "2year" 2
-"198" 2 2009 "Pursat" "Cambodia" "all_kelch" 2007 -0.346961206325631 "2year" 2
-"199" 3 2010 "Pursat" "Cambodia" "all_kelch" 2007 0.0117577841065177 "2year" 2
-"200" 4 2011 "Pursat" "Cambodia" "all_kelch" 2007 0.345525857075596 "2year" 2
-"201" 5 2012 "Pursat" "Cambodia" "all_kelch" 2007 0.699079145130213 "2year" 2
-"202" 6 2013 "Pursat" "Cambodia" "all_kelch" 2007 1.04728624891331 "2year" 2
-"203" 7 2014 "Pursat" "Cambodia" "all_kelch" 2007 1.38458744633433 "2year" 2
-"204" 8 2015 "Pursat" "Cambodia" "all_kelch" 2007 1.73681084603449 "2year" 2
-"205" 9 2016 "Pursat" "Cambodia" "all_kelch" 2007 2.07236648798575 "2year" 2
-"206" 10 2017 "Pursat" "Cambodia" "all_kelch" 2007 2.42283749239546 "2year" 2
-"207" 11 2018 "Pursat" "Cambodia" "all_kelch" 2007 2.75817049364175 "2year" 2
-"208" 12 2019 "Pursat" "Cambodia" "all_kelch" 2007 3.10773873002777 "2year" 2
-"209" 13 2020 "Pursat" "Cambodia" "all_kelch" 2007 3.45022974131595 "2year" 2
-"210" 14 2021 "Pursat" "Cambodia" "all_kelch" 2007 3.80220830653474 "2year" 2
-"211" 15 2022 "Pursat" "Cambodia" "all_kelch" 2007 4.13864745512835 "2year" 2
-"212" 16 2023 "Pursat" "Cambodia" "all_kelch" 2007 4.4844475053625 "2year" 2
-"213" 0 2011 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.37114927271169 "2year" 2
-"214" 1 2012 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.13293457482166 "2year" 2
-"215" 2 2013 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.88809993957237 "2year" 2
-"216" 3 2014 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.65665814374379 "2year" 2
-"217" 4 2015 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.40603669287301 "2year" 2
-"218" 5 2016 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.18450506460395 "2year" 2
-"219" 6 2017 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.92929616109135 "2year" 2
-"220" 7 2018 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.68080487699546 "2year" 2
-"221" 8 2019 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.44611446461077 "2year" 2
-"222" 9 2020 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.20834265943033 "2year" 2
-"223" 10 2021 "Ratanakiri" "Cambodia" "all_kelch" 2011 -0.970365136562606 "2year" 2
-"224" 11 2022 "Ratanakiri" "Cambodia" "all_kelch" 2011 -0.733641370629612 "2year" 2
-"225" 12 2023 "Ratanakiri" "Cambodia" "all_kelch" 2011 -0.486407901791413 "2year" 2
-"226" 0 2011 "Attapeu" "Laos" "all_kelch" 2011 -3.77437889443799 "2year" 2
-"227" 1 2012 "Attapeu" "Laos" "all_kelch" 2011 -3.4292764930853 "2year" 2
-"228" 2 2013 "Attapeu" "Laos" "all_kelch" 2011 -3.07118280349877 "2year" 2
-"229" 3 2014 "Attapeu" "Laos" "all_kelch" 2011 -2.70199451843465 "2year" 2
-"230" 4 2015 "Attapeu" "Laos" "all_kelch" 2011 -2.36099361408528 "2year" 2
-"231" 5 2016 "Attapeu" "Laos" "all_kelch" 2011 -2.01579724639712 "2year" 2
-"232" 6 2017 "Attapeu" "Laos" "all_kelch" 2011 -1.65386746160868 "2year" 2
-"233" 7 2018 "Attapeu" "Laos" "all_kelch" 2011 -1.2998980388436 "2year" 2
-"234" 8 2019 "Attapeu" "Laos" "all_kelch" 2011 -0.953429017232676 "2year" 2
-"235" 9 2020 "Attapeu" "Laos" "all_kelch" 2011 -0.58838023022035 "2year" 2
-"236" 10 2021 "Attapeu" "Laos" "all_kelch" 2011 -0.241499705105151 "2year" 2
-"237" 11 2022 "Attapeu" "Laos" "all_kelch" 2011 0.118747638322233 "2year" 2
-"238" 12 2023 "Attapeu" "Laos" "all_kelch" 2011 0.466544387865915 "2year" 2
-"239" 0 2015 "Sekong" "Laos" "all_kelch" 2015 0.766470833788564 "2year" 2
-"240" 2 2017 "Sekong" "Laos" "all_kelch" 2015 0.708346611337604 "2year" 2
-"241" 3 2018 "Sekong" "Laos" "all_kelch" 2015 0.677715749702676 "2year" 2
-"242" 4 2019 "Sekong" "Laos" "all_kelch" 2015 0.651564647376565 "2year" 2
-"243" 5 2020 "Sekong" "Laos" "all_kelch" 2015 0.612333236988546 "2year" 2
-"244" 6 2021 "Sekong" "Laos" "all_kelch" 2015 0.586228916347949 "2year" 2
-"245" 7 2022 "Sekong" "Laos" "all_kelch" 2015 0.563158164850574 "2year" 2
-"246" 8 2023 "Sekong" "Laos" "all_kelch" 2015 0.534125411894361 "2year" 2
-"247" 0 2013 "Mandalay" "Myanmar" "all_kelch" 2013 -2.09510325694676 "2year" 2
-"248" 1 2014 "Mandalay" "Myanmar" "all_kelch" 2013 -1.81482324290847 "2year" 2
-"249" 2 2015 "Mandalay" "Myanmar" "all_kelch" 2013 -1.54495179399213 "2year" 2
-"250" 3 2016 "Mandalay" "Myanmar" "all_kelch" 2013 -1.27920680727859 "2year" 2
-"251" 4 2017 "Mandalay" "Myanmar" "all_kelch" 2013 -0.999544760104797 "2year" 2
-"252" 5 2018 "Mandalay" "Myanmar" "all_kelch" 2013 -0.731435174020961 "2year" 2
-"253" 6 2019 "Mandalay" "Myanmar" "all_kelch" 2013 -0.468373631109866 "2year" 2
-"254" 7 2020 "Mandalay" "Myanmar" "all_kelch" 2013 -0.193227565736102 "2year" 2
-"255" 8 2021 "Mandalay" "Myanmar" "all_kelch" 2013 0.0727510624591243 "2year" 2
-"256" 9 2022 "Mandalay" "Myanmar" "all_kelch" 2013 0.33880722240941 "2year" 2
-"257" 10 2023 "Mandalay" "Myanmar" "all_kelch" 2013 0.612542545710974 "2year" 2
-"258" 1 2012 "Sisakhet" "Thailand" "all_kelch" 2011 0.0639849572959633 "2year" 2
-"259" 2 2013 "Sisakhet" "Thailand" "all_kelch" 2011 0.104826410985114 "2year" 2
-"260" 3 2014 "Sisakhet" "Thailand" "all_kelch" 2011 0.138921147058567 "2year" 2
-"261" 4 2015 "Sisakhet" "Thailand" "all_kelch" 2011 0.159935185591312 "2year" 2
-"262" 5 2016 "Sisakhet" "Thailand" "all_kelch" 2011 0.207866035870231 "2year" 2
-"263" 6 2017 "Sisakhet" "Thailand" "all_kelch" 2011 0.244170819057849 "2year" 2
-"264" 7 2018 "Sisakhet" "Thailand" "all_kelch" 2011 0.295263836943385 "2year" 2
-"265" 8 2019 "Sisakhet" "Thailand" "all_kelch" 2011 0.327133525187921 "2year" 2
-"266" 9 2020 "Sisakhet" "Thailand" "all_kelch" 2011 0.357201783748698 "2year" 2
-"267" 10 2021 "Sisakhet" "Thailand" "all_kelch" 2011 0.397851153764093 "2year" 2
-"268" 11 2022 "Sisakhet" "Thailand" "all_kelch" 2011 0.441486559796864 "2year" 2
-"269" 12 2023 "Sisakhet" "Thailand" "all_kelch" 2011 0.464597171031157 "2year" 2
-"270" 0 2003 "Tak" "Thailand" "all_kelch" 2003 -4.36134826193883 "2year" 2
-"271" 2 2005 "Tak" "Thailand" "all_kelch" 2003 -3.76081897211171 "2year" 2
-"272" 3 2006 "Tak" "Thailand" "all_kelch" 2003 -3.4683327085528 "2year" 2
-"273" 4 2007 "Tak" "Thailand" "all_kelch" 2003 -3.17812402483713 "2year" 2
-"274" 5 2008 "Tak" "Thailand" "all_kelch" 2003 -2.87405388615887 "2year" 2
-"275" 6 2009 "Tak" "Thailand" "all_kelch" 2003 -2.56135753923865 "2year" 2
-"276" 7 2010 "Tak" "Thailand" "all_kelch" 2003 -2.27847481837509 "2year" 2
-"277" 8 2011 "Tak" "Thailand" "all_kelch" 2003 -1.96921646673998 "2year" 2
-"278" 9 2012 "Tak" "Thailand" "all_kelch" 2003 -1.68479213868463 "2year" 2
-"279" 10 2013 "Tak" "Thailand" "all_kelch" 2003 -1.3818933873612 "2year" 2
-"280" 11 2014 "Tak" "Thailand" "all_kelch" 2003 -1.07560085020393 "2year" 2
-"281" 12 2015 "Tak" "Thailand" "all_kelch" 2003 -0.79425166510725 "2year" 2
-"282" 13 2016 "Tak" "Thailand" "all_kelch" 2003 -0.481020731712344 "2year" 2
-"283" 14 2017 "Tak" "Thailand" "all_kelch" 2003 -0.177847855599831 "2year" 2
-"284" 15 2018 "Tak" "Thailand" "all_kelch" 2003 0.10122092680922 "2year" 2
-"285" 16 2019 "Tak" "Thailand" "all_kelch" 2003 0.416527807760653 "2year" 2
-"286" 17 2020 "Tak" "Thailand" "all_kelch" 2003 0.707060122818162 "2year" 2
-"287" 18 2021 "Tak" "Thailand" "all_kelch" 2003 1.00709496459386 "2year" 2
-"288" 19 2022 "Tak" "Thailand" "all_kelch" 2003 1.28785339808696 "2year" 2
-"289" 20 2023 "Tak" "Thailand" "all_kelch" 2003 1.58920692559042 "2year" 2
-"290" 0 2005 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.722579872089553 "2year" 2
-"291" 2 2007 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.519727295152056 "2year" 2
-"292" 3 2008 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.418996799478372 "2year" 2
-"293" 4 2009 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.319932637068289 "2year" 2
-"294" 5 2010 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.221523520821645 "2year" 2
-"295" 6 2011 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.135730106847568 "2year" 2
-"296" 7 2012 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.0305591016712714 "2year" 2
-"297" 8 2013 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.0786713990809381 "2year" 2
-"298" 9 2014 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.165494745260855 "2year" 2
-"299" 10 2015 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.267696700976215 "2year" 2
-"300" 11 2016 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.365507746774709 "2year" 2
-"301" 12 2017 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.464358082581804 "2year" 2
-"302" 13 2018 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.564874746897318 "2year" 2
-"303" 14 2019 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.648063653064133 "2year" 2
-"304" 15 2020 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.754069412684467 "2year" 2
-"305" 16 2021 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.850455708957333 "2year" 2
-"306" 17 2022 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.956396882249694 "2year" 2
-"307" 18 2023 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.04655782909398 "2year" 2
-"308" 0 2015 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.0701660836522481 "2year" 2
-"309" 1 2016 "Gia Lai" "Vietnam" "all_kelch" 2015 0.0351585029505949 "2year" 2
-"310" 2 2017 "Gia Lai" "Vietnam" "all_kelch" 2015 0.11773538591664 "2year" 2
-"311" 3 2018 "Gia Lai" "Vietnam" "all_kelch" 2015 0.218651766856872 "2year" 2
-"312" 4 2019 "Gia Lai" "Vietnam" "all_kelch" 2015 0.334888047712709 "2year" 2
-"313" 5 2020 "Gia Lai" "Vietnam" "all_kelch" 2015 0.40926860450978 "2year" 2
-"314" 6 2021 "Gia Lai" "Vietnam" "all_kelch" 2015 0.528383126627803 "2year" 2
-"315" 7 2022 "Gia Lai" "Vietnam" "all_kelch" 2015 0.626770356824156 "2year" 2
-"316" 8 2023 "Gia Lai" "Vietnam" "all_kelch" 2015 0.702435301112419 "2year" 2
-"317" 0 2008 "Pailin" "Cambodia" "C580Y" 2008 -0.652791236660326 "3year" 3
-"318" 1 2009 "Pailin" "Cambodia" "C580Y" 2008 -0.0455710270033823 "3year" 3
-"319" 2 2010 "Pailin" "Cambodia" "C580Y" 2008 0.582160968097257 "3year" 3
-"320" 3 2011 "Pailin" "Cambodia" "C580Y" 2008 1.24076878289535 "3year" 3
-"321" 4 2012 "Pailin" "Cambodia" "C580Y" 2008 1.84560443830217 "3year" 3
-"322" 5 2013 "Pailin" "Cambodia" "C580Y" 2008 2.4924098609867 "3year" 3
-"323" 6 2014 "Pailin" "Cambodia" "C580Y" 2008 3.11414652258119 "3year" 3
-"324" 7 2015 "Pailin" "Cambodia" "C580Y" 2008 3.75109042166395 "3year" 3
-"325" 8 2016 "Pailin" "Cambodia" "C580Y" 2008 4.35950548402038 "3year" 3
-"326" 9 2017 "Pailin" "Cambodia" "C580Y" 2008 5.00592611099334 "3year" 3
-"327" 10 2018 "Pailin" "Cambodia" "C580Y" 2008 5.61504095947282 "3year" 3
-"328" 11 2019 "Pailin" "Cambodia" "C580Y" 2008 6.26183368382385 "3year" 3
-"329" 12 2020 "Pailin" "Cambodia" "C580Y" 2008 6.89836090318342 "3year" 3
-"330" 13 2021 "Pailin" "Cambodia" "C580Y" 2008 7.52030562099325 "3year" 3
-"331" 14 2022 "Pailin" "Cambodia" "C580Y" 2008 8.14674813063794 "3year" 3
-"332" 15 2023 "Pailin" "Cambodia" "C580Y" 2008 8.77435464902655 "3year" 3
-"333" 0 2011 "Preah Vihear" "Cambodia" "C580Y" 2011 -2.05947883448363 "3year" 3
-"334" 1 2012 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.55906966091408 "3year" 3
-"335" 2 2013 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.09085072734692 "3year" 3
-"336" 3 2014 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.583121661654597 "3year" 3
-"337" 4 2015 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.111673418080771 "3year" 3
-"338" 5 2016 "Preah Vihear" "Cambodia" "C580Y" 2011 0.392901139737411 "3year" 3
-"339" 6 2017 "Preah Vihear" "Cambodia" "C580Y" 2011 0.866397000857002 "3year" 3
-"340" 7 2018 "Preah Vihear" "Cambodia" "C580Y" 2011 1.36729858167801 "3year" 3
-"341" 8 2019 "Preah Vihear" "Cambodia" "C580Y" 2011 1.83874841877253 "3year" 3
-"342" 9 2020 "Preah Vihear" "Cambodia" "C580Y" 2011 2.31196706295517 "3year" 3
-"343" 10 2021 "Preah Vihear" "Cambodia" "C580Y" 2011 2.8255044176926 "3year" 3
-"344" 11 2022 "Preah Vihear" "Cambodia" "C580Y" 2011 3.29822784727437 "3year" 3
-"345" 12 2023 "Preah Vihear" "Cambodia" "C580Y" 2011 3.79271842570758 "3year" 3
-"346" 0 2007 "Pursat" "Cambodia" "C580Y" 2007 -2.48730686300183 "3year" 3
-"347" 2 2009 "Pursat" "Cambodia" "C580Y" 2007 -1.29654280193248 "3year" 3
-"348" 3 2010 "Pursat" "Cambodia" "C580Y" 2007 -0.695431069714905 "3year" 3
-"349" 4 2011 "Pursat" "Cambodia" "C580Y" 2007 -0.0871097738591709 "3year" 3
-"350" 5 2012 "Pursat" "Cambodia" "C580Y" 2007 0.517468203254877 "3year" 3
-"351" 6 2013 "Pursat" "Cambodia" "C580Y" 2007 1.11665619485301 "3year" 3
-"352" 7 2014 "Pursat" "Cambodia" "C580Y" 2007 1.72087940744882 "3year" 3
-"353" 8 2015 "Pursat" "Cambodia" "C580Y" 2007 2.31469820823155 "3year" 3
-"354" 9 2016 "Pursat" "Cambodia" "C580Y" 2007 2.90970103722316 "3year" 3
-"355" 10 2017 "Pursat" "Cambodia" "C580Y" 2007 3.52553347163769 "3year" 3
-"356" 11 2018 "Pursat" "Cambodia" "C580Y" 2007 4.11850784759798 "3year" 3
-"357" 12 2019 "Pursat" "Cambodia" "C580Y" 2007 4.7265491664711 "3year" 3
-"358" 13 2020 "Pursat" "Cambodia" "C580Y" 2007 5.32914057584102 "3year" 3
-"359" 14 2021 "Pursat" "Cambodia" "C580Y" 2007 5.92426273963953 "3year" 3
-"360" 15 2022 "Pursat" "Cambodia" "C580Y" 2007 6.52877974714986 "3year" 3
-"361" 16 2023 "Pursat" "Cambodia" "C580Y" 2007 7.14055023568985 "3year" 3
-"362" 0 2011 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.31517309544013 "3year" 3
-"363" 1 2012 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.10527786741421 "3year" 3
-"364" 2 2013 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.87450602875865 "3year" 3
-"365" 3 2014 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.68631771617287 "3year" 3
-"366" 4 2015 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.46505134140725 "3year" 3
-"367" 5 2016 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.26875234120387 "3year" 3
-"368" 6 2017 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.04222705505959 "3year" 3
-"369" 7 2018 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.81355797816972 "3year" 3
-"370" 8 2019 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.6237399605064 "3year" 3
-"371" 9 2020 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.40775251576597 "3year" 3
-"372" 10 2021 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.19376513941443 "3year" 3
-"373" 11 2022 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.983783253499339 "3year" 3
-"374" 12 2023 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.777639587317393 "3year" 3
-"375" 0 2011 "Sisakhet" "Thailand" "C580Y" 2011 -0.353898081667036 "3year" 3
-"376" 1 2012 "Sisakhet" "Thailand" "C580Y" 2011 -2.1242727278542 "3year" 3
-"377" 3 2014 "Sisakhet" "Thailand" "C580Y" 2011 -5.67603219662687 "3year" 3
-"378" 4 2015 "Sisakhet" "Thailand" "C580Y" 2011 -7.44406028085109 "3year" 3
-"379" 5 2016 "Sisakhet" "Thailand" "C580Y" 2011 -9.22693383457295 "3year" 3
-"380" 6 2017 "Sisakhet" "Thailand" "C580Y" 2011 -10.997446114181 "3year" 3
-"381" 7 2018 "Sisakhet" "Thailand" "C580Y" 2011 -12.7662615922521 "3year" 3
-"382" 8 2019 "Sisakhet" "Thailand" "C580Y" 2011 -14.5436153039351 "3year" 3
-"383" 9 2020 "Sisakhet" "Thailand" "C580Y" 2011 -16.3190096128232 "3year" 3
-"384" 10 2021 "Sisakhet" "Thailand" "C580Y" 2011 -18.0878491476366 "3year" 3
-"385" 11 2022 "Sisakhet" "Thailand" "C580Y" 2011 -19.8765740454834 "3year" 3
-"386" 12 2023 "Sisakhet" "Thailand" "C580Y" 2011 -21.6441890826629 "3year" 3
-"387" 0 2011 "Tak" "Thailand" "C580Y" 2011 -2.24747322488283 "3year" 3
-"388" 1 2012 "Tak" "Thailand" "C580Y" 2011 -1.19870312223782 "3year" 3
-"389" 2 2013 "Tak" "Thailand" "C580Y" 2011 -0.156246459511182 "3year" 3
-"390" 3 2014 "Tak" "Thailand" "C580Y" 2011 0.884068900488862 "3year" 3
-"391" 4 2015 "Tak" "Thailand" "C580Y" 2011 1.93312893934057 "3year" 3
-"392" 5 2016 "Tak" "Thailand" "C580Y" 2011 2.96528863818511 "3year" 3
-"393" 6 2017 "Tak" "Thailand" "C580Y" 2011 4.01351627050589 "3year" 3
-"394" 7 2018 "Tak" "Thailand" "C580Y" 2011 5.05708648149939 "3year" 3
-"395" 8 2019 "Tak" "Thailand" "C580Y" 2011 6.10085323438148 "3year" 3
-"396" 9 2020 "Tak" "Thailand" "C580Y" 2011 7.1502818591007 "3year" 3
-"397" 10 2021 "Tak" "Thailand" "C580Y" 2011 8.18833287684729 "3year" 3
-"398" 11 2022 "Tak" "Thailand" "C580Y" 2011 9.22992901648204 "3year" 3
-"399" 12 2023 "Tak" "Thailand" "C580Y" 2011 10.2787603030596 "3year" 3
-"400" 0 2010 "Binh Phuoc" "Vietnam" "C580Y" 2010 -3.28946734369908 "3year" 3
-"401" 1 2011 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.9039928658202 "3year" 3
-"402" 2 2012 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.49775570442505 "3year" 3
-"403" 3 2013 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.11529376654055 "3year" 3
-"404" 4 2014 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.73672102064312 "3year" 3
-"405" 5 2015 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.35440448784565 "3year" 3
-"406" 6 2016 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.95996108204691 "3year" 3
-"407" 7 2017 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.591354796285598 "3year" 3
-"408" 8 2018 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.18654769395599 "3year" 3
-"409" 9 2019 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.206032299396635 "3year" 3
-"410" 10 2020 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.587923540443097 "3year" 3
-"411" 11 2021 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.995313290914988 "3year" 3
-"412" 12 2022 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.36881244663042 "3year" 3
-"413" 13 2023 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.75681892112679 "3year" 3
-"414" 0 2015 "Gia Lai" "Vietnam" "C580Y" 2015 -0.699909821749448 "3year" 3
-"415" 1 2016 "Gia Lai" "Vietnam" "C580Y" 2015 -0.18056279108789 "3year" 3
-"416" 2 2017 "Gia Lai" "Vietnam" "C580Y" 2015 0.354401443098276 "3year" 3
-"417" 3 2018 "Gia Lai" "Vietnam" "C580Y" 2015 0.857008367293992 "3year" 3
-"418" 4 2019 "Gia Lai" "Vietnam" "C580Y" 2015 1.408935356161 "3year" 3
-"419" 5 2020 "Gia Lai" "Vietnam" "C580Y" 2015 1.94528174679126 "3year" 3
-"420" 6 2021 "Gia Lai" "Vietnam" "C580Y" 2015 2.47486783638736 "3year" 3
-"421" 7 2022 "Gia Lai" "Vietnam" "C580Y" 2015 3.00910234058828 "3year" 3
-"422" 8 2023 "Gia Lai" "Vietnam" "C580Y" 2015 3.54232396289494 "3year" 3
-"423" 0 2007 "Pailin" "Cambodia" "R539T" 2007 -1.52589192281686 "3year" 3
-"424" 1 2008 "Pailin" "Cambodia" "R539T" 2007 -1.71916313547498 "3year" 3
-"425" 2 2009 "Pailin" "Cambodia" "R539T" 2007 -1.91112285795744 "3year" 3
-"426" 3 2010 "Pailin" "Cambodia" "R539T" 2007 -2.12053321570458 "3year" 3
-"427" 4 2011 "Pailin" "Cambodia" "R539T" 2007 -2.32146106584256 "3year" 3
-"428" 5 2012 "Pailin" "Cambodia" "R539T" 2007 -2.53724195803141 "3year" 3
-"429" 6 2013 "Pailin" "Cambodia" "R539T" 2007 -2.72176706048002 "3year" 3
-"430" 7 2014 "Pailin" "Cambodia" "R539T" 2007 -2.93743048472208 "3year" 3
-"431" 8 2015 "Pailin" "Cambodia" "R539T" 2007 -3.16255541704042 "3year" 3
-"432" 9 2016 "Pailin" "Cambodia" "R539T" 2007 -3.35916876367876 "3year" 3
-"433" 10 2017 "Pailin" "Cambodia" "R539T" 2007 -3.54631712388684 "3year" 3
-"434" 11 2018 "Pailin" "Cambodia" "R539T" 2007 -3.73663969347838 "3year" 3
-"435" 12 2019 "Pailin" "Cambodia" "R539T" 2007 -3.96542802689016 "3year" 3
-"436" 13 2020 "Pailin" "Cambodia" "R539T" 2007 -4.16342319904831 "3year" 3
-"437" 14 2021 "Pailin" "Cambodia" "R539T" 2007 -4.35482518797415 "3year" 3
-"438" 15 2022 "Pailin" "Cambodia" "R539T" 2007 -4.56259847436534 "3year" 3
-"439" 16 2023 "Pailin" "Cambodia" "R539T" 2007 -4.78201156672102 "3year" 3
-"440" 0 2007 "Pursat" "Cambodia" "R539T" 2007 -3.29105640680605 "3year" 3
-"441" 2 2009 "Pursat" "Cambodia" "R539T" 2007 -3.33018966281333 "3year" 3
-"442" 3 2010 "Pursat" "Cambodia" "R539T" 2007 -3.34714248581397 "3year" 3
-"443" 4 2011 "Pursat" "Cambodia" "R539T" 2007 -3.36799166701211 "3year" 3
-"444" 5 2012 "Pursat" "Cambodia" "R539T" 2007 -3.39296019801788 "3year" 3
-"445" 6 2013 "Pursat" "Cambodia" "R539T" 2007 -3.4003178816699 "3year" 3
-"446" 7 2014 "Pursat" "Cambodia" "R539T" 2007 -3.40115227379582 "3year" 3
-"447" 8 2015 "Pursat" "Cambodia" "R539T" 2007 -3.44183557772286 "3year" 3
-"448" 9 2016 "Pursat" "Cambodia" "R539T" 2007 -3.46062878257004 "3year" 3
-"449" 10 2017 "Pursat" "Cambodia" "R539T" 2007 -3.46693141831984 "3year" 3
-"450" 11 2018 "Pursat" "Cambodia" "R539T" 2007 -3.51174383880029 "3year" 3
-"451" 12 2019 "Pursat" "Cambodia" "R539T" 2007 -3.51666554778638 "3year" 3
-"452" 13 2020 "Pursat" "Cambodia" "R539T" 2007 -3.54334168502397 "3year" 3
-"453" 14 2021 "Pursat" "Cambodia" "R539T" 2007 -3.57251145307083 "3year" 3
-"454" 15 2022 "Pursat" "Cambodia" "R539T" 2007 -3.59157932569733 "3year" 3
-"455" 16 2023 "Pursat" "Cambodia" "R539T" 2007 -3.60273933126014 "3year" 3
-"456" 0 2011 "Attapeu" "Laos" "R539T" 2011 -3.52461471353304 "3year" 3
-"457" 1 2012 "Attapeu" "Laos" "R539T" 2011 -3.36597191747474 "3year" 3
-"458" 3 2014 "Attapeu" "Laos" "R539T" 2011 -3.0555585664561 "3year" 3
-"459" 4 2015 "Attapeu" "Laos" "R539T" 2011 -2.90922860461157 "3year" 3
-"460" 5 2016 "Attapeu" "Laos" "R539T" 2011 -2.75388187246377 "3year" 3
-"461" 6 2017 "Attapeu" "Laos" "R539T" 2011 -2.61990689021759 "3year" 3
-"462" 7 2018 "Attapeu" "Laos" "R539T" 2011 -2.45310106043584 "3year" 3
-"463" 8 2019 "Attapeu" "Laos" "R539T" 2011 -2.29046732694291 "3year" 3
-"464" 9 2020 "Attapeu" "Laos" "R539T" 2011 -2.13039627360145 "3year" 3
-"465" 10 2021 "Attapeu" "Laos" "R539T" 2011 -1.99288810993404 "3year" 3
-"466" 11 2022 "Attapeu" "Laos" "R539T" 2011 -1.84867373111145 "3year" 3
-"467" 12 2023 "Attapeu" "Laos" "R539T" 2011 -1.69499348714195 "3year" 3
-"468" 0 2011 "Sisakhet" "Thailand" "R539T" 2011 -0.45176330439674 "3year" 3
-"469" 1 2012 "Sisakhet" "Thailand" "R539T" 2011 -0.23639288279996 "3year" 3
-"470" 2 2013 "Sisakhet" "Thailand" "R539T" 2011 -0.0433828279030423 "3year" 3
-"471" 3 2014 "Sisakhet" "Thailand" "R539T" 2011 0.19308282803971 "3year" 3
-"472" 4 2015 "Sisakhet" "Thailand" "R539T" 2011 0.363604085538267 "3year" 3
-"473" 5 2016 "Sisakhet" "Thailand" "R539T" 2011 0.57908291550314 "3year" 3
-"474" 6 2017 "Sisakhet" "Thailand" "R539T" 2011 0.790345269221731 "3year" 3
-"475" 7 2018 "Sisakhet" "Thailand" "R539T" 2011 0.985074447403879 "3year" 3
-"476" 8 2019 "Sisakhet" "Thailand" "R539T" 2011 1.16779024727857 "3year" 3
-"477" 9 2020 "Sisakhet" "Thailand" "R539T" 2011 1.38464916861328 "3year" 3
-"478" 10 2021 "Sisakhet" "Thailand" "R539T" 2011 1.61794133687006 "3year" 3
-"479" 11 2022 "Sisakhet" "Thailand" "R539T" 2011 1.80584739559505 "3year" 3
-"480" 12 2023 "Sisakhet" "Thailand" "R539T" 2011 2.00661854987633 "3year" 3
-"481" 0 2007 "Pailin" "Cambodia" "all_kelch" 2007 0.201853737793678 "3year" 3
-"482" 1 2008 "Pailin" "Cambodia" "all_kelch" 2007 0.197909078069233 "3year" 3
-"483" 2 2009 "Pailin" "Cambodia" "all_kelch" 2007 0.212210935704904 "3year" 3
-"484" 3 2010 "Pailin" "Cambodia" "all_kelch" 2007 0.208498143813854 "3year" 3
-"485" 4 2011 "Pailin" "Cambodia" "all_kelch" 2007 0.209112172155228 "3year" 3
-"486" 5 2012 "Pailin" "Cambodia" "all_kelch" 2007 0.20801190482717 "3year" 3
-"487" 6 2013 "Pailin" "Cambodia" "all_kelch" 2007 0.223319375168015 "3year" 3
-"488" 7 2014 "Pailin" "Cambodia" "all_kelch" 2007 0.208751777841113 "3year" 3
-"489" 8 2015 "Pailin" "Cambodia" "all_kelch" 2007 0.219956282335928 "3year" 3
-"490" 9 2016 "Pailin" "Cambodia" "all_kelch" 2007 0.209824854741657 "3year" 3
-"491" 10 2017 "Pailin" "Cambodia" "all_kelch" 2007 0.207897186612528 "3year" 3
-"492" 11 2018 "Pailin" "Cambodia" "all_kelch" 2007 0.218111232273735 "3year" 3
-"493" 12 2019 "Pailin" "Cambodia" "all_kelch" 2007 0.212072148891942 "3year" 3
-"494" 13 2020 "Pailin" "Cambodia" "all_kelch" 2007 0.210876424533416 "3year" 3
-"495" 14 2021 "Pailin" "Cambodia" "all_kelch" 2007 0.201393458113404 "3year" 3
-"496" 15 2022 "Pailin" "Cambodia" "all_kelch" 2007 0.185426065183161 "3year" 3
-"497" 16 2023 "Pailin" "Cambodia" "all_kelch" 2007 0.207441499127477 "3year" 3
-"498" 0 2011 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.5371817009208 "3year" 3
-"499" 1 2012 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.28794235522131 "3year" 3
-"500" 2 2013 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.05415807912738 "3year" 3
-"501" 3 2014 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.800401551708835 "3year" 3
-"502" 4 2015 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.564479965444527 "3year" 3
-"503" 5 2016 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.317966090907112 "3year" 3
-"504" 6 2017 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.0642052652719936 "3year" 3
-"505" 7 2018 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.17147921677733 "3year" 3
-"506" 8 2019 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.415491421314905 "3year" 3
-"507" 9 2020 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.669886330934383 "3year" 3
-"508" 10 2021 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.907099290504448 "3year" 3
-"509" 11 2022 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.14203981257293 "3year" 3
-"510" 12 2023 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.39758651539289 "3year" 3
-"511" 0 2007 "Pursat" "Cambodia" "all_kelch" 2007 -1.05519968014955 "3year" 3
-"512" 2 2009 "Pursat" "Cambodia" "all_kelch" 2007 -0.333076377743073 "3year" 3
-"513" 3 2010 "Pursat" "Cambodia" "all_kelch" 2007 0.0297894228771509 "3year" 3
-"514" 4 2011 "Pursat" "Cambodia" "all_kelch" 2007 0.368339602003456 "3year" 3
-"515" 5 2012 "Pursat" "Cambodia" "all_kelch" 2007 0.738919035860053 "3year" 3
-"516" 6 2013 "Pursat" "Cambodia" "all_kelch" 2007 1.09336714580828 "3year" 3
-"517" 7 2014 "Pursat" "Cambodia" "all_kelch" 2007 1.43553798733068 "3year" 3
-"518" 8 2015 "Pursat" "Cambodia" "all_kelch" 2007 1.80232915963737 "3year" 3
-"519" 9 2016 "Pursat" "Cambodia" "all_kelch" 2007 2.14026947823385 "3year" 3
-"520" 10 2017 "Pursat" "Cambodia" "all_kelch" 2007 2.51511549238888 "3year" 3
-"521" 11 2018 "Pursat" "Cambodia" "all_kelch" 2007 2.86368597420454 "3year" 3
-"522" 12 2019 "Pursat" "Cambodia" "all_kelch" 2007 3.23018212975117 "3year" 3
-"523" 13 2020 "Pursat" "Cambodia" "all_kelch" 2007 3.57899959446892 "3year" 3
-"524" 14 2021 "Pursat" "Cambodia" "all_kelch" 2007 3.92916511801944 "3year" 3
-"525" 15 2022 "Pursat" "Cambodia" "all_kelch" 2007 4.27207990383656 "3year" 3
-"526" 16 2023 "Pursat" "Cambodia" "all_kelch" 2007 4.65183174128955 "3year" 3
-"527" 0 2011 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.30068054926762 "3year" 3
-"528" 1 2012 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.22002522737185 "3year" 3
-"529" 2 2013 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.11661954745502 "3year" 3
-"530" 3 2014 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.01110894451218 "3year" 3
-"531" 4 2015 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.92524195927314 "3year" 3
-"532" 5 2016 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.82038025795078 "3year" 3
-"533" 6 2017 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.72958357687811 "3year" 3
-"534" 7 2018 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.63798375946788 "3year" 3
-"535" 8 2019 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.53509219738039 "3year" 3
-"536" 9 2020 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.4565853592953 "3year" 3
-"537" 10 2021 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.34967599069868 "3year" 3
-"538" 11 2022 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.23897803882234 "3year" 3
-"539" 12 2023 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.16057536079346 "3year" 3
-"540" 0 2011 "Attapeu" "Laos" "all_kelch" 2011 -3.63481919801226 "3year" 3
-"541" 1 2012 "Attapeu" "Laos" "all_kelch" 2011 -3.39931404943229 "3year" 3
-"542" 3 2014 "Attapeu" "Laos" "all_kelch" 2011 -2.92878054182111 "3year" 3
-"543" 4 2015 "Attapeu" "Laos" "all_kelch" 2011 -2.67125238562654 "3year" 3
-"544" 5 2016 "Attapeu" "Laos" "all_kelch" 2011 -2.43453619515954 "3year" 3
-"545" 6 2017 "Attapeu" "Laos" "all_kelch" 2011 -2.19828278433583 "3year" 3
-"546" 7 2018 "Attapeu" "Laos" "all_kelch" 2011 -1.94698955777618 "3year" 3
-"547" 8 2019 "Attapeu" "Laos" "all_kelch" 2011 -1.71162188700016 "3year" 3
-"548" 9 2020 "Attapeu" "Laos" "all_kelch" 2011 -1.48165854853165 "3year" 3
-"549" 10 2021 "Attapeu" "Laos" "all_kelch" 2011 -1.2362966794725 "3year" 3
-"550" 11 2022 "Attapeu" "Laos" "all_kelch" 2011 -0.999242817162488 "3year" 3
-"551" 12 2023 "Attapeu" "Laos" "all_kelch" 2011 -0.753217260559804 "3year" 3
-"552" 0 2015 "Sekong" "Laos" "all_kelch" 2015 0.58755234537478 "3year" 3
-"553" 2 2017 "Sekong" "Laos" "all_kelch" 2015 0.639724376661684 "3year" 3
-"554" 3 2018 "Sekong" "Laos" "all_kelch" 2015 0.685298095601533 "3year" 3
-"555" 4 2019 "Sekong" "Laos" "all_kelch" 2015 0.705749141986594 "3year" 3
-"556" 5 2020 "Sekong" "Laos" "all_kelch" 2015 0.750520553561364 "3year" 3
-"557" 6 2021 "Sekong" "Laos" "all_kelch" 2015 0.788021144066737 "3year" 3
-"558" 7 2022 "Sekong" "Laos" "all_kelch" 2015 0.828439032293085 "3year" 3
-"559" 8 2023 "Sekong" "Laos" "all_kelch" 2015 0.857249409620213 "3year" 3
-"560" 0 2013 "Mandalay" "Myanmar" "all_kelch" 2013 -2.03353881512168 "3year" 3
-"561" 1 2014 "Mandalay" "Myanmar" "all_kelch" 2013 -1.98836351985164 "3year" 3
-"562" 2 2015 "Mandalay" "Myanmar" "all_kelch" 2013 -1.95432125472424 "3year" 3
-"563" 3 2016 "Mandalay" "Myanmar" "all_kelch" 2013 -1.88167496228349 "3year" 3
-"564" 4 2017 "Mandalay" "Myanmar" "all_kelch" 2013 -1.85554014238984 "3year" 3
-"565" 5 2018 "Mandalay" "Myanmar" "all_kelch" 2013 -1.80033539567402 "3year" 3
-"566" 6 2019 "Mandalay" "Myanmar" "all_kelch" 2013 -1.74913377794141 "3year" 3
-"567" 7 2020 "Mandalay" "Myanmar" "all_kelch" 2013 -1.71092324809082 "3year" 3
-"568" 8 2021 "Mandalay" "Myanmar" "all_kelch" 2013 -1.66082644654935 "3year" 3
-"569" 9 2022 "Mandalay" "Myanmar" "all_kelch" 2013 -1.6223259734323 "3year" 3
-"570" 10 2023 "Mandalay" "Myanmar" "all_kelch" 2013 -1.56160581457006 "3year" 3
-"571" 1 2012 "Sisakhet" "Thailand" "all_kelch" 2011 0.023424276315267 "3year" 3
-"572" 2 2013 "Sisakhet" "Thailand" "all_kelch" 2011 0.197312336818328 "3year" 3
-"573" 3 2014 "Sisakhet" "Thailand" "all_kelch" 2011 0.346289440634879 "3year" 3
-"574" 4 2015 "Sisakhet" "Thailand" "all_kelch" 2011 0.522505851381329 "3year" 3
-"575" 5 2016 "Sisakhet" "Thailand" "all_kelch" 2011 0.672152061527223 "3year" 3
-"576" 6 2017 "Sisakhet" "Thailand" "all_kelch" 2011 0.830598563576398 "3year" 3
-"577" 7 2018 "Sisakhet" "Thailand" "all_kelch" 2011 1.00430762253368 "3year" 3
-"578" 8 2019 "Sisakhet" "Thailand" "all_kelch" 2011 1.17495672438486 "3year" 3
-"579" 9 2020 "Sisakhet" "Thailand" "all_kelch" 2011 1.32389073015271 "3year" 3
-"580" 10 2021 "Sisakhet" "Thailand" "all_kelch" 2011 1.49503177907553 "3year" 3
-"581" 11 2022 "Sisakhet" "Thailand" "all_kelch" 2011 1.68690979966758 "3year" 3
-"582" 12 2023 "Sisakhet" "Thailand" "all_kelch" 2011 1.82362216153833 "3year" 3
-"583" 0 2003 "Tak" "Thailand" "all_kelch" 2003 -4.16558309389941 "3year" 3
-"584" 2 2005 "Tak" "Thailand" "all_kelch" 2003 -3.81910948228827 "3year" 3
-"585" 3 2006 "Tak" "Thailand" "all_kelch" 2003 -3.61243460285442 "3year" 3
-"586" 4 2007 "Tak" "Thailand" "all_kelch" 2003 -3.45181128881946 "3year" 3
-"587" 5 2008 "Tak" "Thailand" "all_kelch" 2003 -3.27033202833079 "3year" 3
-"588" 6 2009 "Tak" "Thailand" "all_kelch" 2003 -3.09906103669185 "3year" 3
-"589" 7 2010 "Tak" "Thailand" "all_kelch" 2003 -2.92079236836774 "3year" 3
-"590" 8 2011 "Tak" "Thailand" "all_kelch" 2003 -2.74194695901893 "3year" 3
-"591" 9 2012 "Tak" "Thailand" "all_kelch" 2003 -2.55701553258669 "3year" 3
-"592" 10 2013 "Tak" "Thailand" "all_kelch" 2003 -2.38066183374477 "3year" 3
-"593" 11 2014 "Tak" "Thailand" "all_kelch" 2003 -2.21838757408216 "3year" 3
-"594" 12 2015 "Tak" "Thailand" "all_kelch" 2003 -2.0344571454469 "3year" 3
-"595" 13 2016 "Tak" "Thailand" "all_kelch" 2003 -1.85756374335437 "3year" 3
-"596" 14 2017 "Tak" "Thailand" "all_kelch" 2003 -1.68101823073383 "3year" 3
-"597" 15 2018 "Tak" "Thailand" "all_kelch" 2003 -1.50485282734422 "3year" 3
-"598" 16 2019 "Tak" "Thailand" "all_kelch" 2003 -1.33064358027151 "3year" 3
-"599" 17 2020 "Tak" "Thailand" "all_kelch" 2003 -1.15063528451249 "3year" 3
-"600" 18 2021 "Tak" "Thailand" "all_kelch" 2003 -0.963337791274735 "3year" 3
-"601" 19 2022 "Tak" "Thailand" "all_kelch" 2003 -0.791128711295977 "3year" 3
-"602" 20 2023 "Tak" "Thailand" "all_kelch" 2003 -0.608939606451649 "3year" 3
-"603" 0 2005 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.738391680268755 "3year" 3
-"604" 3 2008 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.206296968807862 "3year" 3
-"605" 4 2009 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.0535592699001413 "3year" 3
-"606" 5 2010 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.120745777185792 "3year" 3
-"607" 6 2011 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.304396227067649 "3year" 3
-"608" 7 2012 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.488274925976778 "3year" 3
-"609" 8 2013 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.637075899670067 "3year" 3
-"610" 9 2014 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.820074388495441 "3year" 3
-"611" 10 2015 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.990493798283776 "3year" 3
-"612" 11 2016 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.15448370440337 "3year" 3
-"613" 12 2017 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.34802094744646 "3year" 3
-"614" 13 2018 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.50847181568283 "3year" 3
-"615" 14 2019 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.66513404545758 "3year" 3
-"616" 15 2020 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.84641571176333 "3year" 3
-"617" 16 2021 "Binh Phuoc" "Vietnam" "all_kelch" 2005 2.03046277451944 "3year" 3
-"618" 17 2022 "Binh Phuoc" "Vietnam" "all_kelch" 2005 2.19278461922601 "3year" 3
-"619" 18 2023 "Binh Phuoc" "Vietnam" "all_kelch" 2005 2.36440225607582 "3year" 3
-"620" 0 2015 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.453326564315938 "3year" 3
-"621" 1 2016 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.0234026966620309 "3year" 3
-"622" 2 2017 "Gia Lai" "Vietnam" "all_kelch" 2015 0.416305446951557 "3year" 3
-"623" 3 2018 "Gia Lai" "Vietnam" "all_kelch" 2015 0.840489608018789 "3year" 3
-"624" 4 2019 "Gia Lai" "Vietnam" "all_kelch" 2015 1.29023134889508 "3year" 3
-"625" 5 2020 "Gia Lai" "Vietnam" "all_kelch" 2015 1.71072616178053 "3year" 3
-"626" 6 2021 "Gia Lai" "Vietnam" "all_kelch" 2015 2.15136072869978 "3year" 3
-"627" 7 2022 "Gia Lai" "Vietnam" "all_kelch" 2015 2.60642965302485 "3year" 3
-"628" 8 2023 "Gia Lai" "Vietnam" "all_kelch" 2015 3.03253628699609 "3year" 3
-"629" 0 2008 "Pailin" "Cambodia" "C580Y" 2008 -0.522452558246876 "4year" 4
-"630" 1 2009 "Pailin" "Cambodia" "C580Y" 2008 -0.125110335869567 "4year" 4
-"631" 2 2010 "Pailin" "Cambodia" "C580Y" 2008 0.267659763810906 "4year" 4
-"632" 3 2011 "Pailin" "Cambodia" "C580Y" 2008 0.684136348739752 "4year" 4
-"633" 4 2012 "Pailin" "Cambodia" "C580Y" 2008 1.05162781145404 "4year" 4
-"634" 5 2013 "Pailin" "Cambodia" "C580Y" 2008 1.46220418109309 "4year" 4
-"635" 6 2014 "Pailin" "Cambodia" "C580Y" 2008 1.8761502184307 "4year" 4
-"636" 7 2015 "Pailin" "Cambodia" "C580Y" 2008 2.26419080858797 "4year" 4
-"637" 8 2016 "Pailin" "Cambodia" "C580Y" 2008 2.65433689731959 "4year" 4
-"638" 9 2017 "Pailin" "Cambodia" "C580Y" 2008 3.0599763109232 "4year" 4
-"639" 10 2018 "Pailin" "Cambodia" "C580Y" 2008 3.45904949663217 "4year" 4
-"640" 11 2019 "Pailin" "Cambodia" "C580Y" 2008 3.87554578652866 "4year" 4
-"641" 12 2020 "Pailin" "Cambodia" "C580Y" 2008 4.26912633673775 "4year" 4
-"642" 13 2021 "Pailin" "Cambodia" "C580Y" 2008 4.65645756991445 "4year" 4
-"643" 14 2022 "Pailin" "Cambodia" "C580Y" 2008 5.0687187084963 "4year" 4
-"644" 15 2023 "Pailin" "Cambodia" "C580Y" 2008 5.44197195631607 "4year" 4
-"645" 0 2011 "Preah Vihear" "Cambodia" "C580Y" 2011 -2.04288154739239 "4year" 4
-"646" 1 2012 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.55379272158624 "4year" 4
-"647" 2 2013 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.06365855982395 "4year" 4
-"648" 3 2014 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.553843775447339 "4year" 4
-"649" 4 2015 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.0440759013361508 "4year" 4
-"650" 5 2016 "Preah Vihear" "Cambodia" "C580Y" 2011 0.443508265972099 "4year" 4
-"651" 6 2017 "Preah Vihear" "Cambodia" "C580Y" 2011 0.962510306995453 "4year" 4
-"652" 7 2018 "Preah Vihear" "Cambodia" "C580Y" 2011 1.44748163596373 "4year" 4
-"653" 8 2019 "Preah Vihear" "Cambodia" "C580Y" 2011 1.95130555281308 "4year" 4
-"654" 9 2020 "Preah Vihear" "Cambodia" "C580Y" 2011 2.45463598427223 "4year" 4
-"655" 10 2021 "Preah Vihear" "Cambodia" "C580Y" 2011 2.94961912270813 "4year" 4
-"656" 11 2022 "Preah Vihear" "Cambodia" "C580Y" 2011 3.46118388044335 "4year" 4
-"657" 12 2023 "Preah Vihear" "Cambodia" "C580Y" 2011 3.94576045288793 "4year" 4
-"658" 0 2007 "Pursat" "Cambodia" "C580Y" 2007 -2.63246810058453 "4year" 4
-"659" 2 2009 "Pursat" "Cambodia" "C580Y" 2007 -1.28992533439408 "4year" 4
-"660" 3 2010 "Pursat" "Cambodia" "C580Y" 2007 -0.597403418664138 "4year" 4
-"661" 4 2011 "Pursat" "Cambodia" "C580Y" 2007 0.0508536241638999 "4year" 4
-"662" 5 2012 "Pursat" "Cambodia" "C580Y" 2007 0.745034307994581 "4year" 4
-"663" 6 2013 "Pursat" "Cambodia" "C580Y" 2007 1.44372035271503 "4year" 4
-"664" 7 2014 "Pursat" "Cambodia" "C580Y" 2007 2.09725935200478 "4year" 4
-"665" 8 2015 "Pursat" "Cambodia" "C580Y" 2007 2.80245629739123 "4year" 4
-"666" 9 2016 "Pursat" "Cambodia" "C580Y" 2007 3.46251264440259 "4year" 4
-"667" 10 2017 "Pursat" "Cambodia" "C580Y" 2007 4.13380721626097 "4year" 4
-"668" 11 2018 "Pursat" "Cambodia" "C580Y" 2007 4.82422929927218 "4year" 4
-"669" 12 2019 "Pursat" "Cambodia" "C580Y" 2007 5.48784881453501 "4year" 4
-"670" 13 2020 "Pursat" "Cambodia" "C580Y" 2007 6.17411710263492 "4year" 4
-"671" 14 2021 "Pursat" "Cambodia" "C580Y" 2007 6.85591660232965 "4year" 4
-"672" 15 2022 "Pursat" "Cambodia" "C580Y" 2007 7.51740411983698 "4year" 4
-"673" 16 2023 "Pursat" "Cambodia" "C580Y" 2007 8.19472947630418 "4year" 4
-"674" 0 2011 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.43815748231277 "4year" 4
-"675" 1 2012 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.00298400582443 "4year" 4
-"676" 2 2013 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.54630156951567 "4year" 4
-"677" 4 2015 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.67397479054999 "4year" 4
-"678" 5 2016 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.20126573600919 "4year" 4
-"679" 6 2017 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.772755635399491 "4year" 4
-"680" 7 2018 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.34679137184693 "4year" 4
-"681" 8 2019 "Ratanakiri" "Cambodia" "C580Y" 2011 0.12663024654443 "4year" 4
-"682" 9 2020 "Ratanakiri" "Cambodia" "C580Y" 2011 0.553431895455935 "4year" 4
-"683" 10 2021 "Ratanakiri" "Cambodia" "C580Y" 2011 0.976262636515104 "4year" 4
-"684" 11 2022 "Ratanakiri" "Cambodia" "C580Y" 2011 1.41552065416994 "4year" 4
-"685" 12 2023 "Ratanakiri" "Cambodia" "C580Y" 2011 1.86495416955012 "4year" 4
-"686" 0 2011 "Sisakhet" "Thailand" "C580Y" 2011 -1.27858918467384 "4year" 4
-"687" 1 2012 "Sisakhet" "Thailand" "C580Y" 2011 -1.13102339798171 "4year" 4
-"688" 4 2015 "Sisakhet" "Thailand" "C580Y" 2011 -0.62423741528415 "4year" 4
-"689" 5 2016 "Sisakhet" "Thailand" "C580Y" 2011 -0.48371505302369 "4year" 4
-"690" 6 2017 "Sisakhet" "Thailand" "C580Y" 2011 -0.318616674217804 "4year" 4
-"691" 7 2018 "Sisakhet" "Thailand" "C580Y" 2011 -0.16265478974801 "4year" 4
-"692" 8 2019 "Sisakhet" "Thailand" "C580Y" 2011 0.0191419972505403 "4year" 4
-"693" 9 2020 "Sisakhet" "Thailand" "C580Y" 2011 0.173489484190109 "4year" 4
-"694" 10 2021 "Sisakhet" "Thailand" "C580Y" 2011 0.332338400303615 "4year" 4
-"695" 11 2022 "Sisakhet" "Thailand" "C580Y" 2011 0.50985212236889 "4year" 4
-"696" 12 2023 "Sisakhet" "Thailand" "C580Y" 2011 0.641299655846608 "4year" 4
-"697" 0 2011 "Tak" "Thailand" "C580Y" 2011 -1.72752821224582 "4year" 4
-"698" 1 2012 "Tak" "Thailand" "C580Y" 2011 -1.05590213620183 "4year" 4
-"699" 2 2013 "Tak" "Thailand" "C580Y" 2011 -0.432270092541114 "4year" 4
-"700" 3 2014 "Tak" "Thailand" "C580Y" 2011 0.243126063730072 "4year" 4
-"701" 4 2015 "Tak" "Thailand" "C580Y" 2011 0.894825946637573 "4year" 4
-"702" 5 2016 "Tak" "Thailand" "C580Y" 2011 1.52749671198419 "4year" 4
-"703" 6 2017 "Tak" "Thailand" "C580Y" 2011 2.20052594402785 "4year" 4
-"704" 7 2018 "Tak" "Thailand" "C580Y" 2011 2.8193852762212 "4year" 4
-"705" 8 2019 "Tak" "Thailand" "C580Y" 2011 3.49138446550714 "4year" 4
-"706" 9 2020 "Tak" "Thailand" "C580Y" 2011 4.13880991362892 "4year" 4
-"707" 10 2021 "Tak" "Thailand" "C580Y" 2011 4.79291487979924 "4year" 4
-"708" 11 2022 "Tak" "Thailand" "C580Y" 2011 5.44242563037504 "4year" 4
-"709" 12 2023 "Tak" "Thailand" "C580Y" 2011 6.08686531852767 "4year" 4
-"710" 0 2010 "Binh Phuoc" "Vietnam" "C580Y" 2010 -3.4370660775489 "4year" 4
-"711" 1 2011 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.79832994042543 "4year" 4
-"712" 2 2012 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.17147186987099 "4year" 4
-"713" 4 2014 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.910975789926886 "4year" 4
-"714" 5 2015 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.271015274512148 "4year" 4
-"715" 6 2016 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.385833001405087 "4year" 4
-"716" 7 2017 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.00656324160971 "4year" 4
-"717" 8 2018 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.65354484155402 "4year" 4
-"718" 9 2019 "Binh Phuoc" "Vietnam" "C580Y" 2010 2.27613405785233 "4year" 4
-"719" 10 2020 "Binh Phuoc" "Vietnam" "C580Y" 2010 2.90878975190077 "4year" 4
-"720" 11 2021 "Binh Phuoc" "Vietnam" "C580Y" 2010 3.55166750160468 "4year" 4
-"721" 12 2022 "Binh Phuoc" "Vietnam" "C580Y" 2010 4.17325398115852 "4year" 4
-"722" 13 2023 "Binh Phuoc" "Vietnam" "C580Y" 2010 4.83216479598849 "4year" 4
-"723" 0 2015 "Gia Lai" "Vietnam" "C580Y" 2015 -0.693918456874104 "4year" 4
-"724" 1 2016 "Gia Lai" "Vietnam" "C580Y" 2015 -0.150905602159707 "4year" 4
-"725" 2 2017 "Gia Lai" "Vietnam" "C580Y" 2015 0.33818899646126 "4year" 4
-"726" 3 2018 "Gia Lai" "Vietnam" "C580Y" 2015 0.875710597349505 "4year" 4
-"727" 4 2019 "Gia Lai" "Vietnam" "C580Y" 2015 1.41055815286115 "4year" 4
-"728" 5 2020 "Gia Lai" "Vietnam" "C580Y" 2015 1.92543701830389 "4year" 4
-"729" 6 2021 "Gia Lai" "Vietnam" "C580Y" 2015 2.44470885842829 "4year" 4
-"730" 7 2022 "Gia Lai" "Vietnam" "C580Y" 2015 2.9648668109659 "4year" 4
-"731" 8 2023 "Gia Lai" "Vietnam" "C580Y" 2015 3.49868343579552 "4year" 4
-"732" 0 2007 "Pailin" "Cambodia" "R539T" 2007 -1.37629455052798 "4year" 4
-"733" 1 2008 "Pailin" "Cambodia" "R539T" 2007 -1.71742408747616 "4year" 4
-"734" 2 2009 "Pailin" "Cambodia" "R539T" 2007 -2.02467662912761 "4year" 4
-"735" 3 2010 "Pailin" "Cambodia" "R539T" 2007 -2.33748758362334 "4year" 4
-"736" 4 2011 "Pailin" "Cambodia" "R539T" 2007 -2.64664090669294 "4year" 4
-"737" 5 2012 "Pailin" "Cambodia" "R539T" 2007 -2.98909185742481 "4year" 4
-"738" 6 2013 "Pailin" "Cambodia" "R539T" 2007 -3.29338330719801 "4year" 4
-"739" 7 2014 "Pailin" "Cambodia" "R539T" 2007 -3.61272890192836 "4year" 4
-"740" 8 2015 "Pailin" "Cambodia" "R539T" 2007 -3.9295830640339 "4year" 4
-"741" 9 2016 "Pailin" "Cambodia" "R539T" 2007 -4.25595867807729 "4year" 4
-"742" 10 2017 "Pailin" "Cambodia" "R539T" 2007 -4.57050020713272 "4year" 4
-"743" 11 2018 "Pailin" "Cambodia" "R539T" 2007 -4.90106075048357 "4year" 4
-"744" 12 2019 "Pailin" "Cambodia" "R539T" 2007 -5.20459495029378 "4year" 4
-"745" 13 2020 "Pailin" "Cambodia" "R539T" 2007 -5.52438140195553 "4year" 4
-"746" 14 2021 "Pailin" "Cambodia" "R539T" 2007 -5.84153610412267 "4year" 4
-"747" 15 2022 "Pailin" "Cambodia" "R539T" 2007 -6.1755929364339 "4year" 4
-"748" 16 2023 "Pailin" "Cambodia" "R539T" 2007 -6.49157990660648 "4year" 4
-"749" 0 2007 "Pursat" "Cambodia" "R539T" 2007 -3.85727528921105 "4year" 4
-"750" 2 2009 "Pursat" "Cambodia" "R539T" 2007 -3.23610470035681 "4year" 4
-"751" 3 2010 "Pursat" "Cambodia" "R539T" 2007 -2.94173630271945 "4year" 4
-"752" 4 2011 "Pursat" "Cambodia" "R539T" 2007 -2.60819374865031 "4year" 4
-"753" 5 2012 "Pursat" "Cambodia" "R539T" 2007 -2.32232177626132 "4year" 4
-"754" 6 2013 "Pursat" "Cambodia" "R539T" 2007 -2.0151657042677 "4year" 4
-"755" 7 2014 "Pursat" "Cambodia" "R539T" 2007 -1.71493730383127 "4year" 4
-"756" 8 2015 "Pursat" "Cambodia" "R539T" 2007 -1.39433335671556 "4year" 4
-"757" 9 2016 "Pursat" "Cambodia" "R539T" 2007 -1.09297709432765 "4year" 4
-"758" 10 2017 "Pursat" "Cambodia" "R539T" 2007 -0.799068886481973 "4year" 4
-"759" 11 2018 "Pursat" "Cambodia" "R539T" 2007 -0.482561860787647 "4year" 4
-"760" 12 2019 "Pursat" "Cambodia" "R539T" 2007 -0.181949066466588 "4year" 4
-"761" 13 2020 "Pursat" "Cambodia" "R539T" 2007 0.134887462796272 "4year" 4
-"762" 14 2021 "Pursat" "Cambodia" "R539T" 2007 0.439955949830886 "4year" 4
-"763" 15 2022 "Pursat" "Cambodia" "R539T" 2007 0.752778927897533 "4year" 4
-"764" 16 2023 "Pursat" "Cambodia" "R539T" 2007 1.03453454389074 "4year" 4
-"765" 0 2011 "Attapeu" "Laos" "R539T" 2011 -3.72602440176807 "4year" 4
-"766" 1 2012 "Attapeu" "Laos" "R539T" 2011 -3.35894846264316 "4year" 4
-"767" 4 2015 "Attapeu" "Laos" "R539T" 2011 -2.25636790110126 "4year" 4
-"768" 5 2016 "Attapeu" "Laos" "R539T" 2011 -1.9155860896024 "4year" 4
-"769" 6 2017 "Attapeu" "Laos" "R539T" 2011 -1.53556482605777 "4year" 4
-"770" 7 2018 "Attapeu" "Laos" "R539T" 2011 -1.15945901956802 "4year" 4
-"771" 8 2019 "Attapeu" "Laos" "R539T" 2011 -0.793724673290297 "4year" 4
-"772" 9 2020 "Attapeu" "Laos" "R539T" 2011 -0.441520576919648 "4year" 4
-"773" 10 2021 "Attapeu" "Laos" "R539T" 2011 -0.0771981298971415 "4year" 4
-"774" 11 2022 "Attapeu" "Laos" "R539T" 2011 0.293283270674872 "4year" 4
-"775" 12 2023 "Attapeu" "Laos" "R539T" 2011 0.6724413712851 "4year" 4
-"776" 0 2011 "Sisakhet" "Thailand" "R539T" 2011 -0.376144578417511 "4year" 4
-"777" 1 2012 "Sisakhet" "Thailand" "R539T" 2011 -0.213204574104452 "4year" 4
-"778" 2 2013 "Sisakhet" "Thailand" "R539T" 2011 -0.0243323066491654 "4year" 4
-"779" 4 2015 "Sisakhet" "Thailand" "R539T" 2011 0.378700167126162 "4year" 4
-"780" 5 2016 "Sisakhet" "Thailand" "R539T" 2011 0.554480447731675 "4year" 4
-"781" 6 2017 "Sisakhet" "Thailand" "R539T" 2011 0.733961436788489 "4year" 4
-"782" 7 2018 "Sisakhet" "Thailand" "R539T" 2011 0.93933385885588 "4year" 4
-"783" 8 2019 "Sisakhet" "Thailand" "R539T" 2011 1.10371866235419 "4year" 4
-"784" 9 2020 "Sisakhet" "Thailand" "R539T" 2011 1.30637088957518 "4year" 4
-"785" 10 2021 "Sisakhet" "Thailand" "R539T" 2011 1.4848207168271 "4year" 4
-"786" 11 2022 "Sisakhet" "Thailand" "R539T" 2011 1.67548000394477 "4year" 4
-"787" 12 2023 "Sisakhet" "Thailand" "R539T" 2011 1.8636484794139 "4year" 4
-"788" 0 2007 "Pailin" "Cambodia" "all_kelch" 2007 -0.327450488921291 "4year" 4
-"789" 1 2008 "Pailin" "Cambodia" "all_kelch" 2007 0.171487437158547 "4year" 4
-"790" 2 2009 "Pailin" "Cambodia" "all_kelch" 2007 0.685947895460732 "4year" 4
-"791" 4 2011 "Pailin" "Cambodia" "all_kelch" 2007 1.72170627810433 "4year" 4
-"792" 5 2012 "Pailin" "Cambodia" "all_kelch" 2007 2.24845019858457 "4year" 4
-"793" 6 2013 "Pailin" "Cambodia" "all_kelch" 2007 2.76246644801001 "4year" 4
-"794" 7 2014 "Pailin" "Cambodia" "all_kelch" 2007 3.28278019562727 "4year" 4
-"795" 8 2015 "Pailin" "Cambodia" "all_kelch" 2007 3.78596089570717 "4year" 4
-"796" 9 2016 "Pailin" "Cambodia" "all_kelch" 2007 4.31172018283216 "4year" 4
-"797" 10 2017 "Pailin" "Cambodia" "all_kelch" 2007 4.81751275937676 "4year" 4
-"798" 11 2018 "Pailin" "Cambodia" "all_kelch" 2007 5.34613924543234 "4year" 4
-"799" 12 2019 "Pailin" "Cambodia" "all_kelch" 2007 5.87396011924738 "4year" 4
-"800" 13 2020 "Pailin" "Cambodia" "all_kelch" 2007 6.37316517771978 "4year" 4
-"801" 14 2021 "Pailin" "Cambodia" "all_kelch" 2007 6.89782154642035 "4year" 4
-"802" 15 2022 "Pailin" "Cambodia" "all_kelch" 2007 7.40443333062582 "4year" 4
-"803" 16 2023 "Pailin" "Cambodia" "all_kelch" 2007 7.92762701039966 "4year" 4
-"804" 0 2011 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.55925310215796 "4year" 4
-"805" 1 2012 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.28599894453663 "4year" 4
-"806" 2 2013 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.986012429153356 "4year" 4
-"807" 3 2014 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.696905530992096 "4year" 4
-"808" 4 2015 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.406779288101776 "4year" 4
-"809" 5 2016 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.141731564067609 "4year" 4
-"810" 6 2017 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.143585330149165 "4year" 4
-"811" 7 2018 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.448502593752868 "4year" 4
-"812" 8 2019 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.735492009586384 "4year" 4
-"813" 9 2020 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.02350806198961 "4year" 4
-"814" 10 2021 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.29528556692924 "4year" 4
-"815" 11 2022 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.59721707229298 "4year" 4
-"816" 12 2023 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.86571395525305 "4year" 4
-"817" 0 2007 "Pursat" "Cambodia" "all_kelch" 2007 -1.18975365214001 "4year" 4
-"818" 2 2009 "Pursat" "Cambodia" "all_kelch" 2007 -0.311689397945069 "4year" 4
-"819" 3 2010 "Pursat" "Cambodia" "all_kelch" 2007 0.136422014872089 "4year" 4
-"820" 4 2011 "Pursat" "Cambodia" "all_kelch" 2007 0.577882047341093 "4year" 4
-"821" 5 2012 "Pursat" "Cambodia" "all_kelch" 2007 1.0198808277972 "4year" 4
-"822" 6 2013 "Pursat" "Cambodia" "all_kelch" 2007 1.45866594772718 "4year" 4
-"823" 7 2014 "Pursat" "Cambodia" "all_kelch" 2007 1.90115210102398 "4year" 4
-"824" 8 2015 "Pursat" "Cambodia" "all_kelch" 2007 2.35164622672129 "4year" 4
-"825" 9 2016 "Pursat" "Cambodia" "all_kelch" 2007 2.77985823284684 "4year" 4
-"826" 10 2017 "Pursat" "Cambodia" "all_kelch" 2007 3.20931632744091 "4year" 4
-"827" 11 2018 "Pursat" "Cambodia" "all_kelch" 2007 3.66219252907554 "4year" 4
-"828" 12 2019 "Pursat" "Cambodia" "all_kelch" 2007 4.0896702406149 "4year" 4
-"829" 13 2020 "Pursat" "Cambodia" "all_kelch" 2007 4.53043350008129 "4year" 4
-"830" 14 2021 "Pursat" "Cambodia" "all_kelch" 2007 4.98519670115564 "4year" 4
-"831" 15 2022 "Pursat" "Cambodia" "all_kelch" 2007 5.41973832542902 "4year" 4
-"832" 16 2023 "Pursat" "Cambodia" "all_kelch" 2007 5.86148234079176 "4year" 4
-"833" 0 2011 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.29806914574237 "4year" 4
-"834" 1 2012 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.22716986286867 "4year" 4
-"835" 2 2013 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.13221492797527 "4year" 4
-"836" 3 2014 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.04125145142442 "4year" 4
-"837" 4 2015 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.96650002564196 "4year" 4
-"838" 5 2016 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.89329291058194 "4year" 4
-"839" 6 2017 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.79727071966902 "4year" 4
-"840" 7 2018 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.71034009370602 "4year" 4
-"841" 8 2019 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.6367825120003 "4year" 4
-"842" 9 2020 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.56301037485819 "4year" 4
-"843" 10 2021 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.47501159053864 "4year" 4
-"844" 11 2022 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.37785371582316 "4year" 4
-"845" 12 2023 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.31022604513343 "4year" 4
-"846" 0 2011 "Attapeu" "Laos" "all_kelch" 2011 -3.6692006373841 "4year" 4
-"847" 1 2012 "Attapeu" "Laos" "all_kelch" 2011 -3.34738765113041 "4year" 4
-"848" 4 2015 "Attapeu" "Laos" "all_kelch" 2011 -2.29580805965471 "4year" 4
-"849" 5 2016 "Attapeu" "Laos" "all_kelch" 2011 -1.96349640249806 "4year" 4
-"850" 6 2017 "Attapeu" "Laos" "all_kelch" 2011 -1.61860096411593 "4year" 4
-"851" 7 2018 "Attapeu" "Laos" "all_kelch" 2011 -1.28280555624825 "4year" 4
-"852" 8 2019 "Attapeu" "Laos" "all_kelch" 2011 -0.948523633003059 "4year" 4
-"853" 9 2020 "Attapeu" "Laos" "all_kelch" 2011 -0.611937201779296 "4year" 4
-"854" 10 2021 "Attapeu" "Laos" "all_kelch" 2011 -0.25881765104409 "4year" 4
-"855" 11 2022 "Attapeu" "Laos" "all_kelch" 2011 0.0833249593426986 "4year" 4
-"856" 12 2023 "Attapeu" "Laos" "all_kelch" 2011 0.427427481620499 "4year" 4
-"857" 0 2015 "Sekong" "Laos" "all_kelch" 2015 0.6702586556275 "4year" 4
-"858" 2 2017 "Sekong" "Laos" "all_kelch" 2015 0.596754562923345 "4year" 4
-"859" 3 2018 "Sekong" "Laos" "all_kelch" 2015 0.559639556014006 "4year" 4
-"860" 4 2019 "Sekong" "Laos" "all_kelch" 2015 0.523445437300625 "4year" 4
-"861" 5 2020 "Sekong" "Laos" "all_kelch" 2015 0.469324013150144 "4year" 4
-"862" 6 2021 "Sekong" "Laos" "all_kelch" 2015 0.42147919542595 "4year" 4
-"863" 7 2022 "Sekong" "Laos" "all_kelch" 2015 0.372731602566833 "4year" 4
-"864" 8 2023 "Sekong" "Laos" "all_kelch" 2015 0.32625861945465 "4year" 4
-"865" 0 2013 "Mandalay" "Myanmar" "all_kelch" 2013 -2.22099647038529 "4year" 4
-"866" 1 2014 "Mandalay" "Myanmar" "all_kelch" 2013 -1.79370962643998 "4year" 4
-"867" 2 2015 "Mandalay" "Myanmar" "all_kelch" 2013 -1.38918691410796 "4year" 4
-"868" 3 2016 "Mandalay" "Myanmar" "all_kelch" 2013 -0.946533053574316 "4year" 4
-"869" 4 2017 "Mandalay" "Myanmar" "all_kelch" 2013 -0.53614607021108 "4year" 4
-"870" 5 2018 "Mandalay" "Myanmar" "all_kelch" 2013 -0.117698587167539 "4year" 4
-"871" 6 2019 "Mandalay" "Myanmar" "all_kelch" 2013 0.309063069381378 "4year" 4
-"872" 7 2020 "Mandalay" "Myanmar" "all_kelch" 2013 0.7316567121391 "4year" 4
-"873" 8 2021 "Mandalay" "Myanmar" "all_kelch" 2013 1.15524220766876 "4year" 4
-"874" 9 2022 "Mandalay" "Myanmar" "all_kelch" 2013 1.56289289320198 "4year" 4
-"875" 10 2023 "Mandalay" "Myanmar" "all_kelch" 2013 1.97072316620856 "4year" 4
-"876" 1 2012 "Sisakhet" "Thailand" "all_kelch" 2011 0.00929319048518404 "4year" 4
-"877" 2 2013 "Sisakhet" "Thailand" "all_kelch" 2011 -0.185596708987 "4year" 4
-"878" 4 2015 "Sisakhet" "Thailand" "all_kelch" 2011 -0.622802916364941 "4year" 4
-"879" 5 2016 "Sisakhet" "Thailand" "all_kelch" 2011 -0.832305725963146 "4year" 4
-"880" 6 2017 "Sisakhet" "Thailand" "all_kelch" 2011 -1.04780456034188 "4year" 4
-"881" 7 2018 "Sisakhet" "Thailand" "all_kelch" 2011 -1.25244970250086 "4year" 4
-"882" 8 2019 "Sisakhet" "Thailand" "all_kelch" 2011 -1.4643628091905 "4year" 4
-"883" 9 2020 "Sisakhet" "Thailand" "all_kelch" 2011 -1.69409361830236 "4year" 4
-"884" 10 2021 "Sisakhet" "Thailand" "all_kelch" 2011 -1.90098993111962 "4year" 4
-"885" 11 2022 "Sisakhet" "Thailand" "all_kelch" 2011 -2.10741589222525 "4year" 4
-"886" 12 2023 "Sisakhet" "Thailand" "all_kelch" 2011 -2.30202936836533 "4year" 4
-"887" 0 2003 "Tak" "Thailand" "all_kelch" 2003 -4.17708680756859 "4year" 4
-"888" 2 2005 "Tak" "Thailand" "all_kelch" 2003 -3.78584374256684 "4year" 4
-"889" 4 2007 "Tak" "Thailand" "all_kelch" 2003 -3.36323214100957 "4year" 4
-"890" 5 2008 "Tak" "Thailand" "all_kelch" 2003 -3.17601681248304 "4year" 4
-"891" 6 2009 "Tak" "Thailand" "all_kelch" 2003 -2.9750800405487 "4year" 4
-"892" 7 2010 "Tak" "Thailand" "all_kelch" 2003 -2.78460823185958 "4year" 4
-"893" 8 2011 "Tak" "Thailand" "all_kelch" 2003 -2.55635306250213 "4year" 4
-"894" 9 2012 "Tak" "Thailand" "all_kelch" 2003 -2.37200929829935 "4year" 4
-"895" 10 2013 "Tak" "Thailand" "all_kelch" 2003 -2.17071905750807 "4year" 4
-"896" 11 2014 "Tak" "Thailand" "all_kelch" 2003 -1.97648142247097 "4year" 4
-"897" 12 2015 "Tak" "Thailand" "all_kelch" 2003 -1.78525497173317 "4year" 4
-"898" 13 2016 "Tak" "Thailand" "all_kelch" 2003 -1.57511503169123 "4year" 4
-"899" 14 2017 "Tak" "Thailand" "all_kelch" 2003 -1.36618351917769 "4year" 4
-"900" 15 2018 "Tak" "Thailand" "all_kelch" 2003 -1.17363295531429 "4year" 4
-"901" 16 2019 "Tak" "Thailand" "all_kelch" 2003 -0.987073472591892 "4year" 4
-"902" 17 2020 "Tak" "Thailand" "all_kelch" 2003 -0.788220569452753 "4year" 4
-"903" 18 2021 "Tak" "Thailand" "all_kelch" 2003 -0.581187603154463 "4year" 4
-"904" 19 2022 "Tak" "Thailand" "all_kelch" 2003 -0.381419100523349 "4year" 4
-"905" 20 2023 "Tak" "Thailand" "all_kelch" 2003 -0.179986395953701 "4year" 4
-"906" 0 2005 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.832839724643469 "4year" 4
-"907" 4 2009 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -2.47038956364501 "4year" 4
-"908" 5 2010 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -2.85485013876967 "4year" 4
-"909" 6 2011 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -3.27513505285171 "4year" 4
-"910" 7 2012 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -3.70244427981157 "4year" 4
-"911" 8 2013 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -4.08720846045484 "4year" 4
-"912" 9 2014 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -4.50903774754878 "4year" 4
-"913" 10 2015 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -4.91268629359705 "4year" 4
-"914" 11 2016 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -5.30885883343438 "4year" 4
-"915" 12 2017 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -5.7219017100111 "4year" 4
-"916" 13 2018 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -6.1335482339313 "4year" 4
-"917" 14 2019 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -6.53516134485571 "4year" 4
-"918" 15 2020 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -6.96937158433967 "4year" 4
-"919" 16 2021 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -7.358002567335 "4year" 4
-"920" 17 2022 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -7.77048263940132 "4year" 4
-"921" 18 2023 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -8.16863972327434 "4year" 4
-"922" 0 2015 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.50594644148219 "4year" 4
-"923" 1 2016 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.0448464425544702 "4year" 4
-"924" 2 2017 "Gia Lai" "Vietnam" "all_kelch" 2015 0.410548226716193 "4year" 4
-"925" 3 2018 "Gia Lai" "Vietnam" "all_kelch" 2015 0.86292932987761 "4year" 4
-"926" 4 2019 "Gia Lai" "Vietnam" "all_kelch" 2015 1.32902406952003 "4year" 4
-"927" 5 2020 "Gia Lai" "Vietnam" "all_kelch" 2015 1.78027772900779 "4year" 4
-"928" 6 2021 "Gia Lai" "Vietnam" "all_kelch" 2015 2.22688171718521 "4year" 4
-"929" 7 2022 "Gia Lai" "Vietnam" "all_kelch" 2015 2.67254311442292 "4year" 4
-"930" 8 2023 "Gia Lai" "Vietnam" "all_kelch" 2015 3.13871542940609 "4year" 4
+"1" 0 2008 "Pailin" "Cambodia" "C580Y" 2008 -0.626986028805029 "2year" 2
+"2" 1 2009 "Pailin" "Cambodia" "C580Y" 2008 -0.162029202478082 "2year" 2
+"3" 2 2010 "Pailin" "Cambodia" "C580Y" 2008 0.297363718893568 "2year" 2
+"4" 3 2011 "Pailin" "Cambodia" "C580Y" 2008 0.748611955148166 "2year" 2
+"5" 4 2012 "Pailin" "Cambodia" "C580Y" 2008 1.19870414954644 "2year" 2
+"6" 5 2013 "Pailin" "Cambodia" "C580Y" 2008 1.66188821366208 "2year" 2
+"7" 6 2014 "Pailin" "Cambodia" "C580Y" 2008 2.10971989362064 "2year" 2
+"8" 7 2015 "Pailin" "Cambodia" "C580Y" 2008 2.56944188106618 "2year" 2
+"9" 8 2016 "Pailin" "Cambodia" "C580Y" 2008 3.02961403063869 "2year" 2
+"10" 9 2017 "Pailin" "Cambodia" "C580Y" 2008 3.47825004824427 "2year" 2
+"11" 10 2018 "Pailin" "Cambodia" "C580Y" 2008 3.94472364811912 "2year" 2
+"12" 11 2019 "Pailin" "Cambodia" "C580Y" 2008 4.40459893237134 "2year" 2
+"13" 12 2020 "Pailin" "Cambodia" "C580Y" 2008 4.83903260574432 "2year" 2
+"14" 13 2021 "Pailin" "Cambodia" "C580Y" 2008 5.29242238000131 "2year" 2
+"15" 14 2022 "Pailin" "Cambodia" "C580Y" 2008 5.74640754931577 "2year" 2
+"16" 15 2023 "Pailin" "Cambodia" "C580Y" 2008 6.21030253338434 "2year" 2
+"17" 0 2011 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.95607993328222 "2year" 2
+"18" 1 2012 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.66258501938148 "2year" 2
+"19" 2 2013 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.39083006928558 "2year" 2
+"20" 3 2014 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.11855628977419 "2year" 2
+"21" 4 2015 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.818314617071168 "2year" 2
+"22" 5 2016 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.541090686938186 "2year" 2
+"23" 6 2017 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.239348157318281 "2year" 2
+"24" 7 2018 "Preah Vihear" "Cambodia" "C580Y" 2011 0.0159507379172887 "2year" 2
+"25" 8 2019 "Preah Vihear" "Cambodia" "C580Y" 2011 0.305332029820239 "2year" 2
+"26" 9 2020 "Preah Vihear" "Cambodia" "C580Y" 2011 0.606231912528524 "2year" 2
+"27" 10 2021 "Preah Vihear" "Cambodia" "C580Y" 2011 0.882542123474262 "2year" 2
+"28" 11 2022 "Preah Vihear" "Cambodia" "C580Y" 2011 1.16693945544748 "2year" 2
+"29" 12 2023 "Preah Vihear" "Cambodia" "C580Y" 2011 1.45658453361544 "2year" 2
+"30" 0 2007 "Pursat" "Cambodia" "C580Y" 2007 -2.46820794912079 "2year" 2
+"31" 2 2009 "Pursat" "Cambodia" "C580Y" 2007 -1.39703160694646 "2year" 2
+"32" 3 2010 "Pursat" "Cambodia" "C580Y" 2007 -0.856116070796669 "2year" 2
+"33" 4 2011 "Pursat" "Cambodia" "C580Y" 2007 -0.333396358112189 "2year" 2
+"34" 5 2012 "Pursat" "Cambodia" "C580Y" 2007 0.191500511145053 "2year" 2
+"35" 6 2013 "Pursat" "Cambodia" "C580Y" 2007 0.724646918468513 "2year" 2
+"36" 7 2014 "Pursat" "Cambodia" "C580Y" 2007 1.26776331021198 "2year" 2
+"37" 8 2015 "Pursat" "Cambodia" "C580Y" 2007 1.78870194193141 "2year" 2
+"38" 9 2016 "Pursat" "Cambodia" "C580Y" 2007 2.32289333600306 "2year" 2
+"39" 10 2017 "Pursat" "Cambodia" "C580Y" 2007 2.84979834653887 "2year" 2
+"40" 11 2018 "Pursat" "Cambodia" "C580Y" 2007 3.37310657316471 "2year" 2
+"41" 12 2019 "Pursat" "Cambodia" "C580Y" 2007 3.91587779996418 "2year" 2
+"42" 13 2020 "Pursat" "Cambodia" "C580Y" 2007 4.44874300442285 "2year" 2
+"43" 14 2021 "Pursat" "Cambodia" "C580Y" 2007 4.97527657276782 "2year" 2
+"44" 15 2022 "Pursat" "Cambodia" "C580Y" 2007 5.49407393494145 "2year" 2
+"45" 16 2023 "Pursat" "Cambodia" "C580Y" 2007 6.03238332464545 "2year" 2
+"46" 0 2011 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.31230806334356 "2year" 2
+"47" 1 2012 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.11992946590389 "2year" 2
+"48" 2 2013 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.91302560536218 "2year" 2
+"49" 3 2014 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.71112556081922 "2year" 2
+"50" 4 2015 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.50773507910693 "2year" 2
+"51" 5 2016 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.31116848268799 "2year" 2
+"52" 6 2017 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.11374393221874 "2year" 2
+"53" 7 2018 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.92567190431081 "2year" 2
+"54" 8 2019 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.7103228363664 "2year" 2
+"55" 9 2020 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.52528124953198 "2year" 2
+"56" 10 2021 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.31626623392661 "2year" 2
+"57" 11 2022 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.12399856638604 "2year" 2
+"58" 12 2023 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.927756246349563 "2year" 2
+"59" 0 2011 "Sisakhet" "Thailand" "C580Y" 2011 -0.184100742723503 "2year" 2
+"60" 1 2012 "Sisakhet" "Thailand" "C580Y" 2011 -2.2615923532228 "2year" 2
+"61" 2 2013 "Sisakhet" "Thailand" "C580Y" 2011 -4.33733959525247 "2year" 2
+"62" 3 2014 "Sisakhet" "Thailand" "C580Y" 2011 -6.41318959291647 "2year" 2
+"63" 4 2015 "Sisakhet" "Thailand" "C580Y" 2011 -8.4903512168501 "2year" 2
+"64" 5 2016 "Sisakhet" "Thailand" "C580Y" 2011 -10.5379095811957 "2year" 2
+"65" 6 2017 "Sisakhet" "Thailand" "C580Y" 2011 -12.6170154211595 "2year" 2
+"66" 7 2018 "Sisakhet" "Thailand" "C580Y" 2011 -14.6855246037286 "2year" 2
+"67" 8 2019 "Sisakhet" "Thailand" "C580Y" 2011 -16.7722029278188 "2year" 2
+"68" 9 2020 "Sisakhet" "Thailand" "C580Y" 2011 -18.8364006669071 "2year" 2
+"69" 10 2021 "Sisakhet" "Thailand" "C580Y" 2011 -20.9119735926165 "2year" 2
+"70" 11 2022 "Sisakhet" "Thailand" "C580Y" 2011 -22.9848752556313 "2year" 2
+"71" 12 2023 "Sisakhet" "Thailand" "C580Y" 2011 -25.0554254048206 "2year" 2
+"72" 0 2011 "Tak" "Thailand" "C580Y" 2011 -2.26504803397898 "2year" 2
+"73" 1 2012 "Tak" "Thailand" "C580Y" 2011 -1.21182858650173 "2year" 2
+"74" 2 2013 "Tak" "Thailand" "C580Y" 2011 -0.169623732721683 "2year" 2
+"75" 3 2014 "Tak" "Thailand" "C580Y" 2011 0.877142462654841 "2year" 2
+"76" 4 2015 "Tak" "Thailand" "C580Y" 2011 1.91490816768999 "2year" 2
+"77" 5 2016 "Tak" "Thailand" "C580Y" 2011 2.98535598457208 "2year" 2
+"78" 6 2017 "Tak" "Thailand" "C580Y" 2011 4.03682792687906 "2year" 2
+"79" 7 2018 "Tak" "Thailand" "C580Y" 2011 5.07443041741164 "2year" 2
+"80" 8 2019 "Tak" "Thailand" "C580Y" 2011 6.12830478807173 "2year" 2
+"81" 9 2020 "Tak" "Thailand" "C580Y" 2011 7.17468114011457 "2year" 2
+"82" 10 2021 "Tak" "Thailand" "C580Y" 2011 8.22442340212412 "2year" 2
+"83" 11 2022 "Tak" "Thailand" "C580Y" 2011 9.26184745066533 "2year" 2
+"84" 12 2023 "Tak" "Thailand" "C580Y" 2011 10.3122022493531 "2year" 2
+"85" 0 2010 "Binh Phuoc" "Vietnam" "C580Y" 2010 -3.28131796535895 "2year" 2
+"86" 1 2011 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.87951122640118 "2year" 2
+"87" 2 2012 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.51643336340541 "2year" 2
+"88" 3 2013 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.106006601565 "2year" 2
+"89" 4 2014 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.71348707570562 "2year" 2
+"90" 5 2015 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.32270038010502 "2year" 2
+"91" 6 2016 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.935856227373108 "2year" 2
+"92" 7 2017 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.539320455670024 "2year" 2
+"93" 8 2018 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.143635425848381 "2year" 2
+"94" 9 2019 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.229899627028744 "2year" 2
+"95" 10 2020 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.624925637103541 "2year" 2
+"96" 11 2021 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.03621168947949 "2year" 2
+"97" 12 2022 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.4124402605732 "2year" 2
+"98" 13 2023 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.80397540104532 "2year" 2
+"99" 0 2015 "Gia Lai" "Vietnam" "C580Y" 2015 -0.302175942201006 "2year" 2
+"100" 1 2016 "Gia Lai" "Vietnam" "C580Y" 2015 -0.102732059010217 "2year" 2
+"101" 2 2017 "Gia Lai" "Vietnam" "C580Y" 2015 0.100495227540015 "2year" 2
+"102" 3 2018 "Gia Lai" "Vietnam" "C580Y" 2015 0.31109180836187 "2year" 2
+"103" 4 2019 "Gia Lai" "Vietnam" "C580Y" 2015 0.528472880427913 "2year" 2
+"104" 5 2020 "Gia Lai" "Vietnam" "C580Y" 2015 0.715452555794563 "2year" 2
+"105" 6 2021 "Gia Lai" "Vietnam" "C580Y" 2015 0.947126494393082 "2year" 2
+"106" 7 2022 "Gia Lai" "Vietnam" "C580Y" 2015 1.14283060830796 "2year" 2
+"107" 8 2023 "Gia Lai" "Vietnam" "C580Y" 2015 1.3541823633193 "2year" 2
+"108" 0 2007 "Pailin" "Cambodia" "R539T" 2007 -1.6756118248496 "2year" 2
+"109" 1 2008 "Pailin" "Cambodia" "R539T" 2007 -1.72970821281717 "2year" 2
+"110" 2 2009 "Pailin" "Cambodia" "R539T" 2007 -1.80061452779246 "2year" 2
+"111" 3 2010 "Pailin" "Cambodia" "R539T" 2007 -1.84347316086288 "2year" 2
+"112" 4 2011 "Pailin" "Cambodia" "R539T" 2007 -1.94865005073725 "2year" 2
+"113" 5 2012 "Pailin" "Cambodia" "R539T" 2007 -1.99504799765076 "2year" 2
+"114" 6 2013 "Pailin" "Cambodia" "R539T" 2007 -2.02440175917038 "2year" 2
+"115" 7 2014 "Pailin" "Cambodia" "R539T" 2007 -2.10046199504291 "2year" 2
+"116" 8 2015 "Pailin" "Cambodia" "R539T" 2007 -2.10406215249908 "2year" 2
+"117" 9 2016 "Pailin" "Cambodia" "R539T" 2007 -2.17370164656549 "2year" 2
+"118" 10 2017 "Pailin" "Cambodia" "R539T" 2007 -2.23845600903651 "2year" 2
+"119" 11 2018 "Pailin" "Cambodia" "R539T" 2007 -2.32509460134729 "2year" 2
+"120" 12 2019 "Pailin" "Cambodia" "R539T" 2007 -2.38680031167042 "2year" 2
+"121" 13 2020 "Pailin" "Cambodia" "R539T" 2007 -2.44686865504804 "2year" 2
+"122" 14 2021 "Pailin" "Cambodia" "R539T" 2007 -2.5217001997873 "2year" 2
+"123" 15 2022 "Pailin" "Cambodia" "R539T" 2007 -2.57346400188973 "2year" 2
+"124" 16 2023 "Pailin" "Cambodia" "R539T" 2007 -2.64822411502985 "2year" 2
+"125" 0 2007 "Pursat" "Cambodia" "R539T" 2007 -2.92748798533189 "2year" 2
+"126" 2 2009 "Pursat" "Cambodia" "R539T" 2007 -2.87273867772777 "2year" 2
+"127" 3 2010 "Pursat" "Cambodia" "R539T" 2007 -2.81438931454437 "2year" 2
+"128" 4 2011 "Pursat" "Cambodia" "R539T" 2007 -2.80318271556794 "2year" 2
+"129" 5 2012 "Pursat" "Cambodia" "R539T" 2007 -2.74291034664791 "2year" 2
+"130" 6 2013 "Pursat" "Cambodia" "R539T" 2007 -2.69882831327608 "2year" 2
+"131" 7 2014 "Pursat" "Cambodia" "R539T" 2007 -2.65630802916252 "2year" 2
+"132" 8 2015 "Pursat" "Cambodia" "R539T" 2007 -2.65630462520694 "2year" 2
+"133" 9 2016 "Pursat" "Cambodia" "R539T" 2007 -2.58221862129182 "2year" 2
+"134" 10 2017 "Pursat" "Cambodia" "R539T" 2007 -2.54230306099406 "2year" 2
+"135" 11 2018 "Pursat" "Cambodia" "R539T" 2007 -2.45947115402127 "2year" 2
+"136" 12 2019 "Pursat" "Cambodia" "R539T" 2007 -2.49412422470003 "2year" 2
+"137" 13 2020 "Pursat" "Cambodia" "R539T" 2007 -2.3983626564621 "2year" 2
+"138" 14 2021 "Pursat" "Cambodia" "R539T" 2007 -2.3710049663507 "2year" 2
+"139" 15 2022 "Pursat" "Cambodia" "R539T" 2007 -2.31520011506761 "2year" 2
+"140" 16 2023 "Pursat" "Cambodia" "R539T" 2007 -2.27005179716728 "2year" 2
+"141" 0 2011 "Attapeu" "Laos" "R539T" 2011 -3.14408440234965 "2year" 2
+"142" 1 2012 "Attapeu" "Laos" "R539T" 2011 -3.01636582484658 "2year" 2
+"143" 2 2013 "Attapeu" "Laos" "R539T" 2011 -2.88029871182152 "2year" 2
+"144" 3 2014 "Attapeu" "Laos" "R539T" 2011 -2.7498500625042 "2year" 2
+"145" 4 2015 "Attapeu" "Laos" "R539T" 2011 -2.68349321747054 "2year" 2
+"146" 5 2016 "Attapeu" "Laos" "R539T" 2011 -2.4968196199426 "2year" 2
+"147" 6 2017 "Attapeu" "Laos" "R539T" 2011 -2.37611657482804 "2year" 2
+"148" 7 2018 "Attapeu" "Laos" "R539T" 2011 -2.29192197287416 "2year" 2
+"149" 8 2019 "Attapeu" "Laos" "R539T" 2011 -2.10277113241866 "2year" 2
+"150" 9 2020 "Attapeu" "Laos" "R539T" 2011 -2.00535122565834 "2year" 2
+"151" 10 2021 "Attapeu" "Laos" "R539T" 2011 -1.89480718597273 "2year" 2
+"152" 11 2022 "Attapeu" "Laos" "R539T" 2011 -1.76943330483967 "2year" 2
+"153" 12 2023 "Attapeu" "Laos" "R539T" 2011 -1.62417805529664 "2year" 2
+"154" 0 2011 "Sisakhet" "Thailand" "R539T" 2011 -0.760567843349313 "2year" 2
+"155" 1 2012 "Sisakhet" "Thailand" "R539T" 2011 -0.430916946235536 "2year" 2
+"156" 2 2013 "Sisakhet" "Thailand" "R539T" 2011 -0.103065495726274 "2year" 2
+"157" 3 2014 "Sisakhet" "Thailand" "R539T" 2011 0.218776062480595 "2year" 2
+"158" 4 2015 "Sisakhet" "Thailand" "R539T" 2011 0.616074713800891 "2year" 2
+"159" 5 2016 "Sisakhet" "Thailand" "R539T" 2011 0.94142155329756 "2year" 2
+"160" 6 2017 "Sisakhet" "Thailand" "R539T" 2011 1.27079778096226 "2year" 2
+"161" 7 2018 "Sisakhet" "Thailand" "R539T" 2011 1.62664323116628 "2year" 2
+"162" 8 2019 "Sisakhet" "Thailand" "R539T" 2011 1.95234521585325 "2year" 2
+"163" 9 2020 "Sisakhet" "Thailand" "R539T" 2011 2.30567207845289 "2year" 2
+"164" 10 2021 "Sisakhet" "Thailand" "R539T" 2011 2.64896750292996 "2year" 2
+"165" 11 2022 "Sisakhet" "Thailand" "R539T" 2011 3.01989570270763 "2year" 2
+"166" 12 2023 "Sisakhet" "Thailand" "R539T" 2011 3.34929828090615 "2year" 2
+"167" 0 2007 "Pailin" "Cambodia" "all_kelch" 2007 0.371059288012778 "2year" 2
+"168" 1 2008 "Pailin" "Cambodia" "all_kelch" 2007 0.243316097786082 "2year" 2
+"169" 2 2009 "Pailin" "Cambodia" "all_kelch" 2007 0.115723339909579 "2year" 2
+"170" 3 2010 "Pailin" "Cambodia" "all_kelch" 2007 0.00715591612164397 "2year" 2
+"171" 4 2011 "Pailin" "Cambodia" "all_kelch" 2007 -0.113194998755155 "2year" 2
+"172" 5 2012 "Pailin" "Cambodia" "all_kelch" 2007 -0.242636428072153 "2year" 2
+"173" 6 2013 "Pailin" "Cambodia" "all_kelch" 2007 -0.350070991453881 "2year" 2
+"174" 7 2014 "Pailin" "Cambodia" "all_kelch" 2007 -0.476421754948651 "2year" 2
+"175" 8 2015 "Pailin" "Cambodia" "all_kelch" 2007 -0.597857712778604 "2year" 2
+"176" 9 2016 "Pailin" "Cambodia" "all_kelch" 2007 -0.736649109332842 "2year" 2
+"177" 10 2017 "Pailin" "Cambodia" "all_kelch" 2007 -0.843874084517644 "2year" 2
+"178" 11 2018 "Pailin" "Cambodia" "all_kelch" 2007 -0.973587188483335 "2year" 2
+"179" 12 2019 "Pailin" "Cambodia" "all_kelch" 2007 -1.08384862202258 "2year" 2
+"180" 13 2020 "Pailin" "Cambodia" "all_kelch" 2007 -1.20689936764392 "2year" 2
+"181" 14 2021 "Pailin" "Cambodia" "all_kelch" 2007 -1.33167021550537 "2year" 2
+"182" 15 2022 "Pailin" "Cambodia" "all_kelch" 2007 -1.44699440893042 "2year" 2
+"183" 16 2023 "Pailin" "Cambodia" "all_kelch" 2007 -1.587206069352 "2year" 2
+"184" 0 2011 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.44799414337025 "2year" 2
+"185" 1 2012 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.42630967209171 "2year" 2
+"186" 2 2013 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.40339575631082 "2year" 2
+"187" 3 2014 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.37618079826159 "2year" 2
+"188" 4 2015 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.35422022865645 "2year" 2
+"189" 5 2016 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.3359823975812 "2year" 2
+"190" 6 2017 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.30133354726234 "2year" 2
+"191" 7 2018 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.28733449378748 "2year" 2
+"192" 8 2019 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.25929119192463 "2year" 2
+"193" 9 2020 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.22395050588218 "2year" 2
+"194" 10 2021 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.20523824428275 "2year" 2
+"195" 11 2022 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.18918336795793 "2year" 2
+"196" 12 2023 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.16981312123074 "2year" 2
+"197" 0 2007 "Pursat" "Cambodia" "all_kelch" 2007 -1.03243578082829 "2year" 2
+"198" 2 2009 "Pursat" "Cambodia" "all_kelch" 2007 -0.345257755704299 "2year" 2
+"199" 3 2010 "Pursat" "Cambodia" "all_kelch" 2007 0.0105689059404441 "2year" 2
+"200" 4 2011 "Pursat" "Cambodia" "all_kelch" 2007 0.360696747617742 "2year" 2
+"201" 5 2012 "Pursat" "Cambodia" "all_kelch" 2007 0.696790121851152 "2year" 2
+"202" 6 2013 "Pursat" "Cambodia" "all_kelch" 2007 1.06888974613405 "2year" 2
+"203" 7 2014 "Pursat" "Cambodia" "all_kelch" 2007 1.42265141404939 "2year" 2
+"204" 8 2015 "Pursat" "Cambodia" "all_kelch" 2007 1.7800272725909 "2year" 2
+"205" 9 2016 "Pursat" "Cambodia" "all_kelch" 2007 2.11655501963846 "2year" 2
+"206" 10 2017 "Pursat" "Cambodia" "all_kelch" 2007 2.46304497135611 "2year" 2
+"207" 11 2018 "Pursat" "Cambodia" "all_kelch" 2007 2.80558510158292 "2year" 2
+"208" 12 2019 "Pursat" "Cambodia" "all_kelch" 2007 3.1599632972552 "2year" 2
+"209" 13 2020 "Pursat" "Cambodia" "all_kelch" 2007 3.50475340736851 "2year" 2
+"210" 14 2021 "Pursat" "Cambodia" "all_kelch" 2007 3.8622968441962 "2year" 2
+"211" 15 2022 "Pursat" "Cambodia" "all_kelch" 2007 4.2088236942446 "2year" 2
+"212" 16 2023 "Pursat" "Cambodia" "all_kelch" 2007 4.55625952290951 "2year" 2
+"213" 0 2011 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.37682792418579 "2year" 2
+"214" 1 2012 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.11508041250448 "2year" 2
+"215" 2 2013 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.88430696453514 "2year" 2
+"216" 3 2014 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.62449994484005 "2year" 2
+"217" 4 2015 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.38865111081341 "2year" 2
+"218" 5 2016 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.15139502193796 "2year" 2
+"219" 6 2017 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.89245510494053 "2year" 2
+"220" 7 2018 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.64962774455838 "2year" 2
+"221" 8 2019 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.39340761175525 "2year" 2
+"222" 9 2020 "Ratanakiri" "Cambodia" "all_kelch" 2011 -1.14958404577807 "2year" 2
+"223" 10 2021 "Ratanakiri" "Cambodia" "all_kelch" 2011 -0.901011062599456 "2year" 2
+"224" 11 2022 "Ratanakiri" "Cambodia" "all_kelch" 2011 -0.640779712025597 "2year" 2
+"225" 12 2023 "Ratanakiri" "Cambodia" "all_kelch" 2011 -0.399957184913455 "2year" 2
+"226" 0 2011 "Attapeu" "Laos" "all_kelch" 2011 -3.76299523836402 "2year" 2
+"227" 1 2012 "Attapeu" "Laos" "all_kelch" 2011 -3.41099991220775 "2year" 2
+"228" 2 2013 "Attapeu" "Laos" "all_kelch" 2011 -3.05216511282652 "2year" 2
+"229" 3 2014 "Attapeu" "Laos" "all_kelch" 2011 -2.6790517671123 "2year" 2
+"230" 4 2015 "Attapeu" "Laos" "all_kelch" 2011 -2.3288327830257 "2year" 2
+"231" 5 2016 "Attapeu" "Laos" "all_kelch" 2011 -1.95414245311242 "2year" 2
+"232" 6 2017 "Attapeu" "Laos" "all_kelch" 2011 -1.59011695744483 "2year" 2
+"233" 7 2018 "Attapeu" "Laos" "all_kelch" 2011 -1.22861720578896 "2year" 2
+"234" 8 2019 "Attapeu" "Laos" "all_kelch" 2011 -0.864508625342152 "2year" 2
+"235" 9 2020 "Attapeu" "Laos" "all_kelch" 2011 -0.503455116184021 "2year" 2
+"236" 10 2021 "Attapeu" "Laos" "all_kelch" 2011 -0.151396257416523 "2year" 2
+"237" 11 2022 "Attapeu" "Laos" "all_kelch" 2011 0.225886564791049 "2year" 2
+"238" 12 2023 "Attapeu" "Laos" "all_kelch" 2011 0.570012305675101 "2year" 2
+"239" 0 2015 "Sekong" "Laos" "all_kelch" 2015 0.780287733294579 "2year" 2
+"240" 2 2017 "Sekong" "Laos" "all_kelch" 2015 0.706775630823967 "2year" 2
+"241" 3 2018 "Sekong" "Laos" "all_kelch" 2015 0.668095729528809 "2year" 2
+"242" 4 2019 "Sekong" "Laos" "all_kelch" 2015 0.653068434626528 "2year" 2
+"243" 5 2020 "Sekong" "Laos" "all_kelch" 2015 0.622760148660402 "2year" 2
+"244" 6 2021 "Sekong" "Laos" "all_kelch" 2015 0.59195761887522 "2year" 2
+"245" 7 2022 "Sekong" "Laos" "all_kelch" 2015 0.550717141367054 "2year" 2
+"246" 8 2023 "Sekong" "Laos" "all_kelch" 2015 0.537094202912368 "2year" 2
+"247" 0 2013 "Mandalay" "Myanmar" "all_kelch" 2013 -2.09462464668152 "2year" 2
+"248" 1 2014 "Mandalay" "Myanmar" "all_kelch" 2013 -1.82032136946151 "2year" 2
+"249" 2 2015 "Mandalay" "Myanmar" "all_kelch" 2013 -1.55083602632222 "2year" 2
+"250" 3 2016 "Mandalay" "Myanmar" "all_kelch" 2013 -1.26584361013643 "2year" 2
+"251" 4 2017 "Mandalay" "Myanmar" "all_kelch" 2013 -0.993118380490324 "2year" 2
+"252" 5 2018 "Mandalay" "Myanmar" "all_kelch" 2013 -0.72738608090273 "2year" 2
+"253" 6 2019 "Mandalay" "Myanmar" "all_kelch" 2013 -0.444002149729263 "2year" 2
+"254" 7 2020 "Mandalay" "Myanmar" "all_kelch" 2013 -0.175421751441315 "2year" 2
+"255" 8 2021 "Mandalay" "Myanmar" "all_kelch" 2013 0.111937509691022 "2year" 2
+"256" 9 2022 "Mandalay" "Myanmar" "all_kelch" 2013 0.373611414990941 "2year" 2
+"257" 10 2023 "Mandalay" "Myanmar" "all_kelch" 2013 0.655600408217839 "2year" 2
+"258" 1 2012 "Sisakhet" "Thailand" "all_kelch" 2011 0.0686126837391702 "2year" 2
+"259" 2 2013 "Sisakhet" "Thailand" "all_kelch" 2011 0.101017342824591 "2year" 2
+"260" 3 2014 "Sisakhet" "Thailand" "all_kelch" 2011 0.134881780362156 "2year" 2
+"261" 4 2015 "Sisakhet" "Thailand" "all_kelch" 2011 0.158091602041014 "2year" 2
+"262" 5 2016 "Sisakhet" "Thailand" "all_kelch" 2011 0.19624897969896 "2year" 2
+"263" 6 2017 "Sisakhet" "Thailand" "all_kelch" 2011 0.234628920944263 "2year" 2
+"264" 7 2018 "Sisakhet" "Thailand" "all_kelch" 2011 0.272374914506202 "2year" 2
+"265" 8 2019 "Sisakhet" "Thailand" "all_kelch" 2011 0.301706664051935 "2year" 2
+"266" 9 2020 "Sisakhet" "Thailand" "all_kelch" 2011 0.338854312337413 "2year" 2
+"267" 10 2021 "Sisakhet" "Thailand" "all_kelch" 2011 0.383571186700476 "2year" 2
+"268" 11 2022 "Sisakhet" "Thailand" "all_kelch" 2011 0.411741897753585 "2year" 2
+"269" 12 2023 "Sisakhet" "Thailand" "all_kelch" 2011 0.442335274085364 "2year" 2
+"270" 0 2003 "Tak" "Thailand" "all_kelch" 2003 -4.35907611302549 "2year" 2
+"271" 2 2005 "Tak" "Thailand" "all_kelch" 2003 -3.74238929695736 "2year" 2
+"272" 3 2006 "Tak" "Thailand" "all_kelch" 2003 -3.43069070373341 "2year" 2
+"273" 4 2007 "Tak" "Thailand" "all_kelch" 2003 -3.13384894214967 "2year" 2
+"274" 5 2008 "Tak" "Thailand" "all_kelch" 2003 -2.83621091291311 "2year" 2
+"275" 6 2009 "Tak" "Thailand" "all_kelch" 2003 -2.52300129823344 "2year" 2
+"276" 7 2010 "Tak" "Thailand" "all_kelch" 2003 -2.22815763794055 "2year" 2
+"277" 8 2011 "Tak" "Thailand" "all_kelch" 2003 -1.91011538597437 "2year" 2
+"278" 9 2012 "Tak" "Thailand" "all_kelch" 2003 -1.61197076585573 "2year" 2
+"279" 10 2013 "Tak" "Thailand" "all_kelch" 2003 -1.3005711249141 "2year" 2
+"280" 11 2014 "Tak" "Thailand" "all_kelch" 2003 -0.994363204541568 "2year" 2
+"281" 12 2015 "Tak" "Thailand" "all_kelch" 2003 -0.694320341404402 "2year" 2
+"282" 13 2016 "Tak" "Thailand" "all_kelch" 2003 -0.378801770405741 "2year" 2
+"283" 14 2017 "Tak" "Thailand" "all_kelch" 2003 -0.0859570770257247 "2year" 2
+"284" 15 2018 "Tak" "Thailand" "all_kelch" 2003 0.224203277627976 "2year" 2
+"285" 16 2019 "Tak" "Thailand" "all_kelch" 2003 0.531938856774202 "2year" 2
+"286" 17 2020 "Tak" "Thailand" "all_kelch" 2003 0.834777735237037 "2year" 2
+"287" 18 2021 "Tak" "Thailand" "all_kelch" 2003 1.14215648453955 "2year" 2
+"288" 19 2022 "Tak" "Thailand" "all_kelch" 2003 1.44592643201236 "2year" 2
+"289" 20 2023 "Tak" "Thailand" "all_kelch" 2003 1.74862125754963 "2year" 2
+"290" 0 2005 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.71654231785606 "2year" 2
+"291" 2 2007 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.517445626717109 "2year" 2
+"292" 3 2008 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.441070024043394 "2year" 2
+"293" 4 2009 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.343698895408484 "2year" 2
+"294" 5 2010 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.243386905785797 "2year" 2
+"295" 6 2011 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.155059980234979 "2year" 2
+"296" 7 2012 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.0640930205825551 "2year" 2
+"297" 8 2013 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.027636967090988 "2year" 2
+"298" 9 2014 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.123846931623725 "2year" 2
+"299" 10 2015 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.207608176158262 "2year" 2
+"300" 11 2016 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.303291272627392 "2year" 2
+"301" 12 2017 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.409984439710149 "2year" 2
+"302" 13 2018 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.50042587181093 "2year" 2
+"303" 14 2019 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.589557985588221 "2year" 2
+"304" 15 2020 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.674170597600124 "2year" 2
+"305" 16 2021 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.770510304674868 "2year" 2
+"306" 17 2022 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.859573512006619 "2year" 2
+"307" 18 2023 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.946098555910489 "2year" 2
+"308" 0 2015 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.0725351354676699 "2year" 2
+"309" 1 2016 "Gia Lai" "Vietnam" "all_kelch" 2015 0.0274253406458532 "2year" 2
+"310" 2 2017 "Gia Lai" "Vietnam" "all_kelch" 2015 0.13821175102849 "2year" 2
+"311" 3 2018 "Gia Lai" "Vietnam" "all_kelch" 2015 0.224631727690125 "2year" 2
+"312" 4 2019 "Gia Lai" "Vietnam" "all_kelch" 2015 0.318950782155891 "2year" 2
+"313" 5 2020 "Gia Lai" "Vietnam" "all_kelch" 2015 0.426937982195837 "2year" 2
+"314" 6 2021 "Gia Lai" "Vietnam" "all_kelch" 2015 0.524578527034291 "2year" 2
+"315" 7 2022 "Gia Lai" "Vietnam" "all_kelch" 2015 0.647526091818468 "2year" 2
+"316" 8 2023 "Gia Lai" "Vietnam" "all_kelch" 2015 0.72050157285186 "2year" 2
+"317" 0 2008 "Pailin" "Cambodia" "C580Y" 2008 -0.649664245893393 "3year" 3
+"318" 1 2009 "Pailin" "Cambodia" "C580Y" 2008 -0.0238161185285674 "3year" 3
+"319" 2 2010 "Pailin" "Cambodia" "C580Y" 2008 0.592606056220247 "3year" 3
+"320" 3 2011 "Pailin" "Cambodia" "C580Y" 2008 1.22707439522572 "3year" 3
+"321" 4 2012 "Pailin" "Cambodia" "C580Y" 2008 1.857997524613 "3year" 3
+"322" 5 2013 "Pailin" "Cambodia" "C580Y" 2008 2.48943002113451 "3year" 3
+"323" 6 2014 "Pailin" "Cambodia" "C580Y" 2008 3.10750211138327 "3year" 3
+"324" 7 2015 "Pailin" "Cambodia" "C580Y" 2008 3.74456813672808 "3year" 3
+"325" 8 2016 "Pailin" "Cambodia" "C580Y" 2008 4.35154119040991 "3year" 3
+"326" 9 2017 "Pailin" "Cambodia" "C580Y" 2008 4.98848670900857 "3year" 3
+"327" 10 2018 "Pailin" "Cambodia" "C580Y" 2008 5.61992696575839 "3year" 3
+"328" 11 2019 "Pailin" "Cambodia" "C580Y" 2008 6.23672429059875 "3year" 3
+"329" 12 2020 "Pailin" "Cambodia" "C580Y" 2008 6.871451061806 "3year" 3
+"330" 13 2021 "Pailin" "Cambodia" "C580Y" 2008 7.48393779417997 "3year" 3
+"331" 14 2022 "Pailin" "Cambodia" "C580Y" 2008 8.11693869950191 "3year" 3
+"332" 15 2023 "Pailin" "Cambodia" "C580Y" 2008 8.73912812022957 "3year" 3
+"333" 0 2011 "Preah Vihear" "Cambodia" "C580Y" 2011 -2.06028027573913 "3year" 3
+"334" 1 2012 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.55416705816572 "3year" 3
+"335" 2 2013 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.0747264052847 "3year" 3
+"336" 3 2014 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.599005148068303 "3year" 3
+"337" 4 2015 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.0938635923119981 "3year" 3
+"338" 5 2016 "Preah Vihear" "Cambodia" "C580Y" 2011 0.385281627499918 "3year" 3
+"339" 6 2017 "Preah Vihear" "Cambodia" "C580Y" 2011 0.880610103351461 "3year" 3
+"340" 7 2018 "Preah Vihear" "Cambodia" "C580Y" 2011 1.36004680957241 "3year" 3
+"341" 8 2019 "Preah Vihear" "Cambodia" "C580Y" 2011 1.84220975726962 "3year" 3
+"342" 9 2020 "Preah Vihear" "Cambodia" "C580Y" 2011 2.33325688147575 "3year" 3
+"343" 10 2021 "Preah Vihear" "Cambodia" "C580Y" 2011 2.84661725947358 "3year" 3
+"344" 11 2022 "Preah Vihear" "Cambodia" "C580Y" 2011 3.31396003609073 "3year" 3
+"345" 12 2023 "Preah Vihear" "Cambodia" "C580Y" 2011 3.80572870630436 "3year" 3
+"346" 0 2007 "Pursat" "Cambodia" "C580Y" 2007 -2.5158645220938 "3year" 3
+"347" 2 2009 "Pursat" "Cambodia" "C580Y" 2007 -1.30502511981303 "3year" 3
+"348" 3 2010 "Pursat" "Cambodia" "C580Y" 2007 -0.685948883960648 "3year" 3
+"349" 4 2011 "Pursat" "Cambodia" "C580Y" 2007 -0.0940472207929739 "3year" 3
+"350" 5 2012 "Pursat" "Cambodia" "C580Y" 2007 0.503401031964852 "3year" 3
+"351" 6 2013 "Pursat" "Cambodia" "C580Y" 2007 1.11457411098096 "3year" 3
+"352" 7 2014 "Pursat" "Cambodia" "C580Y" 2007 1.71333499402903 "3year" 3
+"353" 8 2015 "Pursat" "Cambodia" "C580Y" 2007 2.31956452685296 "3year" 3
+"354" 9 2016 "Pursat" "Cambodia" "C580Y" 2007 2.91427330521258 "3year" 3
+"355" 10 2017 "Pursat" "Cambodia" "C580Y" 2007 3.52109795593778 "3year" 3
+"356" 11 2018 "Pursat" "Cambodia" "C580Y" 2007 4.12712816871806 "3year" 3
+"357" 12 2019 "Pursat" "Cambodia" "C580Y" 2007 4.73899572352584 "3year" 3
+"358" 13 2020 "Pursat" "Cambodia" "C580Y" 2007 5.32852136385486 "3year" 3
+"359" 14 2021 "Pursat" "Cambodia" "C580Y" 2007 5.9420041973324 "3year" 3
+"360" 15 2022 "Pursat" "Cambodia" "C580Y" 2007 6.53232449329706 "3year" 3
+"361" 16 2023 "Pursat" "Cambodia" "C580Y" 2007 7.1581454927809 "3year" 3
+"362" 0 2011 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.31837428700917 "3year" 3
+"363" 1 2012 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.09382079075007 "3year" 3
+"364" 2 2013 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.88518465113577 "3year" 3
+"365" 3 2014 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.69169031213253 "3year" 3
+"366" 4 2015 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.4774151504492 "3year" 3
+"367" 5 2016 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.27049873489225 "3year" 3
+"368" 6 2017 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.06099857908763 "3year" 3
+"369" 7 2018 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.85525199712374 "3year" 3
+"370" 8 2019 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.65704746835593 "3year" 3
+"371" 9 2020 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.44104278816802 "3year" 3
+"372" 10 2021 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.22666521050487 "3year" 3
+"373" 11 2022 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.02757538230569 "3year" 3
+"374" 12 2023 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.822191757496333 "3year" 3
+"375" 0 2011 "Sisakhet" "Thailand" "C580Y" 2011 -0.372069938101083 "3year" 3
+"376" 1 2012 "Sisakhet" "Thailand" "C580Y" 2011 -2.11136918051631 "3year" 3
+"377" 3 2014 "Sisakhet" "Thailand" "C580Y" 2011 -5.62294585938383 "3year" 3
+"378" 4 2015 "Sisakhet" "Thailand" "C580Y" 2011 -7.37346698526355 "3year" 3
+"379" 5 2016 "Sisakhet" "Thailand" "C580Y" 2011 -9.12808626503915 "3year" 3
+"380" 6 2017 "Sisakhet" "Thailand" "C580Y" 2011 -10.8761950253698 "3year" 3
+"381" 7 2018 "Sisakhet" "Thailand" "C580Y" 2011 -12.6285848599971 "3year" 3
+"382" 8 2019 "Sisakhet" "Thailand" "C580Y" 2011 -14.3811759814186 "3year" 3
+"383" 9 2020 "Sisakhet" "Thailand" "C580Y" 2011 -16.1271180896169 "3year" 3
+"384" 10 2021 "Sisakhet" "Thailand" "C580Y" 2011 -17.8778726930148 "3year" 3
+"385" 11 2022 "Sisakhet" "Thailand" "C580Y" 2011 -19.641298509498 "3year" 3
+"386" 12 2023 "Sisakhet" "Thailand" "C580Y" 2011 -21.3871154024374 "3year" 3
+"387" 0 2011 "Tak" "Thailand" "C580Y" 2011 -2.2450652880503 "3year" 3
+"388" 1 2012 "Tak" "Thailand" "C580Y" 2011 -1.19321807008807 "3year" 3
+"389" 2 2013 "Tak" "Thailand" "C580Y" 2011 -0.163956262910666 "3year" 3
+"390" 3 2014 "Tak" "Thailand" "C580Y" 2011 0.867863900089026 "3year" 3
+"391" 4 2015 "Tak" "Thailand" "C580Y" 2011 1.92738431522602 "3year" 3
+"392" 5 2016 "Tak" "Thailand" "C580Y" 2011 2.97072101365841 "3year" 3
+"393" 6 2017 "Tak" "Thailand" "C580Y" 2011 4.01304116079707 "3year" 3
+"394" 7 2018 "Tak" "Thailand" "C580Y" 2011 5.04214910686291 "3year" 3
+"395" 8 2019 "Tak" "Thailand" "C580Y" 2011 6.09729657643048 "3year" 3
+"396" 9 2020 "Tak" "Thailand" "C580Y" 2011 7.15227996085367 "3year" 3
+"397" 10 2021 "Tak" "Thailand" "C580Y" 2011 8.18762038920314 "3year" 3
+"398" 11 2022 "Tak" "Thailand" "C580Y" 2011 9.22973090766505 "3year" 3
+"399" 12 2023 "Tak" "Thailand" "C580Y" 2011 10.2728203372501 "3year" 3
+"400" 0 2010 "Binh Phuoc" "Vietnam" "C580Y" 2010 -3.30074387425899 "3year" 3
+"401" 1 2011 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.89377389233197 "3year" 3
+"402" 2 2012 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.51752745781622 "3year" 3
+"403" 3 2013 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.11891826930732 "3year" 3
+"404" 4 2014 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.74830092423329 "3year" 3
+"405" 5 2015 "Binh Phuoc" "Vietnam" "C580Y" 2010 -1.34933677830914 "3year" 3
+"406" 6 2016 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.965325243682571 "3year" 3
+"407" 7 2017 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.589756771944366 "3year" 3
+"408" 8 2018 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.202354686236608 "3year" 3
+"409" 9 2019 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.184837726842196 "3year" 3
+"410" 10 2020 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.563389952156361 "3year" 3
+"411" 11 2021 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.932347725195592 "3year" 3
+"412" 12 2022 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.32301555153048 "3year" 3
+"413" 13 2023 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.70640014624529 "3year" 3
+"414" 0 2015 "Gia Lai" "Vietnam" "C580Y" 2015 -0.720176590590294 "3year" 3
+"415" 1 2016 "Gia Lai" "Vietnam" "C580Y" 2015 -0.182117856807261 "3year" 3
+"416" 2 2017 "Gia Lai" "Vietnam" "C580Y" 2015 0.361393716374264 "3year" 3
+"417" 3 2018 "Gia Lai" "Vietnam" "C580Y" 2015 0.876764564085242 "3year" 3
+"418" 4 2019 "Gia Lai" "Vietnam" "C580Y" 2015 1.41402453153098 "3year" 3
+"419" 5 2020 "Gia Lai" "Vietnam" "C580Y" 2015 1.96841198298802 "3year" 3
+"420" 6 2021 "Gia Lai" "Vietnam" "C580Y" 2015 2.48867991319656 "3year" 3
+"421" 7 2022 "Gia Lai" "Vietnam" "C580Y" 2015 3.0118085161957 "3year" 3
+"422" 8 2023 "Gia Lai" "Vietnam" "C580Y" 2015 3.54782161044063 "3year" 3
+"423" 0 2007 "Pailin" "Cambodia" "R539T" 2007 -1.5413770019131 "3year" 3
+"424" 1 2008 "Pailin" "Cambodia" "R539T" 2007 -1.73032256955772 "3year" 3
+"425" 2 2009 "Pailin" "Cambodia" "R539T" 2007 -1.92971999976226 "3year" 3
+"426" 3 2010 "Pailin" "Cambodia" "R539T" 2007 -2.09861195576014 "3year" 3
+"427" 4 2011 "Pailin" "Cambodia" "R539T" 2007 -2.31859549872442 "3year" 3
+"428" 5 2012 "Pailin" "Cambodia" "R539T" 2007 -2.53061568007295 "3year" 3
+"429" 6 2013 "Pailin" "Cambodia" "R539T" 2007 -2.72716991334583 "3year" 3
+"430" 7 2014 "Pailin" "Cambodia" "R539T" 2007 -2.9345740136541 "3year" 3
+"431" 8 2015 "Pailin" "Cambodia" "R539T" 2007 -3.10701017624749 "3year" 3
+"432" 9 2016 "Pailin" "Cambodia" "R539T" 2007 -3.31235695215713 "3year" 3
+"433" 10 2017 "Pailin" "Cambodia" "R539T" 2007 -3.50181269960014 "3year" 3
+"434" 11 2018 "Pailin" "Cambodia" "R539T" 2007 -3.70187090611911 "3year" 3
+"435" 12 2019 "Pailin" "Cambodia" "R539T" 2007 -3.88893366306747 "3year" 3
+"436" 13 2020 "Pailin" "Cambodia" "R539T" 2007 -4.08943040165376 "3year" 3
+"437" 14 2021 "Pailin" "Cambodia" "R539T" 2007 -4.30276004147629 "3year" 3
+"438" 15 2022 "Pailin" "Cambodia" "R539T" 2007 -4.48848810855331 "3year" 3
+"439" 16 2023 "Pailin" "Cambodia" "R539T" 2007 -4.6966304522704 "3year" 3
+"440" 0 2007 "Pursat" "Cambodia" "R539T" 2007 -3.24711329006448 "3year" 3
+"441" 2 2009 "Pursat" "Cambodia" "R539T" 2007 -3.33431394354148 "3year" 3
+"442" 3 2010 "Pursat" "Cambodia" "R539T" 2007 -3.33048568964391 "3year" 3
+"443" 4 2011 "Pursat" "Cambodia" "R539T" 2007 -3.36964198950695 "3year" 3
+"444" 5 2012 "Pursat" "Cambodia" "R539T" 2007 -3.42240030290044 "3year" 3
+"445" 6 2013 "Pursat" "Cambodia" "R539T" 2007 -3.44546010426437 "3year" 3
+"446" 7 2014 "Pursat" "Cambodia" "R539T" 2007 -3.46596973549217 "3year" 3
+"447" 8 2015 "Pursat" "Cambodia" "R539T" 2007 -3.48499759205208 "3year" 3
+"448" 9 2016 "Pursat" "Cambodia" "R539T" 2007 -3.51046683748853 "3year" 3
+"449" 10 2017 "Pursat" "Cambodia" "R539T" 2007 -3.54750565517197 "3year" 3
+"450" 11 2018 "Pursat" "Cambodia" "R539T" 2007 -3.57071440323646 "3year" 3
+"451" 12 2019 "Pursat" "Cambodia" "R539T" 2007 -3.59613533455752 "3year" 3
+"452" 13 2020 "Pursat" "Cambodia" "R539T" 2007 -3.64487545714865 "3year" 3
+"453" 14 2021 "Pursat" "Cambodia" "R539T" 2007 -3.66386507563567 "3year" 3
+"454" 15 2022 "Pursat" "Cambodia" "R539T" 2007 -3.668145060096 "3year" 3
+"455" 16 2023 "Pursat" "Cambodia" "R539T" 2007 -3.73748942553564 "3year" 3
+"456" 0 2011 "Attapeu" "Laos" "R539T" 2011 -3.49589324750839 "3year" 3
+"457" 1 2012 "Attapeu" "Laos" "R539T" 2011 -3.3746196120951 "3year" 3
+"458" 3 2014 "Attapeu" "Laos" "R539T" 2011 -3.11260544696668 "3year" 3
+"459" 4 2015 "Attapeu" "Laos" "R539T" 2011 -2.96555162397233 "3year" 3
+"460" 5 2016 "Attapeu" "Laos" "R539T" 2011 -2.81743806574067 "3year" 3
+"461" 6 2017 "Attapeu" "Laos" "R539T" 2011 -2.67509633833913 "3year" 3
+"462" 7 2018 "Attapeu" "Laos" "R539T" 2011 -2.54842170749059 "3year" 3
+"463" 8 2019 "Attapeu" "Laos" "R539T" 2011 -2.40425930244694 "3year" 3
+"464" 9 2020 "Attapeu" "Laos" "R539T" 2011 -2.27413471793587 "3year" 3
+"465" 10 2021 "Attapeu" "Laos" "R539T" 2011 -2.14028893842256 "3year" 3
+"466" 11 2022 "Attapeu" "Laos" "R539T" 2011 -2.00001159230513 "3year" 3
+"467" 12 2023 "Attapeu" "Laos" "R539T" 2011 -1.86062232824117 "3year" 3
+"468" 0 2011 "Sisakhet" "Thailand" "R539T" 2011 -0.444799341083556 "3year" 3
+"469" 1 2012 "Sisakhet" "Thailand" "R539T" 2011 -0.252048619450856 "3year" 3
+"470" 2 2013 "Sisakhet" "Thailand" "R539T" 2011 -0.0476475525111405 "3year" 3
+"471" 3 2014 "Sisakhet" "Thailand" "R539T" 2011 0.164938251634349 "3year" 3
+"472" 4 2015 "Sisakhet" "Thailand" "R539T" 2011 0.366344732993239 "3year" 3
+"473" 5 2016 "Sisakhet" "Thailand" "R539T" 2011 0.569498405151409 "3year" 3
+"474" 6 2017 "Sisakhet" "Thailand" "R539T" 2011 0.767231969982713 "3year" 3
+"475" 7 2018 "Sisakhet" "Thailand" "R539T" 2011 0.946243367853682 "3year" 3
+"476" 8 2019 "Sisakhet" "Thailand" "R539T" 2011 1.16863824442733 "3year" 3
+"477" 9 2020 "Sisakhet" "Thailand" "R539T" 2011 1.35357815886722 "3year" 3
+"478" 10 2021 "Sisakhet" "Thailand" "R539T" 2011 1.54524370426035 "3year" 3
+"479" 11 2022 "Sisakhet" "Thailand" "R539T" 2011 1.75243827053361 "3year" 3
+"480" 12 2023 "Sisakhet" "Thailand" "R539T" 2011 1.9479960650725 "3year" 3
+"481" 0 2007 "Pailin" "Cambodia" "all_kelch" 2007 0.221345919271885 "3year" 3
+"482" 1 2008 "Pailin" "Cambodia" "all_kelch" 2007 0.216680032326948 "3year" 3
+"483" 2 2009 "Pailin" "Cambodia" "all_kelch" 2007 0.211717723189391 "3year" 3
+"484" 3 2010 "Pailin" "Cambodia" "all_kelch" 2007 0.204494454159551 "3year" 3
+"485" 4 2011 "Pailin" "Cambodia" "all_kelch" 2007 0.196310291533417 "3year" 3
+"486" 5 2012 "Pailin" "Cambodia" "all_kelch" 2007 0.207414721784531 "3year" 3
+"487" 6 2013 "Pailin" "Cambodia" "all_kelch" 2007 0.192001347845157 "3year" 3
+"488" 7 2014 "Pailin" "Cambodia" "all_kelch" 2007 0.197992622808554 "3year" 3
+"489" 8 2015 "Pailin" "Cambodia" "all_kelch" 2007 0.191211146191264 "3year" 3
+"490" 9 2016 "Pailin" "Cambodia" "all_kelch" 2007 0.187214054685462 "3year" 3
+"491" 10 2017 "Pailin" "Cambodia" "all_kelch" 2007 0.18017750511508 "3year" 3
+"492" 11 2018 "Pailin" "Cambodia" "all_kelch" 2007 0.166285973154268 "3year" 3
+"493" 12 2019 "Pailin" "Cambodia" "all_kelch" 2007 0.160113308928362 "3year" 3
+"494" 13 2020 "Pailin" "Cambodia" "all_kelch" 2007 0.175451347743385 "3year" 3
+"495" 14 2021 "Pailin" "Cambodia" "all_kelch" 2007 0.169126234335089 "3year" 3
+"496" 15 2022 "Pailin" "Cambodia" "all_kelch" 2007 0.157451120046041 "3year" 3
+"497" 16 2023 "Pailin" "Cambodia" "all_kelch" 2007 0.158069946962832 "3year" 3
+"498" 0 2011 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.52648666664638 "3year" 3
+"499" 1 2012 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.28434759694883 "3year" 3
+"500" 2 2013 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.05290172778227 "3year" 3
+"501" 3 2014 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.784833887378002 "3year" 3
+"502" 4 2015 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.561665526209355 "3year" 3
+"503" 5 2016 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.316461048892044 "3year" 3
+"504" 6 2017 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.0730284446828091 "3year" 3
+"505" 7 2018 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.16161327576665 "3year" 3
+"506" 8 2019 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.420414378098324 "3year" 3
+"507" 9 2020 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.67023650339773 "3year" 3
+"508" 10 2021 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.919544676353504 "3year" 3
+"509" 11 2022 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.15312004464421 "3year" 3
+"510" 12 2023 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.42206038944722 "3year" 3
+"511" 0 2007 "Pursat" "Cambodia" "all_kelch" 2007 -1.021296227976 "3year" 3
+"512" 2 2009 "Pursat" "Cambodia" "all_kelch" 2007 -0.333718851656353 "3year" 3
+"513" 3 2010 "Pursat" "Cambodia" "all_kelch" 2007 0.0154584256424481 "3year" 3
+"514" 4 2011 "Pursat" "Cambodia" "all_kelch" 2007 0.389600783995379 "3year" 3
+"515" 5 2012 "Pursat" "Cambodia" "all_kelch" 2007 0.728939232468436 "3year" 3
+"516" 6 2013 "Pursat" "Cambodia" "all_kelch" 2007 1.09389399277465 "3year" 3
+"517" 7 2014 "Pursat" "Cambodia" "all_kelch" 2007 1.4437022640371 "3year" 3
+"518" 8 2015 "Pursat" "Cambodia" "all_kelch" 2007 1.78556246117147 "3year" 3
+"519" 9 2016 "Pursat" "Cambodia" "all_kelch" 2007 2.13202070793957 "3year" 3
+"520" 10 2017 "Pursat" "Cambodia" "all_kelch" 2007 2.49493573389397 "3year" 3
+"521" 11 2018 "Pursat" "Cambodia" "all_kelch" 2007 2.85148073636385 "3year" 3
+"522" 12 2019 "Pursat" "Cambodia" "all_kelch" 2007 3.19478662278107 "3year" 3
+"523" 13 2020 "Pursat" "Cambodia" "all_kelch" 2007 3.55049908125896 "3year" 3
+"524" 14 2021 "Pursat" "Cambodia" "all_kelch" 2007 3.90252735483787 "3year" 3
+"525" 15 2022 "Pursat" "Cambodia" "all_kelch" 2007 4.25355484846766 "3year" 3
+"526" 16 2023 "Pursat" "Cambodia" "all_kelch" 2007 4.59803264384521 "3year" 3
+"527" 0 2011 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.3093758612974 "3year" 3
+"528" 1 2012 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.21506002630114 "3year" 3
+"529" 2 2013 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.11271244575983 "3year" 3
+"530" 3 2014 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.00507493384667 "3year" 3
+"531" 4 2015 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.9334302363215 "3year" 3
+"532" 5 2016 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.8120845211945 "3year" 3
+"533" 6 2017 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.71341470348794 "3year" 3
+"534" 7 2018 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.62256730274801 "3year" 3
+"535" 8 2019 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.53056017025084 "3year" 3
+"536" 9 2020 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.44200842241667 "3year" 3
+"537" 10 2021 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.33079974102075 "3year" 3
+"538" 11 2022 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.22444795150643 "3year" 3
+"539" 12 2023 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.13974113603545 "3year" 3
+"540" 0 2011 "Attapeu" "Laos" "all_kelch" 2011 -3.63065376855559 "3year" 3
+"541" 1 2012 "Attapeu" "Laos" "all_kelch" 2011 -3.3949218589899 "3year" 3
+"542" 3 2014 "Attapeu" "Laos" "all_kelch" 2011 -2.90467911506389 "3year" 3
+"543" 4 2015 "Attapeu" "Laos" "all_kelch" 2011 -2.64359221983527 "3year" 3
+"544" 5 2016 "Attapeu" "Laos" "all_kelch" 2011 -2.39279832755467 "3year" 3
+"545" 6 2017 "Attapeu" "Laos" "all_kelch" 2011 -2.15368167226927 "3year" 3
+"546" 7 2018 "Attapeu" "Laos" "all_kelch" 2011 -1.87778041293201 "3year" 3
+"547" 8 2019 "Attapeu" "Laos" "all_kelch" 2011 -1.64810696145207 "3year" 3
+"548" 9 2020 "Attapeu" "Laos" "all_kelch" 2011 -1.38411887930578 "3year" 3
+"549" 10 2021 "Attapeu" "Laos" "all_kelch" 2011 -1.15223056332801 "3year" 3
+"550" 11 2022 "Attapeu" "Laos" "all_kelch" 2011 -0.914669978472498 "3year" 3
+"551" 12 2023 "Attapeu" "Laos" "all_kelch" 2011 -0.655901628507486 "3year" 3
+"552" 0 2015 "Sekong" "Laos" "all_kelch" 2015 0.578401315464609 "3year" 3
+"553" 2 2017 "Sekong" "Laos" "all_kelch" 2015 0.643509804812848 "3year" 3
+"554" 3 2018 "Sekong" "Laos" "all_kelch" 2015 0.68174630416834 "3year" 3
+"555" 4 2019 "Sekong" "Laos" "all_kelch" 2015 0.720459919378216 "3year" 3
+"556" 5 2020 "Sekong" "Laos" "all_kelch" 2015 0.733945324864701 "3year" 3
+"557" 6 2021 "Sekong" "Laos" "all_kelch" 2015 0.786440854279336 "3year" 3
+"558" 7 2022 "Sekong" "Laos" "all_kelch" 2015 0.829815487436543 "3year" 3
+"559" 8 2023 "Sekong" "Laos" "all_kelch" 2015 0.84699361985454 "3year" 3
+"560" 0 2013 "Mandalay" "Myanmar" "all_kelch" 2013 -2.0144947017103 "3year" 3
+"561" 1 2014 "Mandalay" "Myanmar" "all_kelch" 2013 -1.98705278923498 "3year" 3
+"562" 2 2015 "Mandalay" "Myanmar" "all_kelch" 2013 -1.9427639633345 "3year" 3
+"563" 3 2016 "Mandalay" "Myanmar" "all_kelch" 2013 -1.88256540774519 "3year" 3
+"564" 4 2017 "Mandalay" "Myanmar" "all_kelch" 2013 -1.84303087869159 "3year" 3
+"565" 5 2018 "Mandalay" "Myanmar" "all_kelch" 2013 -1.79282211460453 "3year" 3
+"566" 6 2019 "Mandalay" "Myanmar" "all_kelch" 2013 -1.76226672545147 "3year" 3
+"567" 7 2020 "Mandalay" "Myanmar" "all_kelch" 2013 -1.7215755711793 "3year" 3
+"568" 8 2021 "Mandalay" "Myanmar" "all_kelch" 2013 -1.66609887065359 "3year" 3
+"569" 9 2022 "Mandalay" "Myanmar" "all_kelch" 2013 -1.60735272604013 "3year" 3
+"570" 10 2023 "Mandalay" "Myanmar" "all_kelch" 2013 -1.5749853450099 "3year" 3
+"571" 1 2012 "Sisakhet" "Thailand" "all_kelch" 2011 0.0413983116234518 "3year" 3
+"572" 2 2013 "Sisakhet" "Thailand" "all_kelch" 2011 0.179968111003513 "3year" 3
+"573" 3 2014 "Sisakhet" "Thailand" "all_kelch" 2011 0.348365762201009 "3year" 3
+"574" 4 2015 "Sisakhet" "Thailand" "all_kelch" 2011 0.505484802608593 "3year" 3
+"575" 5 2016 "Sisakhet" "Thailand" "all_kelch" 2011 0.672603449200765 "3year" 3
+"576" 6 2017 "Sisakhet" "Thailand" "all_kelch" 2011 0.831370669306095 "3year" 3
+"577" 7 2018 "Sisakhet" "Thailand" "all_kelch" 2011 1.00350579613607 "3year" 3
+"578" 8 2019 "Sisakhet" "Thailand" "all_kelch" 2011 1.18014518567128 "3year" 3
+"579" 9 2020 "Sisakhet" "Thailand" "all_kelch" 2011 1.33643828637601 "3year" 3
+"580" 10 2021 "Sisakhet" "Thailand" "all_kelch" 2011 1.49677003268753 "3year" 3
+"581" 11 2022 "Sisakhet" "Thailand" "all_kelch" 2011 1.6516212301223 "3year" 3
+"582" 12 2023 "Sisakhet" "Thailand" "all_kelch" 2011 1.83400751997538 "3year" 3
+"583" 0 2003 "Tak" "Thailand" "all_kelch" 2003 -4.16439356815837 "3year" 3
+"584" 2 2005 "Tak" "Thailand" "all_kelch" 2003 -3.80686624892843 "3year" 3
+"585" 3 2006 "Tak" "Thailand" "all_kelch" 2003 -3.62281378631246 "3year" 3
+"586" 4 2007 "Tak" "Thailand" "all_kelch" 2003 -3.42323893777153 "3year" 3
+"587" 5 2008 "Tak" "Thailand" "all_kelch" 2003 -3.25676083278165 "3year" 3
+"588" 6 2009 "Tak" "Thailand" "all_kelch" 2003 -3.07138432120104 "3year" 3
+"589" 7 2010 "Tak" "Thailand" "all_kelch" 2003 -2.8982606620022 "3year" 3
+"590" 8 2011 "Tak" "Thailand" "all_kelch" 2003 -2.71282345875391 "3year" 3
+"591" 9 2012 "Tak" "Thailand" "all_kelch" 2003 -2.51540782256634 "3year" 3
+"592" 10 2013 "Tak" "Thailand" "all_kelch" 2003 -2.34680181140919 "3year" 3
+"593" 11 2014 "Tak" "Thailand" "all_kelch" 2003 -2.16099781007875 "3year" 3
+"594" 12 2015 "Tak" "Thailand" "all_kelch" 2003 -1.97960060942035 "3year" 3
+"595" 13 2016 "Tak" "Thailand" "all_kelch" 2003 -1.79605755023211 "3year" 3
+"596" 14 2017 "Tak" "Thailand" "all_kelch" 2003 -1.615934265927 "3year" 3
+"597" 15 2018 "Tak" "Thailand" "all_kelch" 2003 -1.43573715874834 "3year" 3
+"598" 16 2019 "Tak" "Thailand" "all_kelch" 2003 -1.24812483570897 "3year" 3
+"599" 17 2020 "Tak" "Thailand" "all_kelch" 2003 -1.07901124331589 "3year" 3
+"600" 18 2021 "Tak" "Thailand" "all_kelch" 2003 -0.897015960208317 "3year" 3
+"601" 19 2022 "Tak" "Thailand" "all_kelch" 2003 -0.709113798214302 "3year" 3
+"602" 20 2023 "Tak" "Thailand" "all_kelch" 2003 -0.519989596180942 "3year" 3
+"603" 0 2005 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.712177033247425 "3year" 3
+"604" 3 2008 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.229063602135922 "3year" 3
+"605" 4 2009 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.048082307022529 "3year" 3
+"606" 5 2010 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.110726802574723 "3year" 3
+"607" 6 2011 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.290204168426624 "3year" 3
+"608" 7 2012 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.473253766451995 "3year" 3
+"609" 8 2013 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.623394315792504 "3year" 3
+"610" 9 2014 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.797477518942031 "3year" 3
+"611" 10 2015 "Binh Phuoc" "Vietnam" "all_kelch" 2005 0.961482892806531 "3year" 3
+"612" 11 2016 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.14026911731101 "3year" 3
+"613" 12 2017 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.30145934530104 "3year" 3
+"614" 13 2018 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.47025471421659 "3year" 3
+"615" 14 2019 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.64439031174926 "3year" 3
+"616" 15 2020 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.84087926544771 "3year" 3
+"617" 16 2021 "Binh Phuoc" "Vietnam" "all_kelch" 2005 1.98702848548958 "3year" 3
+"618" 17 2022 "Binh Phuoc" "Vietnam" "all_kelch" 2005 2.1660145441267 "3year" 3
+"619" 18 2023 "Binh Phuoc" "Vietnam" "all_kelch" 2005 2.32568279232356 "3year" 3
+"620" 0 2015 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.467276422344227 "3year" 3
+"621" 1 2016 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.0336853483232274 "3year" 3
+"622" 2 2017 "Gia Lai" "Vietnam" "all_kelch" 2015 0.404002666577006 "3year" 3
+"623" 3 2018 "Gia Lai" "Vietnam" "all_kelch" 2015 0.855525524521187 "3year" 3
+"624" 4 2019 "Gia Lai" "Vietnam" "all_kelch" 2015 1.29609541285678 "3year" 3
+"625" 5 2020 "Gia Lai" "Vietnam" "all_kelch" 2015 1.71104755630454 "3year" 3
+"626" 6 2021 "Gia Lai" "Vietnam" "all_kelch" 2015 2.1497998755327 "3year" 3
+"627" 7 2022 "Gia Lai" "Vietnam" "all_kelch" 2015 2.60000883175718 "3year" 3
+"628" 8 2023 "Gia Lai" "Vietnam" "all_kelch" 2015 3.03260167452756 "3year" 3
+"629" 0 2008 "Pailin" "Cambodia" "C580Y" 2008 -0.513796987110671 "4year" 4
+"630" 1 2009 "Pailin" "Cambodia" "C580Y" 2008 -0.108931930412256 "4year" 4
+"631" 2 2010 "Pailin" "Cambodia" "C580Y" 2008 0.294040112613433 "4year" 4
+"632" 3 2011 "Pailin" "Cambodia" "C580Y" 2008 0.674257530845583 "4year" 4
+"633" 4 2012 "Pailin" "Cambodia" "C580Y" 2008 1.08912880088503 "4year" 4
+"634" 5 2013 "Pailin" "Cambodia" "C580Y" 2008 1.48161869496062 "4year" 4
+"635" 6 2014 "Pailin" "Cambodia" "C580Y" 2008 1.87229779293111 "4year" 4
+"636" 7 2015 "Pailin" "Cambodia" "C580Y" 2008 2.28239191387499 "4year" 4
+"637" 8 2016 "Pailin" "Cambodia" "C580Y" 2008 2.65034951887599 "4year" 4
+"638" 9 2017 "Pailin" "Cambodia" "C580Y" 2008 3.06254685164186 "4year" 4
+"639" 10 2018 "Pailin" "Cambodia" "C580Y" 2008 3.461928443795 "4year" 4
+"640" 11 2019 "Pailin" "Cambodia" "C580Y" 2008 3.84971916559118 "4year" 4
+"641" 12 2020 "Pailin" "Cambodia" "C580Y" 2008 4.27267864959821 "4year" 4
+"642" 13 2021 "Pailin" "Cambodia" "C580Y" 2008 4.64199939241025 "4year" 4
+"643" 14 2022 "Pailin" "Cambodia" "C580Y" 2008 5.04619658076439 "4year" 4
+"644" 15 2023 "Pailin" "Cambodia" "C580Y" 2008 5.45710897691738 "4year" 4
+"645" 0 2011 "Preah Vihear" "Cambodia" "C580Y" 2011 -2.05730689467409 "4year" 4
+"646" 1 2012 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.55766677729299 "4year" 4
+"647" 2 2013 "Preah Vihear" "Cambodia" "C580Y" 2011 -1.06752232989329 "4year" 4
+"648" 3 2014 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.556951935034444 "4year" 4
+"649" 4 2015 "Preah Vihear" "Cambodia" "C580Y" 2011 -0.0599530013318892 "4year" 4
+"650" 5 2016 "Preah Vihear" "Cambodia" "C580Y" 2011 0.43931943120846 "4year" 4
+"651" 6 2017 "Preah Vihear" "Cambodia" "C580Y" 2011 0.930906055006884 "4year" 4
+"652" 7 2018 "Preah Vihear" "Cambodia" "C580Y" 2011 1.43226038824163 "4year" 4
+"653" 8 2019 "Preah Vihear" "Cambodia" "C580Y" 2011 1.9144793646667 "4year" 4
+"654" 9 2020 "Preah Vihear" "Cambodia" "C580Y" 2011 2.43006255118901 "4year" 4
+"655" 10 2021 "Preah Vihear" "Cambodia" "C580Y" 2011 2.94164191168633 "4year" 4
+"656" 11 2022 "Preah Vihear" "Cambodia" "C580Y" 2011 3.43772813763526 "4year" 4
+"657" 12 2023 "Preah Vihear" "Cambodia" "C580Y" 2011 3.91928943553462 "4year" 4
+"658" 0 2007 "Pursat" "Cambodia" "C580Y" 2007 -2.635580776425 "4year" 4
+"659" 2 2009 "Pursat" "Cambodia" "C580Y" 2007 -1.28019707734595 "4year" 4
+"660" 3 2010 "Pursat" "Cambodia" "C580Y" 2007 -0.613713472496011 "4year" 4
+"661" 4 2011 "Pursat" "Cambodia" "C580Y" 2007 0.0721728985026668 "4year" 4
+"662" 5 2012 "Pursat" "Cambodia" "C580Y" 2007 0.760129374931542 "4year" 4
+"663" 6 2013 "Pursat" "Cambodia" "C580Y" 2007 1.41615187893773 "4year" 4
+"664" 7 2014 "Pursat" "Cambodia" "C580Y" 2007 2.09491746202223 "4year" 4
+"665" 8 2015 "Pursat" "Cambodia" "C580Y" 2007 2.78155080858201 "4year" 4
+"666" 9 2016 "Pursat" "Cambodia" "C580Y" 2007 3.45164704458852 "4year" 4
+"667" 10 2017 "Pursat" "Cambodia" "C580Y" 2007 4.13102824092426 "4year" 4
+"668" 11 2018 "Pursat" "Cambodia" "C580Y" 2007 4.80495668106172 "4year" 4
+"669" 12 2019 "Pursat" "Cambodia" "C580Y" 2007 5.48014836861113 "4year" 4
+"670" 13 2020 "Pursat" "Cambodia" "C580Y" 2007 6.15917249408734 "4year" 4
+"671" 14 2021 "Pursat" "Cambodia" "C580Y" 2007 6.83823495870829 "4year" 4
+"672" 15 2022 "Pursat" "Cambodia" "C580Y" 2007 7.51941911101089 "4year" 4
+"673" 16 2023 "Pursat" "Cambodia" "C580Y" 2007 8.19188651910263 "4year" 4
+"674" 0 2011 "Ratanakiri" "Cambodia" "C580Y" 2011 -3.4557240261355 "4year" 4
+"675" 1 2012 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.99154812613491 "4year" 4
+"676" 2 2013 "Ratanakiri" "Cambodia" "C580Y" 2011 -2.5218460669533 "4year" 4
+"677" 4 2015 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.651963359183 "4year" 4
+"678" 5 2016 "Ratanakiri" "Cambodia" "C580Y" 2011 -1.22075126021974 "4year" 4
+"679" 6 2017 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.765297567122137 "4year" 4
+"680" 7 2018 "Ratanakiri" "Cambodia" "C580Y" 2011 -0.321726047098773 "4year" 4
+"681" 8 2019 "Ratanakiri" "Cambodia" "C580Y" 2011 0.134741504976979 "4year" 4
+"682" 9 2020 "Ratanakiri" "Cambodia" "C580Y" 2011 0.55177157843953 "4year" 4
+"683" 10 2021 "Ratanakiri" "Cambodia" "C580Y" 2011 1.00493593604708 "4year" 4
+"684" 11 2022 "Ratanakiri" "Cambodia" "C580Y" 2011 1.43363341833036 "4year" 4
+"685" 12 2023 "Ratanakiri" "Cambodia" "C580Y" 2011 1.90720195830801 "4year" 4
+"686" 0 2011 "Sisakhet" "Thailand" "C580Y" 2011 -1.29213703548814 "4year" 4
+"687" 1 2012 "Sisakhet" "Thailand" "C580Y" 2011 -1.12391453709992 "4year" 4
+"688" 4 2015 "Sisakhet" "Thailand" "C580Y" 2011 -0.614107403610751 "4year" 4
+"689" 5 2016 "Sisakhet" "Thailand" "C580Y" 2011 -0.464572393486429 "4year" 4
+"690" 6 2017 "Sisakhet" "Thailand" "C580Y" 2011 -0.311008067038468 "4year" 4
+"691" 7 2018 "Sisakhet" "Thailand" "C580Y" 2011 -0.136936766811527 "4year" 4
+"692" 8 2019 "Sisakhet" "Thailand" "C580Y" 2011 0.0196851554996423 "4year" 4
+"693" 9 2020 "Sisakhet" "Thailand" "C580Y" 2011 0.182687645613659 "4year" 4
+"694" 10 2021 "Sisakhet" "Thailand" "C580Y" 2011 0.35426918228078 "4year" 4
+"695" 11 2022 "Sisakhet" "Thailand" "C580Y" 2011 0.521537604628777 "4year" 4
+"696" 12 2023 "Sisakhet" "Thailand" "C580Y" 2011 0.678902623732016 "4year" 4
+"697" 0 2011 "Tak" "Thailand" "C580Y" 2011 -1.70593430825256 "4year" 4
+"698" 1 2012 "Tak" "Thailand" "C580Y" 2011 -1.04965700781992 "4year" 4
+"699" 2 2013 "Tak" "Thailand" "C580Y" 2011 -0.421397192929253 "4year" 4
+"700" 3 2014 "Tak" "Thailand" "C580Y" 2011 0.229204052698224 "4year" 4
+"701" 4 2015 "Tak" "Thailand" "C580Y" 2011 0.887546332680517 "4year" 4
+"702" 5 2016 "Tak" "Thailand" "C580Y" 2011 1.50564437922777 "4year" 4
+"703" 6 2017 "Tak" "Thailand" "C580Y" 2011 2.17949048293089 "4year" 4
+"704" 7 2018 "Tak" "Thailand" "C580Y" 2011 2.81944086821785 "4year" 4
+"705" 8 2019 "Tak" "Thailand" "C580Y" 2011 3.47392610901064 "4year" 4
+"706" 9 2020 "Tak" "Thailand" "C580Y" 2011 4.13234963617536 "4year" 4
+"707" 10 2021 "Tak" "Thailand" "C580Y" 2011 4.77871081753572 "4year" 4
+"708" 11 2022 "Tak" "Thailand" "C580Y" 2011 5.42522124712061 "4year" 4
+"709" 12 2023 "Tak" "Thailand" "C580Y" 2011 6.08634188015135 "4year" 4
+"710" 0 2010 "Binh Phuoc" "Vietnam" "C580Y" 2010 -3.45396597504199 "4year" 4
+"711" 1 2011 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.8037094073851 "4year" 4
+"712" 2 2012 "Binh Phuoc" "Vietnam" "C580Y" 2010 -2.19507618263524 "4year" 4
+"713" 4 2014 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.908850201315683 "4year" 4
+"714" 5 2015 "Binh Phuoc" "Vietnam" "C580Y" 2010 -0.28699758434406 "4year" 4
+"715" 6 2016 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.376146470620386 "4year" 4
+"716" 7 2017 "Binh Phuoc" "Vietnam" "C580Y" 2010 0.999154828646416 "4year" 4
+"717" 8 2018 "Binh Phuoc" "Vietnam" "C580Y" 2010 1.63720023643697 "4year" 4
+"718" 9 2019 "Binh Phuoc" "Vietnam" "C580Y" 2010 2.26293233196208 "4year" 4
+"719" 10 2020 "Binh Phuoc" "Vietnam" "C580Y" 2010 2.90534301313119 "4year" 4
+"720" 11 2021 "Binh Phuoc" "Vietnam" "C580Y" 2010 3.54205449787337 "4year" 4
+"721" 12 2022 "Binh Phuoc" "Vietnam" "C580Y" 2010 4.15508415936493 "4year" 4
+"722" 13 2023 "Binh Phuoc" "Vietnam" "C580Y" 2010 4.81280938775603 "4year" 4
+"723" 0 2015 "Gia Lai" "Vietnam" "C580Y" 2015 -0.698684386949644 "4year" 4
+"724" 1 2016 "Gia Lai" "Vietnam" "C580Y" 2015 -0.187653416443072 "4year" 4
+"725" 2 2017 "Gia Lai" "Vietnam" "C580Y" 2015 0.351051239437899 "4year" 4
+"726" 3 2018 "Gia Lai" "Vietnam" "C580Y" 2015 0.86677618477617 "4year" 4
+"727" 4 2019 "Gia Lai" "Vietnam" "C580Y" 2015 1.39287225112296 "4year" 4
+"728" 5 2020 "Gia Lai" "Vietnam" "C580Y" 2015 1.92729285944716 "4year" 4
+"729" 6 2021 "Gia Lai" "Vietnam" "C580Y" 2015 2.45389049918101 "4year" 4
+"730" 7 2022 "Gia Lai" "Vietnam" "C580Y" 2015 2.98168735249085 "4year" 4
+"731" 8 2023 "Gia Lai" "Vietnam" "C580Y" 2015 3.47932411258212 "4year" 4
+"732" 0 2007 "Pailin" "Cambodia" "R539T" 2007 -1.37286742482393 "4year" 4
+"733" 1 2008 "Pailin" "Cambodia" "R539T" 2007 -1.70769444544481 "4year" 4
+"734" 2 2009 "Pailin" "Cambodia" "R539T" 2007 -2.03295852632529 "4year" 4
+"735" 3 2010 "Pailin" "Cambodia" "R539T" 2007 -2.33722460531303 "4year" 4
+"736" 4 2011 "Pailin" "Cambodia" "R539T" 2007 -2.66051066411247 "4year" 4
+"737" 5 2012 "Pailin" "Cambodia" "R539T" 2007 -2.99459997318214 "4year" 4
+"738" 6 2013 "Pailin" "Cambodia" "R539T" 2007 -3.31010926396149 "4year" 4
+"739" 7 2014 "Pailin" "Cambodia" "R539T" 2007 -3.63842707483517 "4year" 4
+"740" 8 2015 "Pailin" "Cambodia" "R539T" 2007 -3.96497099370984 "4year" 4
+"741" 9 2016 "Pailin" "Cambodia" "R539T" 2007 -4.26939833820848 "4year" 4
+"742" 10 2017 "Pailin" "Cambodia" "R539T" 2007 -4.59524993915151 "4year" 4
+"743" 11 2018 "Pailin" "Cambodia" "R539T" 2007 -4.92870641826634 "4year" 4
+"744" 12 2019 "Pailin" "Cambodia" "R539T" 2007 -5.23670650706124 "4year" 4
+"745" 13 2020 "Pailin" "Cambodia" "R539T" 2007 -5.55183634032071 "4year" 4
+"746" 14 2021 "Pailin" "Cambodia" "R539T" 2007 -5.90173102814473 "4year" 4
+"747" 15 2022 "Pailin" "Cambodia" "R539T" 2007 -6.20482842737874 "4year" 4
+"748" 16 2023 "Pailin" "Cambodia" "R539T" 2007 -6.52394340170263 "4year" 4
+"749" 0 2007 "Pursat" "Cambodia" "R539T" 2007 -3.86120188621398 "4year" 4
+"750" 2 2009 "Pursat" "Cambodia" "R539T" 2007 -3.24607753115042 "4year" 4
+"751" 3 2010 "Pursat" "Cambodia" "R539T" 2007 -2.93453949032306 "4year" 4
+"752" 4 2011 "Pursat" "Cambodia" "R539T" 2007 -2.62565849777417 "4year" 4
+"753" 5 2012 "Pursat" "Cambodia" "R539T" 2007 -2.31855212761425 "4year" 4
+"754" 6 2013 "Pursat" "Cambodia" "R539T" 2007 -2.01904604863587 "4year" 4
+"755" 7 2014 "Pursat" "Cambodia" "R539T" 2007 -1.68797146524132 "4year" 4
+"756" 8 2015 "Pursat" "Cambodia" "R539T" 2007 -1.38574587817203 "4year" 4
+"757" 9 2016 "Pursat" "Cambodia" "R539T" 2007 -1.0903773835985 "4year" 4
+"758" 10 2017 "Pursat" "Cambodia" "R539T" 2007 -0.796198982427773 "4year" 4
+"759" 11 2018 "Pursat" "Cambodia" "R539T" 2007 -0.488904722938724 "4year" 4
+"760" 12 2019 "Pursat" "Cambodia" "R539T" 2007 -0.187818996407154 "4year" 4
+"761" 13 2020 "Pursat" "Cambodia" "R539T" 2007 0.112933240670503 "4year" 4
+"762" 14 2021 "Pursat" "Cambodia" "R539T" 2007 0.437908386532436 "4year" 4
+"763" 15 2022 "Pursat" "Cambodia" "R539T" 2007 0.733831047432375 "4year" 4
+"764" 16 2023 "Pursat" "Cambodia" "R539T" 2007 1.04717807042123 "4year" 4
+"765" 0 2011 "Attapeu" "Laos" "R539T" 2011 -3.70735093090083 "4year" 4
+"766" 1 2012 "Attapeu" "Laos" "R539T" 2011 -3.36778405912355 "4year" 4
+"767" 4 2015 "Attapeu" "Laos" "R539T" 2011 -2.30833909875 "4year" 4
+"768" 5 2016 "Attapeu" "Laos" "R539T" 2011 -1.94862187598799 "4year" 4
+"769" 6 2017 "Attapeu" "Laos" "R539T" 2011 -1.59528846432423 "4year" 4
+"770" 7 2018 "Attapeu" "Laos" "R539T" 2011 -1.22317065046164 "4year" 4
+"771" 8 2019 "Attapeu" "Laos" "R539T" 2011 -0.889544619387465 "4year" 4
+"772" 9 2020 "Attapeu" "Laos" "R539T" 2011 -0.535030745017096 "4year" 4
+"773" 10 2021 "Attapeu" "Laos" "R539T" 2011 -0.16472071147278 "4year" 4
+"774" 11 2022 "Attapeu" "Laos" "R539T" 2011 0.185373411266876 "4year" 4
+"775" 12 2023 "Attapeu" "Laos" "R539T" 2011 0.54331564144481 "4year" 4
+"776" 0 2011 "Sisakhet" "Thailand" "R539T" 2011 -0.391650706617047 "4year" 4
+"777" 1 2012 "Sisakhet" "Thailand" "R539T" 2011 -0.202722995898979 "4year" 4
+"778" 2 2013 "Sisakhet" "Thailand" "R539T" 2011 -9.82115736528757e-06 "4year" 4
+"779" 4 2015 "Sisakhet" "Thailand" "R539T" 2011 0.383872330359324 "4year" 4
+"780" 5 2016 "Sisakhet" "Thailand" "R539T" 2011 0.586715732493758 "4year" 4
+"781" 6 2017 "Sisakhet" "Thailand" "R539T" 2011 0.773699248657367 "4year" 4
+"782" 7 2018 "Sisakhet" "Thailand" "R539T" 2011 0.962732947149531 "4year" 4
+"783" 8 2019 "Sisakhet" "Thailand" "R539T" 2011 1.15278031880154 "4year" 4
+"784" 9 2020 "Sisakhet" "Thailand" "R539T" 2011 1.36215664900612 "4year" 4
+"785" 10 2021 "Sisakhet" "Thailand" "R539T" 2011 1.54734578549741 "4year" 4
+"786" 11 2022 "Sisakhet" "Thailand" "R539T" 2011 1.74514577995438 "4year" 4
+"787" 12 2023 "Sisakhet" "Thailand" "R539T" 2011 1.95218037751531 "4year" 4
+"788" 0 2007 "Pailin" "Cambodia" "all_kelch" 2007 -0.341792328959298 "4year" 4
+"789" 1 2008 "Pailin" "Cambodia" "all_kelch" 2007 0.18428545274609 "4year" 4
+"790" 2 2009 "Pailin" "Cambodia" "all_kelch" 2007 0.692507511050551 "4year" 4
+"791" 4 2011 "Pailin" "Cambodia" "all_kelch" 2007 1.72352293418572 "4year" 4
+"792" 5 2012 "Pailin" "Cambodia" "all_kelch" 2007 2.24236326370739 "4year" 4
+"793" 6 2013 "Pailin" "Cambodia" "all_kelch" 2007 2.76013036650104 "4year" 4
+"794" 7 2014 "Pailin" "Cambodia" "all_kelch" 2007 3.27781225625358 "4year" 4
+"795" 8 2015 "Pailin" "Cambodia" "all_kelch" 2007 3.78021533415162 "4year" 4
+"796" 9 2016 "Pailin" "Cambodia" "all_kelch" 2007 4.28468616934569 "4year" 4
+"797" 10 2017 "Pailin" "Cambodia" "all_kelch" 2007 4.80283064161626 "4year" 4
+"798" 11 2018 "Pailin" "Cambodia" "all_kelch" 2007 5.32689749807882 "4year" 4
+"799" 12 2019 "Pailin" "Cambodia" "all_kelch" 2007 5.85485420805224 "4year" 4
+"800" 13 2020 "Pailin" "Cambodia" "all_kelch" 2007 6.34394858552003 "4year" 4
+"801" 14 2021 "Pailin" "Cambodia" "all_kelch" 2007 6.87671361284033 "4year" 4
+"802" 15 2022 "Pailin" "Cambodia" "all_kelch" 2007 7.39722580831086 "4year" 4
+"803" 16 2023 "Pailin" "Cambodia" "all_kelch" 2007 7.90131020215614 "4year" 4
+"804" 0 2011 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.56723956239136 "4year" 4
+"805" 1 2012 "Preah Vihear" "Cambodia" "all_kelch" 2011 -1.27941112640068 "4year" 4
+"806" 2 2013 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.992597960621421 "4year" 4
+"807" 3 2014 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.703446809797748 "4year" 4
+"808" 4 2015 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.420840715134605 "4year" 4
+"809" 5 2016 "Preah Vihear" "Cambodia" "all_kelch" 2011 -0.144698164728096 "4year" 4
+"810" 6 2017 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.14624941289063 "4year" 4
+"811" 7 2018 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.442404523712467 "4year" 4
+"812" 8 2019 "Preah Vihear" "Cambodia" "all_kelch" 2011 0.715390559479044 "4year" 4
+"813" 9 2020 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.00782132517237 "4year" 4
+"814" 10 2021 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.2778494332718 "4year" 4
+"815" 11 2022 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.56196906284309 "4year" 4
+"816" 12 2023 "Preah Vihear" "Cambodia" "all_kelch" 2011 1.84318471060386 "4year" 4
+"817" 0 2007 "Pursat" "Cambodia" "all_kelch" 2007 -1.18384918243891 "4year" 4
+"818" 2 2009 "Pursat" "Cambodia" "all_kelch" 2007 -0.30420119250885 "4year" 4
+"819" 3 2010 "Pursat" "Cambodia" "all_kelch" 2007 0.144460763797264 "4year" 4
+"820" 4 2011 "Pursat" "Cambodia" "all_kelch" 2007 0.569888272144406 "4year" 4
+"821" 5 2012 "Pursat" "Cambodia" "all_kelch" 2007 1.00347428450318 "4year" 4
+"822" 6 2013 "Pursat" "Cambodia" "all_kelch" 2007 1.44891148071097 "4year" 4
+"823" 7 2014 "Pursat" "Cambodia" "all_kelch" 2007 1.88549582697328 "4year" 4
+"824" 8 2015 "Pursat" "Cambodia" "all_kelch" 2007 2.34632194713457 "4year" 4
+"825" 9 2016 "Pursat" "Cambodia" "all_kelch" 2007 2.77539557097403 "4year" 4
+"826" 10 2017 "Pursat" "Cambodia" "all_kelch" 2007 3.22646443923642 "4year" 4
+"827" 11 2018 "Pursat" "Cambodia" "all_kelch" 2007 3.64335135275599 "4year" 4
+"828" 12 2019 "Pursat" "Cambodia" "all_kelch" 2007 4.09618290713359 "4year" 4
+"829" 13 2020 "Pursat" "Cambodia" "all_kelch" 2007 4.53644503959284 "4year" 4
+"830" 14 2021 "Pursat" "Cambodia" "all_kelch" 2007 4.9684895895149 "4year" 4
+"831" 15 2022 "Pursat" "Cambodia" "all_kelch" 2007 5.40501210709967 "4year" 4
+"832" 16 2023 "Pursat" "Cambodia" "all_kelch" 2007 5.84711553504405 "4year" 4
+"833" 0 2011 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.26961543210696 "4year" 4
+"834" 1 2012 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.20280508426488 "4year" 4
+"835" 2 2013 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.13492767228339 "4year" 4
+"836" 3 2014 "Ratanakiri" "Cambodia" "all_kelch" 2011 -3.07009167498567 "4year" 4
+"837" 4 2015 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.97052797267768 "4year" 4
+"838" 5 2016 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.89653369446749 "4year" 4
+"839" 6 2017 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.81845389574742 "4year" 4
+"840" 7 2018 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.75188700287855 "4year" 4
+"841" 8 2019 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.67045442468942 "4year" 4
+"842" 9 2020 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.56765625092679 "4year" 4
+"843" 10 2021 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.49723074324886 "4year" 4
+"844" 11 2022 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.42055273175183 "4year" 4
+"845" 12 2023 "Ratanakiri" "Cambodia" "all_kelch" 2011 -2.33720717509954 "4year" 4
+"846" 0 2011 "Attapeu" "Laos" "all_kelch" 2011 -3.67563967660101 "4year" 4
+"847" 1 2012 "Attapeu" "Laos" "all_kelch" 2011 -3.34154569423817 "4year" 4
+"848" 4 2015 "Attapeu" "Laos" "all_kelch" 2011 -2.35999351257114 "4year" 4
+"849" 5 2016 "Attapeu" "Laos" "all_kelch" 2011 -2.04693524362042 "4year" 4
+"850" 6 2017 "Attapeu" "Laos" "all_kelch" 2011 -1.69614422226119 "4year" 4
+"851" 7 2018 "Attapeu" "Laos" "all_kelch" 2011 -1.38315955941165 "4year" 4
+"852" 8 2019 "Attapeu" "Laos" "all_kelch" 2011 -1.06687877849116 "4year" 4
+"853" 9 2020 "Attapeu" "Laos" "all_kelch" 2011 -0.724093253899874 "4year" 4
+"854" 10 2021 "Attapeu" "Laos" "all_kelch" 2011 -0.394536461634884 "4year" 4
+"855" 11 2022 "Attapeu" "Laos" "all_kelch" 2011 -0.0788294020391133 "4year" 4
+"856" 12 2023 "Attapeu" "Laos" "all_kelch" 2011 0.246409758052487 "4year" 4
+"857" 0 2015 "Sekong" "Laos" "all_kelch" 2015 0.702714184583215 "4year" 4
+"858" 2 2017 "Sekong" "Laos" "all_kelch" 2015 0.606634724253813 "4year" 4
+"859" 3 2018 "Sekong" "Laos" "all_kelch" 2015 0.571860128331906 "4year" 4
+"860" 4 2019 "Sekong" "Laos" "all_kelch" 2015 0.515261701088379 "4year" 4
+"861" 5 2020 "Sekong" "Laos" "all_kelch" 2015 0.441822145671782 "4year" 4
+"862" 6 2021 "Sekong" "Laos" "all_kelch" 2015 0.4033429281531 "4year" 4
+"863" 7 2022 "Sekong" "Laos" "all_kelch" 2015 0.357360128814081 "4year" 4
+"864" 8 2023 "Sekong" "Laos" "all_kelch" 2015 0.315161276645046 "4year" 4
+"865" 0 2013 "Mandalay" "Myanmar" "all_kelch" 2013 -2.22383281975134 "4year" 4
+"866" 1 2014 "Mandalay" "Myanmar" "all_kelch" 2013 -1.79279641686901 "4year" 4
+"867" 2 2015 "Mandalay" "Myanmar" "all_kelch" 2013 -1.38041846993692 "4year" 4
+"868" 3 2016 "Mandalay" "Myanmar" "all_kelch" 2013 -0.94702482045281 "4year" 4
+"869" 4 2017 "Mandalay" "Myanmar" "all_kelch" 2013 -0.539824680993839 "4year" 4
+"870" 5 2018 "Mandalay" "Myanmar" "all_kelch" 2013 -0.119917178105108 "4year" 4
+"871" 6 2019 "Mandalay" "Myanmar" "all_kelch" 2013 0.285491914506346 "4year" 4
+"872" 7 2020 "Mandalay" "Myanmar" "all_kelch" 2013 0.719672992296056 "4year" 4
+"873" 8 2021 "Mandalay" "Myanmar" "all_kelch" 2013 1.12811486692687 "4year" 4
+"874" 9 2022 "Mandalay" "Myanmar" "all_kelch" 2013 1.56360555276841 "4year" 4
+"875" 10 2023 "Mandalay" "Myanmar" "all_kelch" 2013 1.96973611799935 "4year" 4
+"876" 1 2012 "Sisakhet" "Thailand" "all_kelch" 2011 0.0152857274812415 "4year" 4
+"877" 2 2013 "Sisakhet" "Thailand" "all_kelch" 2011 -0.206170644118025 "4year" 4
+"878" 4 2015 "Sisakhet" "Thailand" "all_kelch" 2011 -0.63169173592831 "4year" 4
+"879" 5 2016 "Sisakhet" "Thailand" "all_kelch" 2011 -0.838588254221637 "4year" 4
+"880" 6 2017 "Sisakhet" "Thailand" "all_kelch" 2011 -1.06352163386575 "4year" 4
+"881" 7 2018 "Sisakhet" "Thailand" "all_kelch" 2011 -1.25856472386096 "4year" 4
+"882" 8 2019 "Sisakhet" "Thailand" "all_kelch" 2011 -1.47570118855753 "4year" 4
+"883" 9 2020 "Sisakhet" "Thailand" "all_kelch" 2011 -1.68382197198235 "4year" 4
+"884" 10 2021 "Sisakhet" "Thailand" "all_kelch" 2011 -1.90023935254282 "4year" 4
+"885" 11 2022 "Sisakhet" "Thailand" "all_kelch" 2011 -2.09763786632269 "4year" 4
+"886" 12 2023 "Sisakhet" "Thailand" "all_kelch" 2011 -2.31772451226499 "4year" 4
+"887" 0 2003 "Tak" "Thailand" "all_kelch" 2003 -4.18984329694308 "4year" 4
+"888" 2 2005 "Tak" "Thailand" "all_kelch" 2003 -3.76138843960082 "4year" 4
+"889" 4 2007 "Tak" "Thailand" "all_kelch" 2003 -3.34462783528814 "4year" 4
+"890" 5 2008 "Tak" "Thailand" "all_kelch" 2003 -3.14748279883525 "4year" 4
+"891" 6 2009 "Tak" "Thailand" "all_kelch" 2003 -2.94343334084454 "4year" 4
+"892" 7 2010 "Tak" "Thailand" "all_kelch" 2003 -2.73414443109048 "4year" 4
+"893" 8 2011 "Tak" "Thailand" "all_kelch" 2003 -2.52012761561291 "4year" 4
+"894" 9 2012 "Tak" "Thailand" "all_kelch" 2003 -2.32654187641931 "4year" 4
+"895" 10 2013 "Tak" "Thailand" "all_kelch" 2003 -2.11359596650646 "4year" 4
+"896" 11 2014 "Tak" "Thailand" "all_kelch" 2003 -1.90867630792322 "4year" 4
+"897" 12 2015 "Tak" "Thailand" "all_kelch" 2003 -1.70031722273748 "4year" 4
+"898" 13 2016 "Tak" "Thailand" "all_kelch" 2003 -1.48817399087979 "4year" 4
+"899" 14 2017 "Tak" "Thailand" "all_kelch" 2003 -1.26482862898403 "4year" 4
+"900" 15 2018 "Tak" "Thailand" "all_kelch" 2003 -1.0711324990268 "4year" 4
+"901" 16 2019 "Tak" "Thailand" "all_kelch" 2003 -0.85573565504815 "4year" 4
+"902" 17 2020 "Tak" "Thailand" "all_kelch" 2003 -0.645071363861668 "4year" 4
+"903" 18 2021 "Tak" "Thailand" "all_kelch" 2003 -0.462977806268463 "4year" 4
+"904" 19 2022 "Tak" "Thailand" "all_kelch" 2003 -0.225968218142801 "4year" 4
+"905" 20 2023 "Tak" "Thailand" "all_kelch" 2003 -0.0252608937324655 "4year" 4
+"906" 0 2005 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -0.832373886598532 "4year" 4
+"907" 4 2009 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -2.47581246658711 "4year" 4
+"908" 5 2010 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -2.88505858977925 "4year" 4
+"909" 6 2011 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -3.30360553130012 "4year" 4
+"910" 7 2012 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -3.69172706059467 "4year" 4
+"911" 8 2013 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -4.11326553308207 "4year" 4
+"912" 9 2014 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -4.52361041607756 "4year" 4
+"913" 10 2015 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -4.9399486511947 "4year" 4
+"914" 11 2016 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -5.33037122651499 "4year" 4
+"915" 12 2017 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -5.75503475200194 "4year" 4
+"916" 13 2018 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -6.151551505956 "4year" 4
+"917" 14 2019 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -6.56900447636691 "4year" 4
+"918" 15 2020 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -6.97385617500572 "4year" 4
+"919" 16 2021 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -7.39326362305273 "4year" 4
+"920" 17 2022 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -7.7827468088281 "4year" 4
+"921" 18 2023 "Binh Phuoc" "Vietnam" "all_kelch" 2005 -8.19362918566099 "4year" 4
+"922" 0 2015 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.503400149057916 "4year" 4
+"923" 1 2016 "Gia Lai" "Vietnam" "all_kelch" 2015 -0.0478785902798374 "4year" 4
+"924" 2 2017 "Gia Lai" "Vietnam" "all_kelch" 2015 0.422103487762131 "4year" 4
+"925" 3 2018 "Gia Lai" "Vietnam" "all_kelch" 2015 0.854913978514177 "4year" 4
+"926" 4 2019 "Gia Lai" "Vietnam" "all_kelch" 2015 1.31971154839632 "4year" 4
+"927" 5 2020 "Gia Lai" "Vietnam" "all_kelch" 2015 1.76254386103816 "4year" 4
+"928" 6 2021 "Gia Lai" "Vietnam" "all_kelch" 2015 2.2219656226982 "4year" 4
+"929" 7 2022 "Gia Lai" "Vietnam" "all_kelch" 2015 2.68300566599911 "4year" 4
+"930" 8 2023 "Gia Lai" "Vietnam" "all_kelch" 2015 3.1293036740786 "4year" 4

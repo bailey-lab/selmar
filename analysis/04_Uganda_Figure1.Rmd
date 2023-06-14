@@ -82,15 +82,26 @@ prev <- df %>% group_by(year, Locus) %>%
   theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(.25 , .97), legend.justification = c("right", "top"), legend.box.just = "right", legend.margin = margin(1, 1, 1, 1))
 
 print(prev, width = 4, height =  6.5)
-
+```
+## Saving
+```{r}
 ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.pdf"), prev, width = 4, height = 5.5, , dpi= 700)
 ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.png"), prev, width = 4, height = 5.5, , dpi= 700)
 
 ```
+## Calculation
+```{r}
+prev_df <-  df %>% group_by(year, Locus) %>% 
+  mutate(min_n = sum(n), mut_sample = sum(x)) %>% 
+  distinct(min_n, mut_sample) %>% 
+  mutate(prop_sample = mut_sample/min_n)
 
+avg_20162017 <- prev_df %>% filter(year == 2016 || year == 2017) %>% ungroup %>% group_by(Locus) %>% summarise(sum_prop_sample = mean(prop_sample))
+avg_20202021 <- prev_df %>% filter(year == 2020 || year == 2021) %>% ungroup %>% group_by(Locus) %>% summarise(sum_prop_sample = mean(prop_sample))
+```
 
-
-# Download and preprocessing for map of Uganda
+# Uganda Map
+## Download and preprocessing for map of Uganda
 ```{r}
 #load base map layers
 admin8 <- ne_download(scale="large", type = "admin_1_states_provinces_lines",
@@ -161,7 +172,7 @@ pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-
 
 ```
 
-# Plot map 
+## Plotting 
 ```{r}
 # make plot with wild_type
 map <- ggplot() +
@@ -197,7 +208,9 @@ map <- ggplot() +
   theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.085,0.91))
 
 print(map,width = 5.5, height = 6.5)
-
+```
+## Saving
+```{r}
 ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.pdf"), map, width = 6, height = 5.5, dpi= 700)
 ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.png"), map, width = 6, height = 5.5, dpi= 700)
 ```
