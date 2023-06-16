@@ -34,7 +34,7 @@ library(ggbreak)
 ```{r}
 #load data
 df_uganda <- read.table("data/data-derived/Ugandan_data.txt")
-df_pfk7 <- read.table("data/data-derived/pfk7_data.txt")
+df_pfk7 <- read.table("data/data-derived/NEW_pfk7_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -91,12 +91,7 @@ ggsave(
 
 ## SE Asia (PfK7 data)
 ```{r}
-d1 <- df_pfk7 %>% select(country, District, year, c580y, nobs_c580y, n, prev_580y) %>% mutate(Locus = "C580Y") %>% rename(x = c580y, nobs = nobs_c580y, prev = prev_580y)
-d2 <- df_pfk7 %>% select(country, District, year, r539t, nobs_r539t, n, prev_539t) %>% mutate(Locus = "R539T") %>% rename(x = r539t, nobs = nobs_r539t, prev = prev_539t)
-d3 <- df_pfk7 %>% select(country, District, year, all_kelch, nobs_kelch, n, prev_all_kelch) %>% mutate(Locus = "all_kelch") %>% rename(x=all_kelch, nobs = nobs_kelch, prev = prev_all_kelch)
-prev_df <- rbind(d1, d2, d3)
-
-plot_overview_seAsia <- prev_df %>%
+plot_overview_seAsia <- df_pfk7 %>% filter(Locus != "other_PfK13") %>%
   mutate(N = n + x) %>%
   ggplot(aes(year, prev * 100, group = Locus, color = Locus)) +
   geom_point() +
@@ -105,7 +100,6 @@ plot_overview_seAsia <- prev_df %>%
   facet_wrap( ~ country + District) +
   ylab("Prevalence") +
   xlab("Year") +
-  ylim(-1, 40) +
   scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"), 
                      labels = c("PfK13", "580Y", "539T"),
                      name = "Mutations")  +
@@ -117,7 +111,7 @@ plot_overview_seAsia <- prev_df %>%
     legend.text = element_text(size = 10),
     strip.text.x = element_text(size = 8),
     legend.title = element_text(size = 10),
-    legend.position = c(0.9, 0.08),
+    legend.position = "right",
     legend.box = "horizontal"
   )
 ```
@@ -143,32 +137,25 @@ ggsave(
 # SE Asia
 ## Prevalence plot overview
 ```{r}
-d1 <-
-  df_pfk7 %>% select(country, District, year, c580y, nobs_c580y, n) %>% mutate(Locus = "C580Y") %>% rename(x = c580y, nobs = nobs_c580y)
-d2 <-
-  df_pfk7 %>% select(country, District, year, r539t, nobs_r539t, n) %>% mutate(Locus = "R539T") %>% rename(x = r539t, nobs = nobs_r539t)
-d3 <-
-  df_pfk7 %>% select(country, District, year, all_kelch, nobs_kelch, n) %>% mutate(Locus = "all_kelch") %>% rename(x =
-                                                                                                                       all_kelch, nobs = nobs_kelch)
-d3$x <- d3$x - d2$x - d1$x
-
-prev_df <- rbind(d1, d2, d3)
-prev_df <- prev_df %>% group_by(year, Locus) %>%
-  mutate(min_n = sum(n), mut_sample = sum(x)) %>%
-  distinct(min_n, mut_sample) %>%
-  mutate(prop_sample = mut_sample / min_n)
+prev_df <- df_pfk7 %>% 
+  group_by(year, Locus) %>% 
+  filter(Locus != "PfK13") %>%
+  mutate(n = sum(n), mut_sample = sum(x)) %>%
+  distinct(n, mut_sample) %>%
+  mutate(prop_sample = mut_sample / n) %>%
+  ungroup
 
 prev <- prev_df %>%
   ggplot(aes(x = year, y = prop_sample, fill = Locus)) +
   geom_col() +
   theme_bw() +
   scale_fill_manual("Mutations",
-    values = c("#E69F00", "#56B4E9", "#009E73"),
-    labels = c("other PfK13", "580Y", "539T")
+    values = c("#56B4E9", "#E69F00", "#009E73"),
+    labels = c("580Y", "other PfK13", "539T")
   ) +
   xlab("Year") +
   ylab("Allele frequency") +
-  ylim(0, 1) +
+  ylim(0,1) +
   scale_x_continuous(breaks = seq(1993, 2018, 3)) +
   theme(
     legend.title = element_blank(),
@@ -198,7 +185,8 @@ ggsave(
 )
 ```
 
-## Download and preprocessing map of SE Asia
+## Map
+### Download maps
 ```{r}
 #load base map layers
 admin8 <-
@@ -240,7 +228,11 @@ pt.bbox <- st_bbox(c(
   ymin = pt.lim$ylim[1],
   ymax = pt.lim$ylim[2]
 ))
+```
 
+### Preprocessing
+```{r}
+#adjust names of Districts
 SE_asia <-
   ne_states(country = unique(df_pfk7$country),
             returnclass = "sf") %>%
@@ -263,6 +255,7 @@ SE_asia <-
     name = str_replace(name, "Quàng Nam", "Quang Nam")
   )
 
+#add Latitude for Districts that are not in the database
 SE_asia$name[SE_asia$latitude == 9.33941] <- "Bac Lieu"
 SE_asia$name[SE_asia$latitude == 11.6805] <- "Binh Phuoc"
 SE_asia$name[SE_asia$latitude == 11.1284] <- "Binh Thuan"
@@ -272,47 +265,54 @@ SE_asia$name[SE_asia$latitude == 11.6242] <- "Ninh Thuan"
 SE_asia$name[SE_asia$latitude == 16.7204] <- "Quang Tri"
 SE_asia$name[SE_asia$latitude == 13.6662] <- "Stueng Traeng"
 
+#filter districts that are in SE Asia
 SE_asia <-
   SE_asia  %>% filter(name %in% unique(df_pfk7$District)) %>% na.omit() %>% arrange(name)
 
+#adjust districts that contain non 
+r539t_district <- df_pfk7 %>% 
+  filter(Locus == "R539T", is.finite(lrsmed), nobs > numofobs) %>% 
+  distinct(District)
+r539t_district <- array(t(r539t_district))
+
+c580y_district <- df_pfk7 %>% 
+  filter(Locus == "C580Y", is.finite(lrsmed), nobs > numofobs) %>% 
+  distinct(District)
+c580y_district <- array(t(c580y_district))
+
+allkelch_district <- df_pfk7 %>% 
+  filter(Locus == "other_PfK13", is.finite(lrsmed), nobs > numofobs) %>% 
+  distinct(District)
+allkelch_district <- array(t(allkelch_district))
+
+#label colors for map
 SE_asia$color <- "not_enough_samples"
-r539t_district <-
-  df_pfk7 %>% filter(is.finite(lrsmed_539t), nobs_r539t > numofobs) %>% distinct(District)
-c580y_district <-
-  df_pfk7 %>% filter(is.finite(lrsmed_580y), nobs_c580y > numofobs) %>% distinct(District)
-allkelch_district <-
-  df_pfk7 %>% filter(is.finite(lrsmed_all_kelch), nobs_kelch > numofobs) %>% distinct(District)
-
-r539t_district <- t(as.data.frame(r539t_district))
-c580y_district <- t(as.data.frame(c580y_district))
-allkelch_district <- t(as.data.frame(allkelch_district))
-
-districts <- cbind(c580y_district, r539t_district)
-
-allkelch_district <-
-  allkelch_district[!allkelch_district %in% districts]
-r539t_district <- array(r539t_district)
-c580y_district <- array(c580y_district)
-
 SE_asia$color[SE_asia$name %in% r539t_district] <- "r539t" #combined
-SE_asia$color[SE_asia$name %in% c580y_district] <-
-  "c580y, " #combined
-SE_asia$color[SE_asia$name %in% allkelch_district] <-
-  "other PfK13" #only other kelch mutants
+SE_asia$color[SE_asia$name %in% c580y_district] <- "c580y" #combined
+SE_asia$color[SE_asia$name %in% allkelch_district] <- "other PfK13" #only other kelch mutants
 
-pie_data <-
-  df_pfk7 %>% mutate(
-    WildType = n - c580y - r539t - (all_kelch - c580y - r539t),
-    all_kelch = all_kelch - c580y - r539t
-  ) %>% select(District, n, c580y, r539t, all_kelch, WildType)
+#sum prevalence per Locus and District
+pie_data <- df_pfk7 %>% 
+  group_by(Locus, District) %>% 
+  mutate(sum_district_locus = sum(x)) %>% 
+  filter(Locus != "PfK13") %>%
+  select(District, Locus, sum_district_locus) %>% 
+  distinct(District, Locus, .keep_all = TRUE) %>% 
+  ungroup() 
+#sum sample size for each District
+nwild <- df_pfk7 %>% 
+  group_by(District) %>% 
+  mutate(sum_district_locus = sum(n)) %>% 
+  select(District, sum_district_locus) %>% 
+  distinct(District, .keep_all = TRUE) %>% 
+  ungroup() 
+#add wild-type to dataframe
+pie_data <- pie_data %>% 
+  add_row(District = unique(df_pfk7$District), Locus = rep("Wild-Type", dim(nwild)[1]), sum_district_locus = nwild$sum_district_locus) %>% 
+  arrange(District) %>% 
+  ungroup
 
-pie_data <-
-  pie_data %>% group_by(District) %>% mutate(
-    c580y = sum(c580y),
-    r539t = sum(r539t),
-    all_kelch = sum(all_kelch),
-    WildType = sum(WildType)
-  ) %>% arrange(District) %>% ungroup %>% distinct(District, .keep_all = TRUE)
+#add long and lat to dataframe for plotting
 pie_data$lat <- NA
 pie_data$long <- NA
 for (i in unique(pie_data$District)) {
@@ -322,16 +322,36 @@ for (i in unique(pie_data$District)) {
     rep(SE_asia$longitude[SE_asia$name == i], sum((pie_data$District == i)))
 }
 
-pie_data$radius <-
-  (pie_data$c580y + pie_data$r539t + pie_data$all_kelch) / pie_data$WildType
-minr <- min(pie_data$radius)  # min in the data original scale
-maxr <- max(pie_data$radius)  # max in the data original scale
+#initialize rows for each mutation and WT
+pie_data2 <- pie_data %>% select(District, lat, long) %>% distinct(District, .keep_all = TRUE)
+pie_data2$c580y <- NA
+pie_data2$r539t <- NA
+pie_data2$other_PfK13 <- NA
+pie_data2$WildType <- NA
+
+#obtain districts that obtain each mutation
+C580Y_dist <- unique(df_pfk7$District[df_pfk7$Locus == "C580Y"])
+R539T_dist <- unique(df_pfk7$District[df_pfk7$Locus == "R539T"])
+other_PfK13_dist <- unique(df_pfk7$District[df_pfk7$Locus == "other_PfK13"])
+
+#add prevalence for each mutation to dataframe
+pie_data2$c580y[match(C580Y_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C580Y"]
+pie_data2$r539t[match(R539T_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "R539T"]
+pie_data2$other_PfK13[match(other_PfK13_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "other_PfK13"]
+pie_data2$WildType <- pie_data$sum_district_locus[pie_data$Locus == "Wild-Type"]
+pie_data2[is.na(pie_data2)] <- 0
+
+pie_data2$radius <- (pie_data2$c580y + pie_data2$r539t + pie_data2$other_PfK13) / pie_data2$WildType
+#rescale radius
+minr <- min(pie_data2$radius)  # min in the data original scale
+maxr <- max(pie_data2$radius)  # max in the data original scale
 
 min_scale <- 0.3  ## min in the new scale
 max_scale <- 0.7 ## max in the new scale
 
-pie_data$radius_adj <-
-  min_scale + (max_scale - min_scale) * pie_data$radius / (maxr - minr)
+pie_data2$radius_adj <-
+  min_scale + (max_scale - min_scale) * pie_data2$radius / (maxr - minr)
+pie_data <- pie_data2
 ```
 
 ### Map with pie chart
@@ -435,7 +455,7 @@ map_SEAsia <- ggplot() +
       group = District,
       r = radius_adj
     ),
-    cols = c("c580y", "r539t", "all_kelch")
+    cols = c("c580y", "r539t", "other_PfK13")
   ) +
   geom_scatterpie_legend(
     pie_data$radius_adj*2,

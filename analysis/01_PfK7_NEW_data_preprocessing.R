@@ -58,7 +58,22 @@ df_all_kelch <- cam %>%
   mutate(Locus = "PfK13") %>%
   ungroup
 
-pfk7_data <- rbind(df_c580y, df_r539t, df_all_kelch)
+## all other validated markers besides 580Y and 539T
+cam$other_kelch <- NA
+cam$other_kelch[which(cam$ARTresistant == "resistant")] <- 0
+cam$other_kelch[grep("446|458|476|493|543|553|561",
+                   cam$kelch13_349.726_ns_changes)] <- 1
+df_other_kelch <- cam %>%
+  select(sample_id, year, country, site, other_kelch) %>%
+  arrange(country, site, year) %>%
+  group_by(country, site, year) %>%
+  summarise(N = n(),
+            other_kelch = if(all(is.na(other_kelch))){NA} else{sum(other_kelch, na.rm = T)}) %>%
+  rename(x = other_kelch) %>%
+  mutate(Locus = "other_PfK13") %>%
+  ungroup
+
+pfk7_data <- rbind(df_c580y, df_r539t, df_all_kelch, df_other_kelch)
 pfk7_data <- pfk7_data %>%
   group_by(country, site, Locus) %>%
   filter(is.finite(x)) %>%
@@ -85,6 +100,9 @@ numofobs <- 2
 pfk7_data <-
   pfk7_data %>% rename(District = site) %>% rename(n = N) %>%
   mutate(lrsmed = log(prev / (1 - prev)))
+
+pfk7_data$lrsmed[pfk7_data$lrsmed == Inf] <- NA
+pfk7_data$lrsmed[pfk7_data$lrsmed == -Inf] <- NA
 
 pfk7_data$wt_med <- NA
 pfk7_data$wt_med[pfk7_data$nobs > numofobs & is.finite(pfk7_data$lrsmed)] <- 1/(se_ln_ratio_noZeros(round(pfk7_data$prev[pfk7_data$nobs > numofobs & is.finite(pfk7_data$lrsmed)]*pfk7_data$n[pfk7_data$nobs > numofobs & is.finite(pfk7_data$lrsmed)]), pfk7_data$n[pfk7_data$nobs > numofobs & is.finite(pfk7_data$lrsmed)])^2)
