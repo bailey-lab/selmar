@@ -47,7 +47,8 @@ fileLocManuscript_pfK7 <- "figures/"
 c580y_stanmod <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = pfk7_data %>% filter(Locus == "C580Y", nobs > numofobs),
-  weights = wt_med, adapt_delta = 0.9975
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 vals <- summary(c580y_stanmod$stanfit)$summary[,1]
@@ -60,7 +61,8 @@ ranef_c580y_stanmod$mutation <- rep("C580Y", dim(ranef_c580y_stanmod)[1])
 r539t_stanmod <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = pfk7_data %>% filter(Locus == "R539T", nobs > numofobs),
-  weights = wt_med, adapt_delta = 0.9975
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 vals <- summary(r539t_stanmod$stanfit)$summary[,1]
@@ -73,7 +75,8 @@ ranef_r539t_stanmod$mutation <- rep("R539T", dim(ranef_r539t_stanmod)[1])
 all_kelch_stanmod <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = pfk7_data %>% filter(Locus == "PfK13", nobs > numofobs),
-  weights = wt_med, adapt_delta = 0.9975
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 vals <- summary(all_kelch_stanmod$stanfit)$summary[,1]
