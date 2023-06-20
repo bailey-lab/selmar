@@ -1051,8 +1051,7 @@ ggsave(
 ## Data preprocessing
 ```{r}
 inital_true <- pfk7_data %>% 
-  filter(nobs > numofobs,
-         is.finite(predict_stan))
+  filter(nobs > numofobs)
 
 corr_df_cutoff <- NULL
 for(l in unique(df_predict_cutoff_allyear$label)) {
@@ -1074,11 +1073,11 @@ for(l in unique(df_predict_cutoff_allyear$label)) {
   colnames(df)[ncol(df)-2] <- "p_pred"
   colnames(df)[ncol(df)-1] <- "label"
   colnames(df)[ncol(df)] <- "pred_y"
-  corr_df_cutoff <- rbind(corr_df_cutoff, df) %>% filter(year >= min_year + pred_y)
+  corr_df_cutoff <- rbind(corr_df_cutoff, df) %>% 
+    filter(year >= min_year + pred_y)
 }
 
 corr_df_cutoff <- corr_df_cutoff %>% 
-  filter(is.finite(predict_stan)) %>%
   mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
   rename(t_pred_prev = x) %>%
   group_by(country, District, label)
@@ -1232,10 +1231,9 @@ ggsave(
 ```{r}
 ## Correlation plot for 50% avg
 for (mu in unique(corr_df_cutoff$Locus)){
-  correlation_raw_plot_avg <- corr_df_cutoff %>% 
+  correlation_raw_plot_cutoff <- corr_df_cutoff %>% 
     filter(Locus == mu) %>% 
     rename("Mutation" = "Locus") %>%
-    mutate(N = n+x) %>%
   ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, shape = District)) +
   geom_point() +
   geom_smooth(method=lm, se=FALSE, linetype = "dashed") +
@@ -1260,7 +1258,7 @@ for (mu in unique(corr_df_cutoff$Locus)){
   
     #Assigning df_predict to variables
   var_name <- paste0(mu, "_comb_dist_correlation_raw_plot_cutoff")
-  assign(var_name, correlation_raw_plot_avg)
+  assign(var_name, correlation_raw_plot_cutoff)
 }
 ```
 
