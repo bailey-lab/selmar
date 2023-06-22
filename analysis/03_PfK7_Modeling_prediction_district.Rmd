@@ -1076,7 +1076,7 @@ for(l in unique(df_predict_cutoff_allyear$label)) {
 
 corr_df_cutoff <- corr_df_cutoff %>% 
   mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
-  rename(t_pred_prev = prev) %>%
+  mutate(t_pred_prev = prev*100) %>%
   group_by(country, District, label)
 ```                                            
 
@@ -1088,13 +1088,13 @@ for (mu in unique(corr_df_cutoff$Locus)){
     ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
     geom_point() +
     geom_smooth(method=lm, se=FALSE) +
-    geom_abline(slope = 1, intercept = 0, color = "grey") +
+    geom_abline(slope = 1, intercept = 0, color = "grey", linetype = "dashed") +
     facet_wrap(~ District) +
     theme_bw() +
     xlab("True") +
     ylab("Predicted") +
-    # scale_y_continuous(limits=c(-10,105), breaks = c(0, 25, 50, 75, 100)) +
-    # scale_x_continuous(limits=c(-10,105), breaks = c(0, 25, 50, 75, 100)) +
+    scale_y_continuous(limits=c(0,100), breaks = c(0, 25, 50, 75, 100)) +
+    scale_x_continuous(limits=c(0,100), breaks = c(0, 25, 50, 75, 100)) +
     scale_color_manual(
       values = c("#E69F00", "#56B4E9", "#0072B2"),
       labels = c("2 years", "3 years", "4 years")
