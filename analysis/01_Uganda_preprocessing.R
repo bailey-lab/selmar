@@ -52,6 +52,7 @@ df$wt_med[df$nobs > numofobs & is.finite(df$lrsmed)] <- 1/(se_ln_ratio_noZeros(r
 #COMBINED FOR OVERALL UGANDAN SELECTION COEF
 df_comb <- df %>% group_by(District, year) %>% mutate(comb = sum(x)) %>% ungroup
 
+#Mixed genotypes
 df_comb <- as.data.frame(df_comb)
 df_comb$comb[df_comb$District == "Agago" & df_comb$year == "2019"] <-  df_comb$comb[df_comb$District == "Agago" & df_comb$year == "2019"] - 1
 
