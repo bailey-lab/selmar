@@ -127,13 +127,31 @@ uganda <- ne_states(country="Uganda", returnclass = "sf") %>%
   select(name, latitude, longitude) %>%
   arrange(name)
 uganda$name[uganda$name == "Kabale"] <- "Rukiga"
-uganda <- uganda %>% filter(name %in% unique(df$District)) %>% na.omit() %>% arrange(name)
+uganda <- uganda %>% 
+  filter(name %in% unique(df$District)) %>% 
+  na.omit() %>% arrange(name)
 
-pie_data <- df %>% group_by(Locus, District) %>% mutate(sum_district_locus = sum(x)) %>% select(District, Locus, sum_district_locus) %>% distinct(District, Locus, .keep_all = TRUE) %>% ungroup() 
+#sum prevalence per Locus and District
+pie_data <- df %>% 
+  group_by(Locus, District) %>% 
+  mutate(sum_district_locus = sum(x)) %>% 
+  select(District, Locus, sum_district_locus) %>% 
+  distinct(District, Locus, .keep_all = TRUE) %>% 
+  ungroup() 
+#sum sample size for each District
+nwild <- df %>% 
+  group_by(District) %>% 
+  mutate(sum_district_locus = sum(n)) %>% 
+  select(District, sum_district_locus) %>% 
+  distinct(District, .keep_all = TRUE) %>% 
+  ungroup() 
+#add wild-type to dataframe
+pie_data <- pie_data %>% 
+  add_row(District = unique(df$District), Locus = rep("Wild-Type", 14), sum_district_locus = nwild$sum_district_locus) %>% 
+  arrange(District) %>% 
+  ungroup
 
-nwild <- df %>% group_by(District) %>% mutate(sum_district_locus = sum(n)) %>% select(District, sum_district_locus) %>% distinct(District, .keep_all = TRUE) %>% ungroup() 
-
-pie_data <- pie_data %>% add_row(District = unique(df$District), Locus = rep("Wild-Type", 14), sum_district_locus = nwild$sum_district_locus) %>% arrange(District) %>% ungroup
+#add long and lat to dataframe for plotting
 pie_data$lat <- NA
 pie_data$long <- NA
 for (i in unique(pie_data$District)){
@@ -141,6 +159,7 @@ for (i in unique(pie_data$District)){
   pie_data$long[pie_data$District == i] <- rep(uganda$longitude[uganda$name == i], sum((pie_data$District == i)))
 }
 
+#initialize rows for each mutation and WT
 pie_data2 <- pie_data %>% select(District, lat, long) %>% distinct(District, .keep_all = TRUE)
 pie_data2$A675V <- NA
 pie_data2$C469Y <- NA
@@ -148,26 +167,27 @@ pie_data2$C469F <- NA
 pie_data2$R561H <- NA
 pie_data2$WildType <- NA
 
+#obtain districts that obtain each mutation
 C469Y_dist <- unique(df$District[df$Locus == "C469Y"])
 A675V_dist <- unique(df$District[df$Locus == "A675V"])
 C469F_dist <- unique(df$District[df$Locus == "C469F"])
 R561H_dist <- unique(df$District[df$Locus == "R561H"])
-WT_dist <- unique(df$District[df$Locus == "Wild-Type"])
 
+#add prevalence for each mutation to dataframe
 pie_data2$A675V[match(A675V_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "A675V"]
 pie_data2$C469Y[match(C469Y_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C469Y"]
 pie_data2$C469F[match(C469F_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C469F"]
 pie_data2$R561H[match(R561H_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "R561H"]
 pie_data2$WildType <- pie_data$sum_district_locus[pie_data$Locus == "Wild-Type"]
-pie_data2[is.na(pie_data2)] =0
+pie_data2[is.na(pie_data2)] <- 0
 
 pie_data2$radius <- (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F +pie_data2$R561H)/pie_data2$WildType
+
+#rescale radius
 minr<-min(pie_data2$radius)  # min in the data original scale
 maxr<-max(pie_data2$radius)  # max in the data original scale
- 
 min_scale<-0.1  ## min in the new scale
 max_scale<-0.4 ## max in the new scale
- 
 pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
 
 ```

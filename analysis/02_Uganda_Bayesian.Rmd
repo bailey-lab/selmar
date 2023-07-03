@@ -260,7 +260,7 @@ selection_coef_bay <- ggplot() +
   scale_color_manual(values=c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499", "#44AA99", "black")) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_bw() +
-  xlim(-2,2) +
+  xlim(-2.5,4) +
   theme(legend.title=element_blank(), axis.line = element_line(), legend.position = "right", plot.title = element_text(hjust = 0.5, size = 20), axis.text = element_text(size = 14), axis.title=element_text(size=16), legend.text=element_text(size=16))
 
 effect_size_bay <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))

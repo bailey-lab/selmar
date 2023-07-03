@@ -32,7 +32,7 @@ library(gt)
 # Load data
 ```{r}
 #load data
-pfk7_data <- read.table("data/data-derived/pfk7_data.txt")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% filter(Locus != "other_PfK13")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -45,35 +45,38 @@ fileLocManuscript_pfK7 <- "figures/"
 
 # ---- Model for c580y -----
 c580y_stanmod <- rstanarm::stan_glmer(
-  lrsmed_580y ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_c580y > numofobs),
-  weights = wt_med_580y, adapt_delta = 0.9975
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(Locus == "C580Y", nobs > numofobs),
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 vals <- summary(c580y_stanmod$stanfit)$summary[,1]
 vals <- vals[grep("^b", names(vals))]
 ranef_c580y_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_c580y_stanmod$mutation <- rep("c580y", dim(ranef_c580y_stanmod)[1])
+ranef_c580y_stanmod$mutation <- rep("C580Y", dim(ranef_c580y_stanmod)[1])
 
 # ---- Model for r539t -----
 r539t_stanmod <- rstanarm::stan_glmer(
-  lrsmed_539t ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_r539t > numofobs),
-  weights = wt_med_539t, adapt_delta = 0.9975
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(Locus == "R539T", nobs > numofobs),
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 vals <- summary(r539t_stanmod$stanfit)$summary[,1]
 vals <- vals[grep("^b", names(vals))]
 ranef_r539t_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_r539t_stanmod$mutation <- rep("r539t", dim(ranef_r539t_stanmod)[1])
+ranef_r539t_stanmod$mutation <- rep("R539T", dim(ranef_r539t_stanmod)[1])
 
 # ---- Model for combined kelch -----
 all_kelch_stanmod <- rstanarm::stan_glmer(
-  lrsmed_all_kelch ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(nobs_kelch > numofobs),
-  weights = wt_med_all_kelch, adapt_delta = 0.9975
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(Locus == "PfK13", nobs > numofobs),
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 vals <- summary(all_kelch_stanmod$stanfit)$summary[,1]
@@ -92,73 +95,49 @@ ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
 ## Posterior of the model
 ```{r}
 #  get model predictions for plotting
-pfk7_data$predict_stan_c580y <- NA
-pfk7_data$predict_stan_r539t <- NA
-pfk7_data$predict_stan_all_kelch <- NA
+pfk7_data$predict_stan <- NA
 
-pfk7_data$predict_stan_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "PfK13" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 ```
 
 ## Confidence interval
 ```{r}
 #  get model predictions for plotting
-pfk7_data$conf.low_c580y <- NA
-pfk7_data$conf.high_c580y <- NA
-pfk7_data$conf.low_r539t <- NA
-pfk7_data$conf.high_r539t <- NA
-pfk7_data$conf.low_all_kelch <- NA
-pfk7_data$conf.high_all_kelch <- NA
+pfk7_data$conf.low <- NA
+pfk7_data$conf.high <- NA
 
 c580y_conf <- rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
 r539t_conf <- rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
 all_kelch_conf <- rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
 
 # here just add predictions  for the c469Y rows
-pfk7_data$conf.low_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <- c580y_conf[1,]
-pfk7_data$conf.low_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <- r539t_conf[1,]
-pfk7_data$conf.low_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[1,]
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[1,]
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[1,]
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "PfK13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[1,]
 
-pfk7_data$conf.high_c580y[is.finite(pfk7_data$lrsmed_580y) & pfk7_data$nobs_c580y > numofobs] <- c580y_conf[2,]
-pfk7_data$conf.high_r539t[is.finite(pfk7_data$lrsmed_539t) & pfk7_data$nobs_r539t > numofobs] <- r539t_conf[2,]
-pfk7_data$conf.high_all_kelch[is.finite(pfk7_data$lrsmed_all_kelch) & pfk7_data$nobs_kelch > numofobs] <- all_kelch_conf[2,]
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[2,]
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[2,]
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "PfK13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[2,]
 ```
 
 ## Prevalence scale
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
-pfk7_data$predict_stan_prev_c580y <- NA
-pfk7_data$predict_stan_prev_r539t <- NA
-pfk7_data$predict_stan_prev_all_kelch <- NA
+pfk7_data$predict_stan_prev <- NA
 
-pfk7_data$predict_stan_prev_c580y <- exp(pfk7_data$predict_stan_c580y)*100/(1+exp(pfk7_data$predict_stan_c580y))
-pfk7_data$predict_stan_prev_r539t <- exp(pfk7_data$predict_stan_r539t)*100/(1+exp(pfk7_data$predict_stan_r539t))
-pfk7_data$predict_stan_prev_all_kelch <- exp(pfk7_data$predict_stan_all_kelch)*100/(1+exp(pfk7_data$predict_stan_all_kelch))
-
-pfk7_data$conf.high_prev_c580y <- exp(pfk7_data$conf.high_c580y)*100/(1+exp(pfk7_data$conf.high_c580y))
-pfk7_data$conf.high_prev_r539t <- exp(pfk7_data$conf.high_r539t)*100/(1+exp(pfk7_data$conf.high_r539t))
-pfk7_data$conf.high_prev_all_kelch <- exp(pfk7_data$conf.high_all_kelch)*100/(1+exp(pfk7_data$conf.high_all_kelch))
-
-pfk7_data$conf.low_prev_c580y <- exp(pfk7_data$conf.low_c580y)*100/(1+exp(pfk7_data$conf.low_c580y))
-pfk7_data$conf.low_prev_r539t <- exp(pfk7_data$conf.low_r539t)*100/(1+exp(pfk7_data$conf.low_r539t))
-pfk7_data$conf.low_prev_all_kelch <- exp(pfk7_data$conf.low_all_kelch)*100/(1+exp(pfk7_data$conf.low_all_kelch))
+pfk7_data$predict_stan_prev <- exp(pfk7_data$predict_stan)*100/(1+exp(pfk7_data$predict_stan))
+pfk7_data$conf.high_prev <- exp(pfk7_data$conf.high)*100/(1+exp(pfk7_data$conf.high))
+pfk7_data$conf.low_prev <- exp(pfk7_data$conf.low)*100/(1+exp(pfk7_data$conf.low))
 ```
 
 # Plot prevalence for all mutations
 ## Preprocessing
 ```{r}
-d1 <- pfk7_data %>% select(country, District, year, c580y, n, nobs_c580y, lrsmed_580y, prev_580y, predict_stan_prev_c580y, conf.low_prev_c580y, conf.high_prev_c580y) %>% mutate(Locus = "C580Y")
-colnames(d1) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
-d2 <- pfk7_data %>% select(country, District, year, r539t, n, nobs_r539t, lrsmed_539t, prev_539t, predict_stan_prev_r539t, conf.low_prev_r539t, conf.high_prev_r539t) %>% mutate(Locus = "R539T")
-colnames(d2) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
-d3 <- pfk7_data %>% select(country, District, year, all_kelch, n, nobs_kelch, lrsmed_all_kelch, prev_all_kelch, predict_stan_prev_all_kelch, conf.low_prev_all_kelch, conf.high_prev_all_kelch) %>% mutate(Locus = "combined PfK13")
-colnames(d3) <- c("country", "District", "year", "x", "n", "nobs", "lrsmed", "prev", "predict_stan_prev", "conf.low_prev", "conf.high_prev", "Locus")
-prev_df <- rbind(d1, d2, d3)
-
-prev_df2 <- prev_df %>% filter(nobs > numofobs)
-prev_df <- rbind(prev_df2, prev_df %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")) ## added these sites to show general prevalence across SE Asia
+prev_df2 <- pfk7_data %>% filter(nobs > numofobs)
+prev_df <- rbind(prev_df2, pfk7_data %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")) ## added these sites to show general prevalence across SE Asia
 ```
 
 ## Plot
@@ -167,13 +146,12 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
   ggplot(aes(year, prev*100, group = Locus, color = Locus)) +
   geom_point(aes(size = N, group = Locus, color = Locus)) +
   facet_wrap(~country + District) +
-  #ggtitle("Baysian Prevalence - C580Y") +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   geom_line(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
   geom_ribbon(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
   #scale_y_log10() +
-  scale_color_manual(values=c("#56B4E9", "#E69F00", "#009E73"), name = "Mutations", labels = c("580Y", "combined PfK13", "539T")) + 
+  scale_color_manual(values=c("#56B4E9", "#E69F00", "#009E73"), name = "Mutations", labels = c("580Y", "PfK13", "539T")) + 
   scale_fill_manual(values=c("#56B4E9", "#E69F00", "#009E73")) + 
   ylab("Prevalence") +
   xlab("Year") +
@@ -185,14 +163,14 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.png"),
+  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_posterior_prevalence.png"),
   prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.pdf"),
+  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_posterior_prevalence.pdf"),
   prev_plot,
   width = 8,
   height = 8,
@@ -282,7 +260,7 @@ selection_coef_bay <- ggplot() +
   scale_y_discrete(labels = c("539T", "580Y", "PfK13")) +
   ylab("Mutation") +
   xlab("Selection Coefficient") +
-  xlim(-2,2) +
+  xlim(-2.5,4) +
   scale_color_manual(
     values = c(
       "#999999",
