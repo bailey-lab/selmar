@@ -34,7 +34,7 @@ library(ggbreak)
 ```{r}
 #load data
 df_uganda <- read.table("data/data-derived/Ugandan_data.txt")
-df_pfk7 <- read.table("data/data-derived/NEW_pfk7_data.txt")
+df_pfk7 <- read.table("data/data-derived/pfk7_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -92,7 +92,6 @@ ggsave(
 ## SE Asia (PfK7 data)
 ```{r}
 plot_overview_seAsia <- df_pfk7 %>% filter(Locus != "other_PfK13") %>%
-  mutate(N = n + x) %>%
   ggplot(aes(year, prev * 100, group = Locus, color = Locus)) +
   geom_point() +
   labs(shape = "Mutations", size = "Sample Size") +
@@ -140,9 +139,9 @@ ggsave(
 prev_df <- df_pfk7 %>% 
   group_by(year, Locus) %>% 
   filter(Locus != "PfK13") %>%
-  mutate(n = sum(n), mut_sample = sum(x)) %>%
-  distinct(n, mut_sample) %>%
-  mutate(prop_sample = mut_sample / n) %>%
+  mutate(N = sum(N), mut_sample = sum(x)) %>%
+  distinct(N, mut_sample) %>%
+  mutate(prop_sample = mut_sample / N) %>%
   ungroup
 
 prev <- prev_df %>%

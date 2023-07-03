@@ -32,7 +32,7 @@ library(gt)
 # Load data
 ```{r}
 #load data
-pfk7_data <- read.table("data/data-derived/NEW_pfk7_data.txt") %>% filter(Locus != "other_PfK13")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% filter(Locus != "other_PfK13")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -163,14 +163,14 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.png"),
+  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_posterior_prevalence.png"),
   prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_prevalence.pdf"),
+  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_posterior_prevalence.pdf"),
   prev_plot,
   width = 8,
   height = 8,
@@ -260,7 +260,7 @@ selection_coef_bay <- ggplot() +
   scale_y_discrete(labels = c("539T", "580Y", "PfK13")) +
   ylab("Mutation") +
   xlab("Selection Coefficient") +
-  xlim(-2.5,2.5) +
+  xlim(-2.5,4) +
   scale_color_manual(
     values = c(
       "#999999",

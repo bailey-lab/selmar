@@ -35,7 +35,7 @@ library(gt)
 #set the limit of number of observations
 numofobs <- 2
 #load data
-pfk7_data <- read.table("data/data-derived/NEW_pfk7_data.txt") %>% filter(Locus != "other_PfK13")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% filter(Locus != "other_PfK13")
 ```
 
 # Bayesian GMM with slopes and intercepts
@@ -138,7 +138,7 @@ pfk7_data$conf.high_prev <- exp(pfk7_data$conf.high)*100/(1+exp(pfk7_data$conf.h
 pfk7_data$conf.low_prev <- exp(pfk7_data$conf.low)*100/(1+exp(pfk7_data$conf.low))
 ```
 
-# Forecasting Selection 
+120*# Forecasting Selection 
 ## No filtering based on the first 2, 3, and 4 years 
 ```{r}
 pred_year <- c(2, 3, 4)
@@ -159,7 +159,7 @@ for (i in pred_year) {
   
   # forecasting
   new_data <- pfk7_data %>%
-    filter(nobs > numofobs, is.finite(pfk7_data$lrsmed)) %>% 
+    filter(nobs > numofobs, is.finite(lrsmed)) %>% 
     mutate(Locus = "C580Y") %>%
     group_by(District, Locus) %>%
     complete(year = seq(min(min_year) + i, 2023, 1)) %>% # this creates all the year values up to 2023
@@ -201,7 +201,9 @@ for (i in pred_year) {
   
   #forecasting
   new_data <- pfk7_data %>%
-    filter(nobs > numofobs, is.finite(pfk7_data$lrsmed)) %>%
+    filter(nobs > numofobs, 
+           is.finite(lrsmed),
+           ) %>% 
     mutate(Locus = "R539T") %>%
     group_by(District, Locus) %>%
     complete(year = seq(min(min_year) + i, 2023, 1)) %>% # this creates all the year values up to 2023
@@ -210,7 +212,7 @@ for (i in pred_year) {
     mutate(min_year = replace(min_year, is.na(min_year), 0)) %>%
     ungroup
 
-new_data <- new_data %>%
+  new_data <- new_data %>%
     group_by(District, Locus) %>%
     mutate(min_year = max(min_year),
       adj_year = year - min_year,
@@ -244,7 +246,7 @@ new_data <- new_data %>%
   
   # forecasting
   new_data <- pfk7_data %>%
-    filter(nobs > numofobs, is.finite(pfk7_data$lrsmed)) %>% 
+    filter(nobs > numofobs, is.finite(lrsmed)) %>% 
     mutate(Locus = "PfK13") %>%
     group_by(District, Locus) %>% 
     complete(year = seq(min(min_year) + i, 2023, 1)) %>% # this creates all the year values up to 2023
@@ -300,9 +302,9 @@ df_pred <- df_predict_allyear %>%
   filter(District %in% unique(ex$District), year >= min_year + pred_y, Locus == "C580Y")
 prev_c580y_plot <- 
   ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100), color = ex_pt$point_col) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true"), linewidth = 1) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100), color = ex_pt$point_col) +
   labs(shape="Mutations") +
   theme_bw() +
   facet_wrap(~District) +
@@ -340,9 +342,9 @@ df_pred <- df_predict_allyear %>%
 
 prev_r539t_plot <- 
   ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100), color = ex_pt$point_col) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100), color = ex_pt$point_col) +
   labs(shape="Mutations") +
   theme_bw() +
   facet_wrap(~District) +
@@ -380,9 +382,9 @@ df_pred <- df_predict_allyear %>%
   filter(District %in% unique(ex$District), year >= min_year +  pred_y, Locus == "PfK13")  
 prev_all_kelch_plot <- 
   ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100), color = ex_pt$point_col) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100), color = ex_pt$point_col) +
   labs(shape="Mutations") +
   theme_bw() +
   facet_wrap(~District) +
@@ -470,8 +472,7 @@ for (i in pred_year) {
   data_c580y <- pfk7_data %>% 
     filter(
       Locus == "C580Y",
-      nobs > numofobs,
-      year >= min_year & year <= min_year + i) 
+      nobs > numofobs) 
   
   selected_district <- data_c580y %>% 
     group_by(Locus, country, District) %>%
@@ -483,7 +484,9 @@ for (i in pred_year) {
   selected_district <- array(t(selected_district)) #check if the prevalence in the first year observed is less than cutoff
   
   data_c580y <- data_c580y %>% 
-    filter(District %in% selected_district) #keep only the district that satisfy filtering
+    filter(District %in% selected_district, #keep only the district that satisfy filtering 
+           year >= min_year & year <= min_year + i) 
+  
   
   c580y_pred <- rstanarm::stan_glmer(
     lrsmed ~ adj_year + (1 + adj_year | District),
@@ -526,8 +529,7 @@ for (i in pred_year) {
   data_r539t <- pfk7_data %>% 
     filter(
       Locus == "R539T",
-      nobs > numofobs, 
-      year >= min_year & year <= min_year + i)
+      nobs > numofobs)
 
   selected_district <- data_r539t %>% 
     group_by(Locus, country, District) %>%
@@ -539,7 +541,8 @@ for (i in pred_year) {
   selected_district <- array(t(selected_district)) #check if the prevalence in the first year observed is less than cutoff
   
   data_r539t <- data_r539t %>% 
-    filter(District %in% selected_district)
+    filter(District %in% selected_district,
+           year >= min_year & year <= min_year + i)
   
   r539t_pred <- rstanarm::stan_glmer(
     lrsmed ~ adj_year + (1 + adj_year | District),
@@ -550,7 +553,7 @@ for (i in pred_year) {
   
   new_data <- pfk7_data %>%
     filter(nobs > numofobs, 
-           is.finite(pfk7_data$lrsmed), 
+           is.finite(lrsmed), 
            District %in% selected_district,
            Locus == "R539T") %>%
     group_by(District, Locus) %>%
@@ -581,8 +584,7 @@ for (i in pred_year) {
   data_all_kelch <- pfk7_data %>% 
     filter(
       Locus == "PfK13",
-      nobs > numofobs, 
-      year >= min_year & year <= min_year + i)
+      nobs > numofobs)
 
   selected_district <- data_all_kelch %>% 
     group_by(Locus, country, District) %>%
@@ -594,7 +596,8 @@ for (i in pred_year) {
   selected_district <- array(t(selected_district)) #check if the prevalence in the first year observed is less than cutoff
   
   data_all_kelch <- data_all_kelch %>% 
-    filter(District %in% selected_district)
+    filter(District %in% selected_district,
+           year >= min_year & year <= min_year + i)
   
   all_kelch_pred <- rstanarm::stan_glmer(
     lrsmed ~ adj_year + (1 + adj_year | District),
@@ -649,7 +652,7 @@ for (i in pred_year) {
 df_predict_cutoff_allyear <- rbind(df_predict_cutoff_2year, df_predict_cutoff_3year, df_predict_cutoff_4year)
 ```
 
- ### Plotting forecasting of predictions for the first 2, 3, and 4 years with prevalence cut off
+### Plotting forecasting of predictions for the first 2, 3, and 4 years with prevalence cut off
 #### Point sized based on sample size
 ```{r}
 ################ PLOT FOR C580Y ################
@@ -668,9 +671,10 @@ ex_pt <- pfk7_data %>%
 ## PLOT FOR C580Y
 prev_cutoff_c580y_plot <- 
   ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true"), linewidth = 1) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -707,9 +711,10 @@ ex_pt <- pfk7_data %>%
                                year < min_year ~ "black")) 
 prev_cutoff_r539t_plot <- 
   ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -745,9 +750,10 @@ ex_pt <- pfk7_data %>%
                                year > min_year + 4 ~ "black",
                                year < min_year ~ "black")) 
  prev_cutoff_all_kelch_plot <- ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label,color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -796,6 +802,17 @@ ggsave(
   height = 4,
   dpi = 700
 )
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/50_cutoff_firstobs/larger_plot/SEAsia_cutoff_pred_C580Y_",
+    prev_cutoff_perc,
+    "prev_pred.pdf"
+  ),
+  prev_cutoff_c580y_plot,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
 
 ################ PLOT FOR R539T ################
 ggsave(
@@ -820,6 +837,17 @@ ggsave(
   height = 2.7,
   dpi = 700
 )
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/50_cutoff_firstobs/larger_plot/SEAsia_cutoff_pred_R539T_",
+    prev_cutoff_perc,
+    "prev_pred.pdf"
+  ),
+  prev_cutoff_r539t_plot,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
 
 ################ PLOT FOR ALL KELCH ################
 ggsave(
@@ -842,6 +870,17 @@ ggsave(
   prev_cutoff_all_kelch_plot,
   width = 6,
   height = 4,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/predictions/SE_Asia/per_district/50_cutoff_firstobs/larger_plot/SEAsia_cutoff_pred_PfK13_",
+    prev_cutoff_perc,
+    "prev_pred.pdf"
+  ),
+  prev_cutoff_all_kelch_plot,
+  width = 8,
+  height = 5,
   dpi = 700
 )
 
@@ -1087,7 +1126,6 @@ for (mu in unique(corr_df_cutoff$Locus)){
   correlation_raw_plot_cutoff <- corr_df_cutoff %>% filter(Locus == mu) %>%
     ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
     geom_point() +
-    geom_smooth(method=lm, se=FALSE) +
     geom_abline(slope = 1, intercept = 0, color = "grey", linetype = "dashed") +
     facet_wrap(~ District) +
     theme_bw() +
@@ -1336,31 +1374,31 @@ ggsave(
 
 # Supplement Figure 
 
-## Figure 4 (A): Binh Phuoc - Model
+## Figure 4 (A): Preah Vihear - Model
 ### Preprocessing
 ```{r}
-prev_Ratanakiri <- pfk7_data %>% 
+prev_PreahVihear <- pfk7_data %>% 
   select(country, District, year, Locus, x, n, N, nobs, lrsmed, prev, predict_stan_prev, conf.low_prev, conf.high_prev) %>% 
-  filter(District == "Ratanakiri", Locus == "C580Y", nobs > numofobs)
+  filter(District == "Preah Vihear", Locus == "C580Y", nobs > numofobs)
 ```
 
 ### Ploting
 ```{r}
-df_Ratanakiri_pred <- df_predict_cutoff_allyear %>% 
+df_PreahVihear_pred <- df_predict_cutoff_allyear %>% 
   filter(year <= min_year + pred_y, 
          Locus == "C580Y", 
-         District == "Ratanakiri") %>%
+         District == "Preah Vihear") %>%
   mutate(predict_prev = exp(predict)*100/(1+exp(predict))) 
 ex_pt <- pfk7_data %>% 
-  filter(nobs > numofobs, District == "Ratanakiri", Locus == "C580Y") %>%
+  filter(nobs > numofobs, District == "Preah Vihear", Locus == "C580Y") %>%
   mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
                                year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
                                year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
                                year > min_year + 4 ~ "black",
                                year < min_year ~ "black")) 
-prev_Ratanakiri_plot <- ggplot() +
-  geom_line(data = df_Ratanakiri_pred, aes(year, predict_prev, group = label, color = label)) +
+prev_PreahVihear_plot <- ggplot() +
   geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  geom_line(data = df_PreahVihear_pred, aes(year, predict_prev, group = label, color = label)) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   scale_x_continuous(breaks = seq(min(ex_pt$year), max(ex_pt$year), by = 2)) +
@@ -1385,14 +1423,14 @@ prev_Ratanakiri_plot <- ggplot() +
 
 ### Saving
 ```{r}
-ggsave("figures/Figure4_Ratanakiri_model.png",
-  prev_Ratanakiri_plot,
+ggsave("figures/Figure4_PreahVihear_model.png",
+  prev_PreahVihear_plot,
   width = 4.5,
   height = 3,
   dpi = 700
 )
-ggsave("figures/Figure4_Ratanakiri_model.pdf",
-  prev_Ratanakiri_plot,
+ggsave("figures/Figure4_PreahVihear_model.pdf",
+  prev_PreahVihear_plot,
   width = 4.5,
   height = 3,
   dpi = 700
@@ -1403,7 +1441,7 @@ ggsave("figures/Figure4_Ratanakiri_model.pdf",
 ### Preprocessing
 ```{r}
 df_pred <- df_predict_cutoff_allyear %>% 
-  filter(year >= min_year + pred_y, Locus == "C580Y", District == "Ratanakiri", Locus == "C580Y") %>%
+  filter(year >= min_year + pred_y, Locus == "C580Y", District == "Preah Vihear", Locus == "C580Y") %>%
   mutate(predicted_prev = exp(predict)*100/(1+exp(predict)))
 ex <- pfk7_data %>% 
   filter(is.finite(lrsmed), nobs > numofobs, District %in% unique(df_pred$District), Locus == "C580Y")
@@ -1420,11 +1458,11 @@ ex_pt <- pfk7_data %>%
 
 ### Plotting
 ```{r}
-prev_cutoff_c580y_Ratanakiri_plot <- 
+prev_cutoff_c580y_PreahVihear_plot <- 
   ggplot() +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true"), linewidth = 1) + 
   geom_line(data=df_pred, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
   labs(shape="Mutations", size = "Sample Size") +
   scale_x_continuous(breaks = seq(min(ex_pt$year), max(df_pred$year), by = 2)) +
   theme_bw() +
@@ -1448,11 +1486,11 @@ prev_cutoff_c580y_Ratanakiri_plot <-
 ```{r}
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_district/50_cutoff_Ratanakiri/SEAsia_cutoff_pred_C580Y_Ratanakiri_",
+    "figures/predictions/SE_Asia/per_district/50_cutoff_PreahVihear/SEAsia_cutoff_pred_C580Y_PreahVihear_",
     prev_cutoff_perc,
     "avg_prev_pred.png"
   ),
-  prev_cutoff_c580y_Ratanakiri_plot,
+  prev_cutoff_c580y_PreahVihear_plot,
   width = 2.7,
   height = 3,
   dpi = 700
@@ -1460,11 +1498,11 @@ ggsave(
 
 ggsave(
   paste0(
-    "figures/predictions/SE_Asia/per_district/50_cutoff_Ratanakiri/SEAsia_cutoff_pred_C580Y_Ratanakiri_",
+    "figures/predictions/SE_Asia/per_district/50_cutoff_PreahVihear/SEAsia_cutoff_pred_C580Y_PreahVihear_",
     prev_cutoff_perc,
     "avg_prev_pred.pdf"
   ),
-  prev_cutoff_c580y_Ratanakiri_plot,
+  prev_cutoff_c580y_PreahVihear_plot,
   width = 2.7,
   height = 3.5,
   dpi = 700

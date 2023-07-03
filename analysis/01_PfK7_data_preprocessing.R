@@ -20,13 +20,13 @@ cam <- cam %>%
          !(kelch13_349.726_ns_changes %in% c("!", "*", "-", "!*"))) %>%
   arrange(country, site, year) %>%
   group_by(country, site, year) %>%
-  summarise(c580y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
-         r539t = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
+  summarise(C580Y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
+         R539T = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
          PfK13 = sum(grepl("580Y|580y|446|458|476|493|539|543|553|561", kelch13_349.726_ns_changes)),
          other_PfK13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
          N = n()) %>%
   ungroup %>%
-  pivot_longer(cols = c580y:other_PfK13) %>%
+  pivot_longer(cols = C580Y:other_PfK13) %>%
   rename(Locus = name, x = value) %>%
   select(country, site, year, N, x, Locus)
 
@@ -37,7 +37,8 @@ pfk7_data <- cam %>%
   mutate(nobs= sum(x > 0)) %>%
   ungroup %>%
   mutate(adj_year = year - min_year,
-         prev = x / N) %>%
+         prev = x / N,
+         n = N - x) %>%
   filter(is.finite(min_year)) %>%
   arrange(Locus, country, site, year)
 
@@ -55,10 +56,13 @@ numofobs <- 2
 pfk7_data$wt_med <- NA
 
 pfk7_data <-
-  pfk7_data %>% rename(District = site) %>% rename(n = N) %>%
+  pfk7_data %>% rename(District = site) %>%
   mutate(lrsmed = log(prev / (1 - prev)),
          wt_med = replace(wt_med, nobs > numofobs & is.finite(lrsmed),
-                          1/(se_ln_ratio_noZeros(round(prev[nobs > numofobs & is.finite(lrsmed)]*n[nobs > numofobs & is.finite(lrsmed)]), n[nobs > numofobs & is.finite(lrsmed)])^2)
+                          1/(se_ln_ratio_noZeros(round(prev[nobs > numofobs & is.finite(lrsmed)]*N[nobs > numofobs & is.finite(lrsmed)]), N[nobs > numofobs & is.finite(lrsmed)])^2)
          ))
+
+pfk7_data$lrsmed[pfk7_data$lrsmed == Inf] <- NA
+pfk7_data$lrsmed[pfk7_data$lrsmed == -Inf] <- NA
 
 write.table(pfk7_data,"analysis/data/data-derived/pfk7_data.txt")
