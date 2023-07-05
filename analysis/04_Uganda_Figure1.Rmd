@@ -37,7 +37,7 @@ df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
-fileLocManuscript <- "figures/"
+fileLocManuscript <- "figures"
 
 #log ratio function
 se_ln_ratio_noZeros<-function(x,N) {
@@ -85,8 +85,26 @@ print(prev, width = 4, height =  6.5)
 ```
 ## Saving
 ```{r}
-ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.pdf"), prev, width = 4, height = 5.5, , dpi= 700)
-ggsave(paste0(fileLocManuscript, "/Figure1A_Prevalence.png"), prev, width = 4, height = 5.5, , dpi= 700)
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/Figure1-UgandaPrevMap/Figure1A_Prevalence.pdf"
+  ),
+  prev,
+  width = 4,
+  height = 5.5,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/Figure1-UgandaPrevMap/Figure1A_Prevalence.png"
+  ),
+  prev,
+  width = 4,
+  height = 5.5,
+  dpi = 700
+)
 
 ```
 ## Calculation
@@ -231,6 +249,24 @@ print(map,width = 5.5, height = 6.5)
 ```
 ## Saving
 ```{r}
-ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.pdf"), map, width = 6, height = 5.5, dpi= 700)
-ggsave(paste0(fileLocManuscript, "/Figure1B_MapUganda.png"), map, width = 6, height = 5.5, dpi= 700)
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/Figure1-UgandaPrevMap/Figure1B_MapUganda.pdf"
+  ),
+  map,
+  width = 6,
+  height = 5.5,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/Figure1-UgandaPrevMap/Figure1B_MapUganda.png"
+  ),
+  map,
+  width = 6,
+  height = 5.5,
+  dpi = 700
+)
 ```

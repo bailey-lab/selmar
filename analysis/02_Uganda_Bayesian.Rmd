@@ -130,7 +130,7 @@ df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <-
 df_comb$conf.high_uganda[is.finite(df_comb$lrsmed) & df_comb$nobs > numofobs] <- uganda_ceof[2,]
 ```
 
-## Convert to prevalence
+## Prevalence scale
 ```{r}
 # Plot the predictions in each site with only Bayesian
 #convert to prevalence scale
@@ -161,9 +161,24 @@ prev <- df %>%
   scale_color_manual(values = c("#D55E00", "#0072B2", "#009E73"), name = "Mutations", labels = c("675V", "469F", "469Y", "561H")) +
   scale_fill_manual(values = c("#E69F00", "#0072B2", "#009E73")) +
   theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.85,0.15), legend.box = "horizontal")
+```
 
-ggsave(paste0(fileLocManuscript, "/Figure2_Uganda_prevalence.png"), prev, width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript, "/Figure2_Uganda_prevalence.pdf"), prev, width = 8, height = 5, dpi=700)
+### Saving plots
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/Figure2-UgandaPrevalence/Figure2_Uganda_prevalence.png"),
+  prev,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/Figure2-UgandaPrevalence/Figure2_Uganda_prevalence.pdf"),
+  prev,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
 
 ```
 
@@ -239,7 +254,6 @@ selec_coef$sizes <- 0.5
 stan_eff_bay_overall <- effect_size_bay %>% mutate(method = "Baysian") %>% relocate(District, conf.low, estimate, conf.high, method, mutation, s, sizes)
 rownames(stan_eff_bay_overall) <- NULL
 
-# selec_coef_bay <- selec_coef %>% mutate(method = "Baysian") %>% relocate(District, conf.low, estimate, conf.high, method, mutation, s, sizes)
 
 effect_size_bay <- rbind(effect_size_bay, selec_coef)
 effect_size_bay <- effect_size_bay %>% group_by(mutation) %>% arrange(District)
@@ -249,6 +263,17 @@ effect_size_bay <- effect_size_bay %>% mutate(mutation = replace(mutation, mutat
   mutate(mutation = replace(mutation, mutation == "C469F", "469F"))
 
 effect_size_bay <- rbind(effect_size_bay, uganda_selec_coef)
+
+# effect_size_bay_plot <- effect_size_bay 
+# effect_size_bay_plot$conf.high[effect_size_bay_plot$conf.high > 1] <- 1.1
+# effect_size_bay_plot$conf.low[effect_size_bay_plot$conf.low < -1] <- -1.1
+
+effect_size_bay <- effect_size_bay %>% 
+  relocate(District, mutation) %>% select(!(s:sizes)) %>% 
+  mutate(conf.low = round(conf.low, 3), 
+         conf.high = round(conf.high, 3), 
+         estimate = round(estimate, 3))
+
 ```
 
 ## Plot
@@ -261,13 +286,37 @@ selection_coef_bay <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
   theme_bw() +
   xlim(-2.5,4) +
-  theme(legend.title=element_blank(), axis.line = element_line(), legend.position = "right", plot.title = element_text(hjust = 0.5, size = 20), axis.text = element_text(size = 14), axis.title=element_text(size=16), legend.text=element_text(size=16))
+  theme(legend.title=element_blank(), 
+        axis.line = element_line(), 
+        legend.position = "right", 
+        plot.title = element_text(hjust = 0.5, size = 20), 
+        axis.text = element_text(size = 14), 
+        axis.title=element_text(size=16), 
+        legend.text=element_text(size=16))
+```
 
-effect_size_bay <- effect_size_bay %>% relocate(District, mutation) %>% select(!(s:sizes)) %>% mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
-
-ggsave(paste0(fileLocManuscript, "/Figure3_Uganda_Effectsize.png"), selection_coef_bay,width = 8, height = 5, dpi=700)
-ggsave(paste0(fileLocManuscript, "/Figure3_Uganda_Effectsize.pdf"), selection_coef_bay,width = 8, height = 5, dpi=700)
-write.csv(effect_size_bay, paste0(fileLocManuscript, "/Uganda_selectioncoefficients.csv"), row.names = F,quote = F)
+#Saving plots
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/Figure3-SelectionCeof/Figure3_Uganda_Effectsize.png"),
+  selection_coef_bay,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/Figure3-SelectionCeof/Figure3_Uganda_Effectsize.pdf"),
+  selection_coef_bay,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+write.csv(
+  effect_size_bay,
+  paste0(fileLocManuscript, "/Figure3-SelectionCeof/Uganda_selectioncoefficients.csv"),
+  row.names = F,
+  quote = F
+)
 ```
 
 ## Statistical analysis of selection coefficients

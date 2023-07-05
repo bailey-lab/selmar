@@ -163,14 +163,14 @@ prev_plot <- prev_df  %>% mutate(N = n+x) %>%
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_posterior_prevalence.png"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure4-SEAsiaPrevalence/SEAsia_posterior_prevalence.png"),
   prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/SEAsia_posterior_prevalence.pdf"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure4-SEAsiaPrevalence/SEAsia_posterior_prevalence.pdf"),
   prev_plot,
   width = 8,
   height = 8,
@@ -295,14 +295,14 @@ effect_size_bay2 <- effect_size_bay %>%
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.png"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.png"),
   selection_coef_bay,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/Figure3_SEAsia_Effectsize.pdf"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.pdf"),
   selection_coef_bay,
   width = 8,
   height = 5,
@@ -310,7 +310,7 @@ ggsave(
 )
 write.csv(
   effect_size_bay2,
-  paste0(fileLocManuscript_pfK7, "/SEAsia_selectioncoefficients.csv"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients.csv"),
   row.names = F,
   quote = F
 )
