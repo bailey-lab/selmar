@@ -270,3 +270,28 @@ ggsave(
   dpi = 700
 )
 ```
+
+#ISMB Poster
+```{r}
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/ISMB2023-poster/MapUganda.pdf"
+  ),
+  map,
+  width = 7.5,
+  height =  6,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/ISMB2023-poster/PrevUganda.pdf"
+  ),
+  prev,
+  width = 4.5,
+  height =  6,
+  dpi = 700
+)
+
+```

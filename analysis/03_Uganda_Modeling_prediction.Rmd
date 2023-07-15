@@ -162,27 +162,28 @@ pred_a675v <- ggplot() +
   geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
   #ggtitle("A675V") +
-  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
   scale_color_manual(
-    values = c("#E69F00", "grey"),
+    values = c("#CC79A7", "grey"),
     labels = c("Forecasting",  "True")
   ) +
   scale_fill_manual(
-    values = c("#E69F00", "grey"),
+    values = c("#CC79A7", "grey"),
     labels = c("Forecasting",  "True")
   ) +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.position = "right"
-  ) +  labs(color = NULL)
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "none",
+    panel.spacing = unit(0.45, "lines")) 
 
 ################ PLOT FOR C469Y ################
 df_true <- df_predict_allyear %>% 
@@ -202,27 +203,28 @@ pred_c469y <- ggplot() +
   geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
   #ggtitle("C469Y") +
-  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
   scale_color_manual(
-    values = c("#E69F00", "grey"),
+    values = c("#CC79A7", "grey"),
     labels = c("Forecasting",  "True")
   ) +
   scale_fill_manual(
-    values = c("#E69F00", "grey"),
+    values = c("#CC79A7", "grey"),
     labels = c("Forecasting",  "True")
   ) +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.position = "none"
-  ) +  labs(color = NULL)
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "none",
+    panel.spacing = unit(0.45, "lines")) 
 
 ################ PLOT FOR C469F ################
 df_true <- df_predict_allyear %>% 
@@ -242,72 +244,75 @@ pred_c469f <- ggplot() +
   geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
   geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
   #ggtitle("C469F") +
-  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
   ylab("Prevalence") +
   xlab("Year") +
   scale_color_manual(
-    values = c("#E69F00", "grey"),
+    values = c("#CC79A7", "grey"),
     labels = c("Forecasting",  "True")
   ) +
   scale_fill_manual(
-    values = c("#E69F00", "grey"),
+    values = c("#CC79A7", "grey"),
     labels = c("Forecasting",  "True")
   ) +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 6),
-    axis.title = element_text(size = 12),
-    strip.text.x = element_text(size = 12),
-    legend.position = "none"
-  ) +  labs(color = NULL)
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "none",
+    panel.spacing = unit(0.45, "lines")) 
 ```
 
 ## Saving plots
 ```{r}
+fig6_width = 6
+fig6_height = 4
 ggsave(
-  "figures/predictions/Uganda/Uganda_pred_A675V_pred.png",
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_A675V.png",
   pred_a675v,
-  width = 4,
-  height = 3,
+  width = fig6_width,
+  height = fig6_height,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda/Uganda_pred_C469Y_pred.png",
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469Y.png",
   pred_c469y,
-  width = 4,
-  height = 3,
+  width = fig6_width,
+  height = fig6_height,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda/Uganda_pred_C469F_pred.png",
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469F.png",
   pred_c469f,
-  width = 4,
-  height = 1.5,
+  width = fig6_width,
+  height = 2.7,
   dpi = 700
 )
 
 ggsave(
-  "figures/predictions/Uganda/Uganda_pred_A675V_pred.pdf",
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_A675V.pdf",
   pred_a675v,
-  width = 4,
-  height = 3,
+  width = fig6_width,
+  height = fig6_height,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda/Uganda_pred_C469Y_pred.pdf",
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469Y.pdf",
   pred_c469y,
-  width = 4,
-  height = 3,
+  width = fig6_width,
+  height = fig6_height,
   dpi = 700
 )
 ggsave(
-  "figures/predictions/Uganda/Uganda_pred_C469F_pred.pdf",
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469F.pdf",
   pred_c469f,
-  width = 4,
-  height = 1.5,
+  width = fig6_width,
+  height = 2.7,
   dpi = 700
 )
 ```

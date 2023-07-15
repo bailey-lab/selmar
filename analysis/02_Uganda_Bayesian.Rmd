@@ -269,7 +269,7 @@ effect_size_bay <- rbind(effect_size_bay, uganda_selec_coef)
 # effect_size_bay_plot$conf.low[effect_size_bay_plot$conf.low < -1] <- -1.1
 
 effect_size_bay <- effect_size_bay %>% 
-  relocate(District, mutation) %>% select(!(s:sizes)) %>% 
+  relocate(District, mutation) %>% 
   mutate(conf.low = round(conf.low, 3), 
          conf.high = round(conf.high, 3), 
          estimate = round(estimate, 3))
@@ -312,7 +312,7 @@ ggsave(
   dpi = 700
 )
 write.csv(
-  effect_size_bay,
+  effect_size_bay %>% select(!c(s, sizes)),
   paste0(fileLocManuscript, "/Figure3-SelectionCeof/Uganda_selectioncoefficients.csv"),
   row.names = F,
   quote = F
@@ -321,20 +321,26 @@ write.csv(
 
 ## Statistical analysis of selection coefficients
 ```{r}
+selec_ceof_stats <- data.frame(matrix(ncol = 5, nrow = 3))
 min_675V <- min(effect_size_bay %>% filter(mutation == "675V" & District != "Uganda") %>% pull(estimate))
 max_675V <- max(effect_size_bay %>% filter(mutation == "675V" & District != "Uganda") %>% pull(estimate))
-min_675V
-max_675V 
-effect_size_bay[which(effect_size_bay$estimate == max_675V),]
+selec_ceof_stats[1, ] <- cbind("675V", min_675V, effect_size_bay[which(effect_size_bay$estimate == min_675V),][1], max_675V, effect_size_bay[which(effect_size_bay$estimate == max_675V),][1])
 
 min_469Y <- min(effect_size_bay %>% filter(mutation == "469Y" & District != "Uganda") %>% pull(estimate))
 max_469Y <- max(effect_size_bay %>% filter(mutation == "469Y" & District != "Uganda") %>% pull(estimate))
-min_469Y 
-max_469Y
+selec_ceof_stats[2, ] <- cbind("469Y", min_469Y, effect_size_bay[which(effect_size_bay$estimate == min_469Y),][1], max_469Y, effect_size_bay[which(effect_size_bay$estimate == max_469Y),][1])
 
 min_469F <- min(effect_size_bay %>% filter(mutation == "469F" & District != "Uganda") %>% pull(estimate))
 max_469F <- max(effect_size_bay %>% filter(mutation == "469F" & District != "Uganda") %>% pull(estimate))
-min_469F
-max_469F
+selec_ceof_stats[3, ] <- cbind("469F", min_469F, effect_size_bay[which(effect_size_bay$estimate == min_469F),][1], max_469F, effect_size_bay[which(effect_size_bay$estimate == max_469F),][1])
+
+colnames(selec_ceof_stats) <- c("Mutation", "Min Select Ceof", "District", "Max Select Ceof", "District")
+
+write.csv(
+  selec_ceof_stats,
+  paste0(fileLocManuscript, "/Figure3-SelectionCeof/Uganda_selectioncoefficients_stats.csv"),
+  row.names = F,
+  quote = F
+)
 ```
 

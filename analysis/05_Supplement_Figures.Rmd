@@ -92,7 +92,7 @@ ggsave(
 
 # Figure2: Overview of data plot SE Asia (PfK7 data)
 ```{r}
-plot_overview_seAsia <- df_pfk7 %>% filter(Locus != "other_PfK13") %>%
+plot_overview_seAsia <- df_pfk7 %>% filter(Locus != "PfK13") %>%
   ggplot(aes(year, prev * 100, group = Locus, color = Locus)) +
   geom_point() +
   labs(shape = "Mutations", size = "Sample Size") +
@@ -100,8 +100,8 @@ plot_overview_seAsia <- df_pfk7 %>% filter(Locus != "other_PfK13") %>%
   facet_wrap( ~ country + District) +
   ylab("Prevalence") +
   xlab("Year") +
-  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"), 
-                     labels = c("PfK13", "580Y", "539T"),
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"),
+                     labels = c("580Y","other PfK13", "539T"),
                      name = "Mutations")  +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(
@@ -497,6 +497,21 @@ ggsave(
 )
 ```
 
+### ISMB Poster
+```{r}
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/ISMB2023-poster/SEAsia_map.pdf"
+  ),
+  map_SEAsia,
+  width = 7.5,
+  height = 6,
+  dpi = 700
+)
+
+```
+
 
 # Figure 5: Plotting forecasting of predictions for the first 2, 3, and 4 years with confidence values
 ```{r}
@@ -508,15 +523,14 @@ for(y in c(2, 3, 4)){
   col <- plot_colors[count]
   ################ PLOT FOR C580Y ################
   df_pred <- figure5_forecasting %>% 
-    filter(year >= min_year + pred_y, 
+    filter(year >= min_year + y, 
            Locus == "C580Y",
            pred_y == y) 
-  ex <- figure5_pfk7_data %>% 
-    filter(is.finite(lrsmed), 
-           nobs > numofobs, 
-           District %in% unique(df_pred$District), 
+  df_true <- figure5_forecasting %>% 
+    filter(year <= min_year + y, 
            Locus == "C580Y",
-           year <= min_year + y)
+           pred_y == y) %>%
+    mutate(label = "true")
   ex_pt <- figure5_pfk7_data %>% 
     filter(nobs > numofobs, 
            District %in% unique(df_pred$District), 
@@ -525,13 +539,11 @@ for(y in c(2, 3, 4)){
   ## PLOT FOR C580Y
   prev_cutoff_c580y_plot <- 
     ggplot() +
-    geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N, color = "true")) +
-    scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
-    geom_line(data = ex, aes(year, predict_stan_prev, color = "true")) + 
+    geom_point(data = ex_pt, aes(x=year, y=prev*100, color = "true")) +
+    geom_line(data = df_true, aes(year, predict_prev, color = "true")) + 
     geom_line(data = df_pred, aes(year, predict_prev, color = "forecasting")) +
     geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
     theme_bw() +
-    labs(size = "Sample Size") +
     facet_wrap(~District) +
     ylab("Prevalence") +
     xlab("Year") +
@@ -553,7 +565,7 @@ for(y in c(2, 3, 4)){
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 6),
         legend.position = "right",
-        panel.spacing = unit(0.2, "lines")
+        panel.spacing = unit(0.45, "lines")
       )
   
   var_name <- paste0("prev_cutoff_c580y_plot_", y, "year")
@@ -564,12 +576,11 @@ for(y in c(2, 3, 4)){
     filter(year >= min_year +  pred_y, 
            Locus == "R539T",
            pred_y == y)  
-  ex <- figure5_pfk7_data %>% 
-    filter(is.finite(lrsmed), 
-           nobs > numofobs, 
-           District %in% unique(df_pred$District), 
+  df_true <- figure5_forecasting %>% 
+    filter(year <= min_year + y, 
            Locus == "R539T",
-           year <= min_year + y)
+           pred_y == y) %>%
+    mutate(label = "true")
   ex_pt <- figure5_pfk7_data %>% 
     filter(nobs > numofobs, 
            District %in% unique(df_pred$District),
@@ -578,12 +589,10 @@ for(y in c(2, 3, 4)){
   ## PLOT FOR R539T
   prev_cutoff_r539t_plot <- 
     ggplot() +
-    geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N, color = "true")) +
-    scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
-    geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
-    geom_line(data=df_pred, aes(year, predict_prev, color = "forecasting")) +
+    geom_point(data = ex_pt, aes(x=year, y=prev*100, color = "true")) +
+    geom_line(data = df_true, aes(year, predict_prev, color = "true")) + 
+    geom_line(data = df_pred, aes(year, predict_prev, color = "forecasting")) +
     geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-    labs(shape="Mutations", size = "Sample Size") +
     theme_bw() +
     facet_wrap(~District) +
     ylab("Prevalence") +
@@ -606,22 +615,21 @@ for(y in c(2, 3, 4)){
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 6),
         legend.position = "right",
-        panel.spacing = unit(0.2, "lines")
+        panel.spacing = unit(0.45, "lines")
       )
   var_name <- paste0("prev_cutoff_r539t_plot_", y, "year")
   assign(var_name, prev_cutoff_r539t_plot)
   
   ################ PLOT FOR ALL KELCH ################
   df_pred <- figure5_forecasting %>% 
-    filter(year >= min_year +  pred_y, 
+    filter(year >= min_year +  y, 
            Locus == "PfK13",
            pred_y == y)  
-  ex <- figure5_pfk7_data %>% 
-    filter(is.finite(lrsmed), 
-           nobs > numofobs, 
-           District %in% unique(df_pred$District), 
+  df_true <- figure5_forecasting %>% 
+    filter(year <= min_year + y, 
            Locus == "PfK13",
-           year <= min_year + y)
+           pred_y == y) %>%
+    mutate(label = "true")
   ex_pt <- figure5_pfk7_data %>% 
     filter(nobs > numofobs, 
            District %in% unique(df_pred$District), 
@@ -629,12 +637,10 @@ for(y in c(2, 3, 4)){
   
   ## PLOT FOR PfK13
    prev_cutoff_all_kelch_plot <- ggplot() +
-    geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N, color = "true")) +
-    scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
-    geom_line(data=ex, aes(year, predict_stan_prev,  color = "true")) + 
-    geom_line(data=df_pred, aes(year, predict_prev, color = "forecasting")) +
+    geom_point(data = ex_pt, aes(x=year, y=prev*100, color = "true")) +
+    geom_line(data = df_true, aes(year, predict_prev,  color = "true")) + 
+    geom_line(data = df_pred, aes(year, predict_prev, color = "forecasting")) +
      geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-    labs(shape="Mutations", size = "Sample Size") +
     theme_bw() +
     facet_wrap(~District) +
     ylab("Prevalence") +
@@ -657,7 +663,7 @@ for(y in c(2, 3, 4)){
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 6),
         legend.position = "right",
-        panel.spacing = unit(0.2, "lines")
+        panel.spacing = unit(0.45, "lines")
     )
     var_name <- paste0("prev_cutoff_all_kelch_plot_", y, "year")
     assign(var_name, prev_cutoff_all_kelch_plot)
