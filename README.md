@@ -74,30 +74,6 @@ reproducibility. Please use `renv::restore` to restore the state of the
 project and see <https://rstudio.github.io/renv/articles/renv.html> for
 more information.
 
-### To-Dos
-Week of Monday 05/08
-- [x] Remove y-log and check figures Uganda
-- [x] Remove y-log and check figures SE Asia
-- [ ] Finalize the predictions for SE Asia
-- [ ] Finalize the predictions for Uganda
-- [ ] Finalize the metrics of predictions for SE Asia
-- [ ] Add forecasting to methods
-- [ ] Add forecasting to conclusion
-- [ ] Add forecasting to discussion
-- [ ] Update discussion
-- [x] Update Figure 2
-- [ ] Finalize literature review
-- [x] Finalize supplement figure 1
-- [x] Finalize all data figure SE Asia (supplement)
-- [x] Finalize all data figure Uganda (supplement)
-
-Week of Monday 05/08
-- [ ] Polishing Manuscript
-- [ ] Supplement figures
-- [ ] Take Manuscript offline and add all references
-- [ ] Format Code for GitHub
-- [ ] Finalize ReadMe on GitHub
-
 ### Licenses
 
 Code: [MIT](http://opensource.org/licenses/MIT) year: 2023, copyright
