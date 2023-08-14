@@ -92,28 +92,23 @@ ggsave(
 
 # Figure2: Overview of data plot SE Asia (PfK7 data)
 ```{r}
-plot_overview_seAsia <- df_pfk7 %>% filter(Locus != "PfK13") %>%
-  ggplot(aes(year, prev * 100, group = Locus, color = Locus)) +
-  geom_point() +
-  labs(shape = "Mutations", size = "Sample Size") +
+plot_overview_seAsia <- df_pfk7 %>% 
+  filter(Locus != "PfK13", is.finite(lrsmed), nobs <= numofobs) %>% 
+  mutate(N = n+x) %>%
+  ggplot(aes(year, prev*100, group = Locus, color = Locus)) +
+  geom_point(aes(size = N)) + 
+  labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  facet_wrap( ~ country + District) +
+  facet_wrap(~District) +
+  #scale_y_log10() +
   ylab("Prevalence") +
   xlab("Year") +
-  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"),
-                     labels = c("580Y","other PfK13", "539T"),
-                     name = "Mutations")  +
   ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    strip.text.x = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    legend.position = "right",
-    legend.box = "horizontal"
-  )
+  scale_color_manual("Mutations",
+    values = c("#D55E00", "#0072B2", "#009E73", "#F0E442"),
+    labels = c("675V", "469F", "469Y", "561H")
+  ) +
+  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = "right", legend.box = "vertical")
 ```
 
 ### Saving plot

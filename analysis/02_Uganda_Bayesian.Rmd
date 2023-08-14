@@ -143,7 +143,7 @@ df$conf.high_prev <- exp(df$conf.high)*100/(1+exp(df$conf.high))
 df$conf.low_prev <- exp(df$conf.low)*100/(1+exp(df$conf.low))
 ```
 
-# Plot prevalence for all mutations
+# Figure 2: Plot prevalence for all mutations with numobs>2
 ```{r}
 prev <- df %>%
   filter(is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x) %>%

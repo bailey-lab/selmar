@@ -164,7 +164,7 @@ pred_a675v <- ggplot() +
   #ggtitle("A675V") +
   theme_bw() +
   facet_wrap(~District) +
-  ylab("Prevalence") +
+  ylab("A675V Prevalence") +
   xlab("Year") +
   scale_color_manual(
     values = c("#CC79A7", "grey"),
@@ -183,7 +183,7 @@ pred_a675v <- ggplot() +
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
     legend.position = "none",
-    panel.spacing = unit(0.45, "lines")) 
+    panel.spacing = unit(0.2, "lines")) 
 
 ################ PLOT FOR C469Y ################
 df_true <- df_predict_allyear %>% 
@@ -205,7 +205,7 @@ pred_c469y <- ggplot() +
   #ggtitle("C469Y") +
   theme_bw() +
   facet_wrap(~District) +
-  ylab("Prevalence") +
+  ylab("C469Y Prevalence") +
   xlab("Year") +
   scale_color_manual(
     values = c("#CC79A7", "grey"),
@@ -224,7 +224,7 @@ pred_c469y <- ggplot() +
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
     legend.position = "none",
-    panel.spacing = unit(0.45, "lines")) 
+    panel.spacing = unit(0.2, "lines")) 
 
 ################ PLOT FOR C469F ################
 df_true <- df_predict_allyear %>% 
@@ -246,7 +246,7 @@ pred_c469f <- ggplot() +
   #ggtitle("C469F") +
   theme_bw() +
   facet_wrap(~District) +
-  ylab("Prevalence") +
+  ylab("C469F Prevalence") +
   xlab("Year") +
   scale_color_manual(
     values = c("#CC79A7", "grey"),
@@ -265,7 +265,7 @@ pred_c469f <- ggplot() +
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
     legend.position = "none",
-    panel.spacing = unit(0.45, "lines")) 
+    panel.spacing = unit(0.2, "lines")) 
 ```
 
 ## Saving plots
