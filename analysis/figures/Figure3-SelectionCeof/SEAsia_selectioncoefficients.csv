@@ -1,26 +1,26 @@
 District,mutation,conf.low,estimate,conf.high
-Attapeu,539T,-1.578,0.173,2.022
-Attapeu,PfK13,0.26,0.656,1.06
-Binh Phuoc,580Y,0.398,0.835,1.276
-Binh Phuoc,PfK13,0.12,0.465,0.814
-Gia Lai,580Y,-0.063,0.416,0.894
-Gia Lai,PfK13,-0.109,0.294,0.704
-Mandalay,PfK13,-0.158,0.289,0.692
-Pailin,580Y,-0.127,0.322,0.772
-Pailin,539T,-2.032,-0.184,1.577
-Pailin,PfK13,-0.247,0.131,0.497
-Preah Vihear,580Y,0.038,0.537,1.034
-Preah Vihear,PfK13,-0.064,0.357,0.779
-Pursat,580Y,-0.113,0.327,0.763
-Pursat,539T,-1.696,0.048,1.858
-Pursat,PfK13,-0.115,0.239,0.591
-Ratanakiri,580Y,0.301,0.746,1.2
-Ratanakiri,PfK13,0.406,0.768,1.147
-Sekong,PfK13,-0.385,0.179,0.678
-Sisakhet,580Y,-0.523,0.344,0.877
-Sisakhet,539T,-1.17,0.784,3.845
-Southeast Asia,580Y,0.272,0.51,0.703
-Southeast Asia,539T,-0.596,0.152,1.187
-Southeast Asia,PfK13,0.217,0.392,0.556
-Tak,580Y,0.093,0.571,1.068
-Tak,PfK13,0.183,0.541,0.894
+Attapeu,539T,-1.716,0.183,2.163
+Attapeu,PfK13,0.258,0.657,1.07
+Binh Phuoc,580Y,0.395,0.835,1.285
+Binh Phuoc,PfK13,0.11,0.466,0.819
+Gia Lai,580Y,-0.066,0.418,0.886
+Gia Lai,PfK13,-0.119,0.292,0.716
+Mandalay,PfK13,-0.181,0.288,0.714
+Pailin,580Y,-0.13,0.325,0.761
+Pailin,539T,-2.164,-0.19,1.711
+Pailin,PfK13,-0.259,0.129,0.504
+Preah Vihear,580Y,0.034,0.54,1.029
+Preah Vihear,PfK13,-0.088,0.354,0.771
+Pursat,580Y,-0.114,0.329,0.758
+Pursat,539T,-1.839,0.052,2.02
+Pursat,PfK13,-0.127,0.236,0.596
+Ratanakiri,580Y,0.301,0.749,1.19
+Ratanakiri,PfK13,0.393,0.768,1.147
+Sekong,PfK13,-0.401,0.179,0.673
+Sisakhet,580Y,-0.544,0.343,0.875
+Sisakhet,539T,-1.171,0.827,3.875
+Southeast Asia,580Y,0.282,0.512,0.715
+Southeast Asia,539T,-0.635,0.158,1.299
+Southeast Asia,PfK13,0.212,0.393,0.565
+Tak,580Y,0.094,0.573,1.076
+Tak,PfK13,0.175,0.538,0.906

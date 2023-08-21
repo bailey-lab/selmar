@@ -15,6 +15,12 @@ save_figs <- function(name,
   dir.create(plot_dir, showWarnings = FALSE)
   fig_path <- function(name) {paste0(plot_dir, "/", name)}
 
+  cowplot::save_plot(filename = fig_path(paste0(name,".jpg")),
+                     plot = fig,
+                     base_height = height,
+                     base_width = width,
+                     dpi = 600)
+
   cowplot::save_plot(filename = fig_path(paste0(name,".png")),
                      plot = fig,
                      base_height = height,

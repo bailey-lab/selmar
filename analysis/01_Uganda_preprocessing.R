@@ -2,6 +2,7 @@ library(lme4)
 library(nlme)
 library(dplyr)
 library(tabulizer)
+library(tidyr)
 
 #load data from raw-data
 out2 <- tabulizer::extract_tables("analysis/data/data-raw/NEJM_submission.pdf", pages = 15, guess = TRUE, output = "data.frame")

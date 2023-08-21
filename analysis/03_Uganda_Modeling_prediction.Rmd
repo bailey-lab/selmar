@@ -142,7 +142,7 @@ df_predict_allyear <- df_predict_allyear %>% mutate(predict_prev = exp(predict)*
                                                     conf.high_prev = exp(conf.high)*100/(1+exp(conf.high)))
 ```
 
-## Ploting forecasting of predictions for the first 2, 3, and 4 years
+## Figure 6: Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ################ PLOT FOR A675V ################
 df_true <- df_predict_allyear %>% 

@@ -32,42 +32,17 @@ library(gt)
 #Load data
 ```{r}
 #load data
-df<- read.table("data/data-derived/Ugandan_data.txt")
-df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+df <- read.table("data/data-derived/Ugandan_data.txt")
 #set the limit of number of observations
 numofobs <- 2
 
 fileLocManuscript <- "figures"
-
-#log ratio function
-se_ln_ratio_noZeros<-function(x,N) {
-  inds<-which(x==0)
-  x[inds]<-0.5
-  inds<-which(x==N)
-  x[inds]<-x[inds]-0.5
-  se<- sqrt(1/x + 1/(N-x))
-  return(se)
-}
-
-df_comb2 <- df_comb %>% group_by(District, year) %>% distinct(comb)%>%group_by(District) %>%  
-  mutate(nobs = sum(comb>0)) %>% ungroup
-df_comb2$n <- df %>% group_by(District, year) %>% 
-  summarise(min(n)) %>% 
-  ungroup 
-colnames(df_comb2)[7] <- "n"
-df_comb2 <- df_comb %>%mutate(med = comb/n)
-
-df_comb <- df_comb2 %>% mutate(med = comb/n, lrsmed = log(med/(1-med)))
-
-df_comb$lrsmed[df_comb$lrsmed == -Inf] <- NA
-
-df_comb$wt_med <- NA
-df_comb$wt_med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)] <- 1/(se_ln_ratio_noZeros(round(df_comb$med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]*df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]), df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)])^2)
 ```
 
 # Prevalence plot
 ```{r}
-prev <- df %>% group_by(year, Locus) %>% 
+prev <- df %>% 
+  group_by(year, Locus) %>%
   mutate(min_n = sum(n), mut_sample = sum(x)) %>% 
   distinct(min_n, mut_sample) %>% 
   mutate(prop_sample = mut_sample/min_n) %>%
@@ -76,7 +51,7 @@ prev <- df %>% group_by(year, Locus) %>%
   theme_bw() +
   scale_fill_manual(values = c("#D55E00", "#0072B2", "#009E73", "#F0E442"), labels = c("675V", "469F", "469Y", "561H")) +
   xlab("Year") +
-  ylab("Prevalence (%)") + 
+  ylab("Prevalence") + 
   ylim(0, 100) +
   scale_x_continuous("Year", labels = as.character(df$year), breaks = df$year) +
   theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(.25 , .97), legend.justification = c("right", "top"), legend.box.just = "right", legend.margin = margin(1, 1, 1, 1))
@@ -148,24 +123,31 @@ uganda$name[uganda$name == "Kabale"] <- "Rukiga"
 uganda <- uganda %>% 
   filter(name %in% unique(df$District)) %>% 
   na.omit() %>% arrange(name)
+```
 
+# Per year checking
+```{r}
 #sum prevalence per Locus and District
 pie_data <- df %>% 
-  group_by(Locus, District) %>% 
-  mutate(sum_district_locus = sum(x)) %>% 
-  select(District, Locus, sum_district_locus) %>% 
-  distinct(District, Locus, .keep_all = TRUE) %>% 
+  mutate(sum_district_locus = x) %>%
+  select(year, District, Locus, sum_district_locus) %>% 
+  distinct(District, Locus, year, .keep_all = TRUE) %>% 
   ungroup() 
+
 #sum sample size for each District
-nwild <- df %>% 
-  group_by(District) %>% 
+all_genotyped <- df %>% 
+  group_by(District, year) %>% 
   mutate(sum_district_locus = sum(n)) %>% 
-  select(District, sum_district_locus) %>% 
-  distinct(District, .keep_all = TRUE) %>% 
+  select(year, District, sum_district_locus) %>% 
+  distinct(District, year, .keep_all = TRUE) %>% 
   ungroup() 
-#add wild-type to dataframe
+
+#add all genotyped data to dataframe as additional rows
 pie_data <- pie_data %>% 
-  add_row(District = unique(df$District), Locus = rep("Wild-Type", 14), sum_district_locus = nwild$sum_district_locus) %>% 
+  add_row(year = all_genotyped$year, 
+          District = all_genotyped$District,
+          Locus = rep("AllGenotyped", length(all_genotyped$District)), 
+          sum_district_locus = all_genotyped$sum_district_locus) %>% 
   arrange(District) %>% 
   ungroup
 
@@ -177,13 +159,13 @@ for (i in unique(pie_data$District)){
   pie_data$long[pie_data$District == i] <- rep(uganda$longitude[uganda$name == i], sum((pie_data$District == i)))
 }
 
-#initialize rows for each mutation and WT
-pie_data2 <- pie_data %>% select(District, lat, long) %>% distinct(District, .keep_all = TRUE)
+#initialize rows for each mutation and all genotyped
+pie_data2 <- pie_data %>% select(year, District, lat, long) %>% distinct(year, District, .keep_all = TRUE)
 pie_data2$A675V <- NA
 pie_data2$C469Y <- NA
 pie_data2$C469F <- NA
 pie_data2$R561H <- NA
-pie_data2$WildType <- NA
+pie_data2$AllGenotyped <- NA
 
 #obtain districts that obtain each mutation
 C469Y_dist <- unique(df$District[df$Locus == "C469Y"])
@@ -192,14 +174,14 @@ C469F_dist <- unique(df$District[df$Locus == "C469F"])
 R561H_dist <- unique(df$District[df$Locus == "R561H"])
 
 #add prevalence for each mutation to dataframe
-pie_data2$A675V[match(A675V_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "A675V"]
-pie_data2$C469Y[match(C469Y_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C469Y"]
-pie_data2$C469F[match(C469F_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "C469F"]
-pie_data2$R561H[match(R561H_dist, pie_data2$District)] <- pie_data$sum_district_locus[pie_data$Locus == "R561H"]
-pie_data2$WildType <- pie_data$sum_district_locus[pie_data$Locus == "Wild-Type"]
+pie_data2$A675V[pie_data2$District %in% A675V_dist] <- pie_data$sum_district_locus[pie_data$Locus == "A675V"]
+pie_data2$C469Y[pie_data2$District %in% C469Y_dist] <- pie_data$sum_district_locus[pie_data$Locus == "C469Y"]
+pie_data2$C469F[pie_data2$District %in% C469F_dist] <- pie_data$sum_district_locus[pie_data$Locus == "C469F"]
+pie_data2$R561H[pie_data2$District %in% R561H_dist] <- pie_data$sum_district_locus[pie_data$Locus == "R561H"]
+pie_data2$AllGenotyped <- pie_data$sum_district_locus[pie_data$Locus == "AllGenotyped"]
 pie_data2[is.na(pie_data2)] <- 0
 
-pie_data2$radius <- (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F +pie_data2$R561H)/pie_data2$WildType
+pie_data2$radius <- (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F + pie_data2$R561H) / pie_data2$AllGenotyped
 
 #rescale radius
 minr<-min(pie_data2$radius)  # min in the data original scale
@@ -210,9 +192,11 @@ pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-
 
 ```
 
-## Plotting 
+## Plotting for 2021
 ```{r}
 # make plot with wild_type
+pie_chart_df <- pie_data2 %>% filter(year == 2021)
+val <- 2
 map <- ggplot() +
   geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
   geom_sf(data=uganda, fill = "moccasin") +
@@ -226,7 +210,7 @@ map <- ggplot() +
   coord_sf(xlim = c(28.5, 35), ylim = c(4 ,-2), expand = TRUE) +
   annotate("text", x = 34.8, y = 0.5, label = "Kenya",
            color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 29.4, y = 1.5, label = "Democratic Republic \n of the Congo",
+  annotate("text", x = 29.4, y = 1.2, label = "Democratic Republic \n of the Congo",
            color="grey50", size=4 , fontface="italic") +
   annotate("text", x = 30.2, y = -1.7, label = "Rwanda",
            color="grey50", size=4 , fontface="italic") +
@@ -240,58 +224,30 @@ map <- ggplot() +
            fontface = "italic", color = "grey50", size = 5) +
   xlab("") +
   ylab("") +
-  geom_scatterpie(data = pie_data2, aes(x=long, y=lat, group=District, r = radius_adj), cols=c("A675V", "C469F", "C469Y", "R561H")) +
-  geom_scatterpie_legend(pie_data2$radius*2, x=28.7, y=2.3, labeller = function(x) round(x * 100/2)) +
+  geom_scatterpie(data = pie_chart_df, aes(x=long, y=lat, group=District, r = radius_adj), cols=c("A675V", "C469F", "C469Y", "R561H")) +
+  geom_scatterpie_legend(pie_chart_df$radius*val, x=28.7, y=2.3, labeller = function(x) round(x * 100/val)) +
     scale_fill_manual(values = c("#D55E00", "#0072B2", "#009E73", "#F0E442"), labels = c("675V", "469F", "469Y", "561H"), name = "")  +
   theme(legend.text=element_text(size=10), axis.text = element_text(size = 10), legend.position = c(0.085,0.91))
 
-print(map,width = 5.5, height = 6.5)
-```
-## Saving
-```{r}
 ggsave(
   paste0(
     fileLocManuscript,
-    "/Figure1-UgandaPrevMap/Figure1B_MapUganda.pdf"
+    paste0("/Figure1-UgandaPrevMap/Figure1B_MapUganda_2021.pdf")
   ),
   map,
   width = 6,
   height = 5.5,
   dpi = 700
-)
-ggsave(
-  paste0(
-    fileLocManuscript,
-    "/Figure1-UgandaPrevMap/Figure1B_MapUganda.png"
-  ),
-  map,
-  width = 6,
-  height = 5.5,
-  dpi = 700
-)
-```
-
-#ISMB Poster
-```{r}
-ggsave(
-  paste0(
-    fileLocManuscript,
-    "/ISMB2023-poster/MapUganda.pdf"
-  ),
-  map,
-  width = 7.5,
-  height =  6,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    fileLocManuscript,
-    "/ISMB2023-poster/PrevUganda.pdf"
-  ),
-  prev,
-  width = 4.5,
-  height =  6,
-  dpi = 700
-)
+  )
+  ggsave(
+    paste0(
+      fileLocManuscript,
+      paste0("/Figure1-UgandaPrevMap/Figure1B_MapUganda_2021.png")
+    ),
+    map,
+    width = 6,
+    height = 5.5,
+    dpi = 700
+  )
 
 ```

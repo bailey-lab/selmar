@@ -140,37 +140,51 @@ prev_df2 <- pfk7_data %>% filter(nobs > numofobs)
 prev_df <- rbind(prev_df2, pfk7_data %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")) ## added these sites to show general prevalence across SE Asia
 ```
 
-## Plot
+## Supplement Figure7: Plot
 ```{r}
-prev_plot <- prev_df  %>% mutate(N = n+x) %>%
+prev_plot <- prev_df  %>% 
+  mutate(N = n+x) %>%
   ggplot(aes(year, prev*100, group = Locus, color = Locus)) +
   geom_point(aes(size = N, group = Locus, color = Locus)) +
   facet_wrap(~country + District) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  geom_line(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
-  geom_ribbon(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed) & nobs > numofobs) %>% mutate(N = n+x), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
-  #scale_y_log10() +
-  scale_color_manual(values=c("#56B4E9", "#E69F00", "#009E73"), name = "Mutations", labels = c("580Y", "PfK13", "539T")) + 
-  scale_fill_manual(values=c("#56B4E9", "#E69F00", "#009E73")) + 
+  geom_line(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed)) %>% mutate(N = n+x), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
+  geom_ribbon(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed)) %>% mutate(N = n+x), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  scale_color_manual(
+    values = c("#56B4E9", "#E69F00", "#009E73"),
+    name = "Mutations",
+    labels = c("580Y", "PfK13", "539T")
+  ) +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) + 
   ylab("Prevalence") +
   xlab("Year") +
   ylim(-1, 101)+
   ggpubr::theme_pubclean(base_size = 12)+
-  theme(axis.line = element_line(), axis.text = element_text(size = 8), axis.title=element_text(size=12), legend.text=element_text(size=12), strip.text.x = element_text(size = 12), legend.title = element_text(size=12), legend.position = c(0.8,0.05), legend.margin = margin(-0.5,0,0,0, unit="cm"), legend.box = "horizontal")
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    strip.text.x = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.position = c(0.8, 0.05),
+    legend.margin = margin(-0.5, 0, 0, 0, unit = "cm"),
+    legend.box = "horizontal"
+  )
 ```
 
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/Figure4-SEAsiaPrevalence/SEAsia_posterior_prevalence.png"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure7-SEAsiaPrevalence/SEAsia_posterior_prevalence.png"),
   prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/Figure4-SEAsiaPrevalence/SEAsia_posterior_prevalence.pdf"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure7-SEAsiaPrevalence/SEAsia_posterior_prevalence.pdf"),
   prev_plot,
   width = 8,
   height = 8,
@@ -250,7 +264,7 @@ effect_size_bay <- effect_size_bay %>% group_by(mutation) %>% arrange(District)
 effect_size_bay <- effect_size_bay %>% mutate(mutation = replace(mutation, mutation == "C580Y", "580Y"), mutation = replace(mutation, mutation == "R539T", "539T")) 
 ```
 
-## Plot
+## Figure3: Plot
 ```{r}
 selection_coef_bay <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
@@ -292,7 +306,7 @@ effect_size_bay2 <- effect_size_bay %>%
   mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
 ```
 
-## Saving plots
+### Saving plots
 ```{r}
 ggsave(
   paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.png"),
@@ -317,7 +331,7 @@ write.csv(
 ```
 
 
-## Statistical analysis of selection coefficients
+### Statistical analysis of selection coefficients
 ```{r}
 selec_ceof_stats <- data.frame(matrix(ncol = 5, nrow = 3))
 min_580Y <- min(effect_size_bay %>% filter(mutation == "580Y" & District != "Southeast Asia") %>% pull(estimate))
@@ -352,4 +366,4 @@ write.csv(
   quote = F
 )
 ```
-
+5
