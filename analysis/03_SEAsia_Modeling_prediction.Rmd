@@ -346,7 +346,7 @@ ex_pt <- pfk7_data %>%
 ## PLOT FOR C580Y
 prev_cutoff_c580y_plot <- 
   ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
   scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true"), linewidth = 1) + 
   geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
@@ -386,7 +386,7 @@ ex_pt <- pfk7_data %>%
                                year < min_year ~ "black")) 
 prev_cutoff_r539t_plot <- 
   ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
   scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
@@ -425,7 +425,7 @@ ex_pt <- pfk7_data %>%
                                year > min_year + 4 ~ "black",
                                year < min_year ~ "black")) 
  prev_cutoff_all_kelch_plot <- ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
   scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
@@ -729,7 +729,7 @@ ex_pt <- pfk7_data %>%
 ```{r}
 prev_cutoff_c580y_Pailin_plot <- 
   ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = N), color = ex_pt$point_col) +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
   geom_line(data = df_Pailin_pred, aes(year, predict_prev, group = label, color = label)) +
   geom_line(data=df_Pailin_forecasting, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
   labs(shape="Mutations", size = "Sample Size") +

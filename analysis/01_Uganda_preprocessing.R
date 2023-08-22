@@ -5,7 +5,7 @@ library(tabulizer)
 library(tidyr)
 
 #load data from raw-data
-out2 <- tabulizer::extract_tables("analysis/data/data-raw/NEJM_submission.pdf", pages = 15, guess = TRUE, output = "data.frame")
+out2 <- tabulizer::extract_tables("analysis/data/data-raw/Conrad2023_NEJM_submission.pdf", pages = 1, guess = TRUE, output = "data.frame")
 
 # get the data from the scraped table
 df <- out2[[1]]
@@ -22,7 +22,7 @@ for(i in 1:6){
 df <- df %>% pivot_longer(cols = `2016`:`2021`) %>%
   mutate(n = as.numeric(gsub("(.*)/(.*)","\\2", value))) %>%
   mutate(x = as.numeric(gsub("(.*)/(.*)","\\1", value))) %>%
-  mutate(med = x/n) %>%
+  mutate(med = x / n) %>%
   rowwise() %>%
   na.omit %>%
   mutate(lrsmed = log(med/(1-med))) %>%

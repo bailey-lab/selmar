@@ -155,13 +155,19 @@ df_pred <- df_predict_allyear %>%
   mutate(label = "predicted")
 ex_pt <- df %>% 
   filter(nobs > numofobs, Locus == "A675V", District %in% unique(df_pred$District))
-
+  
 pred_a675v <- ggplot() +
-  geom_line(data = df_true, aes(year, predict_prev, color = label)) +
-  geom_line(data = df_pred, aes(year, predict_prev, color = label)) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
-  #ggtitle("A675V") +
+  geom_line(data = df_true, 
+            aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, 
+            aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, 
+              aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), 
+              linetype = "dashed", 
+              alpha = 0.2,  
+              show.legend = FALSE) +
+  geom_point(data = ex_pt, 
+             aes(x = year, y = med * 100, color = "true")) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("A675V Prevalence") +
@@ -198,11 +204,17 @@ ex_pt <-df %>%
   filter(nobs > numofobs, Locus == "C469Y", District %in% unique(df_pred$District)) 
 
 pred_c469y <- ggplot() +
-  geom_line(data = df_true, aes(year, predict_prev, color = label)) +
-  geom_line(data = df_pred, aes(year, predict_prev, color = label)) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
-  #ggtitle("C469Y") +
+  geom_line(data = df_true, 
+            aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, 
+            aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, 
+              aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), 
+              linetype = "dashed", 
+              alpha = 0.2,  
+              show.legend = FALSE) +
+  geom_point(data = ex_pt, 
+             aes(x = year, y = med * 100, color = "true")) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("C469Y Prevalence") +
@@ -239,11 +251,16 @@ ex_pt <-df %>%
   filter(nobs > numofobs, Locus == "C469F", District %in% unique(df_pred$District)) 
 
 pred_c469f <- ggplot() +
-  geom_line(data = df_true, aes(year, predict_prev, color = label)) +
-  geom_line(data = df_pred, aes(year, predict_prev, color = label)) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "true")) +
-  #ggtitle("C469F") +
+  geom_line(data = df_true, 
+            aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, 
+            aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), 
+              linetype = "dashed", 
+              alpha = 0.2,  
+              show.legend = FALSE) +
+  geom_point(data = ex_pt, 
+             aes(x = year, y = med * 100, color = "true")) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("C469F Prevalence") +
