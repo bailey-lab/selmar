@@ -249,6 +249,19 @@ min_scale<-0.1  ## min in the new scale
 max_scale<-0.4 ## max in the new scale
 pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
 ```
+
+```{r} 
+pie_data <- pie_data2 %>% 
+  select(year, District, A675V,C469Y, C469F, R561H, AllGenotyped) %>%
+  group_by(year) %>%
+  mutate(mutations = round(((rowSums(across(where(is.numeric))) - AllGenotyped)*100/AllGenotyped), 2),
+         max_mutations = max(mutations),
+         max_district = District[which(max_mutations == mutations)]) %>%
+  distinct(year, max_mutations, max_district)
+
+write.csv(pie_data, file = paste0(fileLocManuscript,"/supplement/Figure3-UgandaMap/Figure3_stas.csv"))
+```
+
 ## Plotting
 ```{r}
 # make plot with wild_type

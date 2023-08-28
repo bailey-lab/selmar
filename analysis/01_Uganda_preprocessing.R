@@ -30,8 +30,10 @@ df <- df %>% pivot_longer(cols = `2016`:`2021`) %>%
   rename(year = name) %>%
   mutate(year = as.numeric(year)) %>%
   group_by(District, Locus) %>%
-  mutate(nobs = sum(x>0)) %>%
-  ungroup
+  mutate(min_year = min(year[x>0]),
+         nobs= sum(x > 0)) %>%
+  ungroup %>%
+  mutate(adj_year = year - min_year)
 
 # log ratio function
 se_ln_ratio_noZeros<-function(x,N) {
