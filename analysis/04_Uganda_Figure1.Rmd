@@ -39,14 +39,22 @@ numofobs <- 2
 fileLocManuscript <- "figures"
 ```
 
+
 # Figure1A: Prevalence plot
 ```{r}
 prev <- df %>% 
   group_by(year, Locus) %>%
-  mutate(all_genotyped = sum(n), mut_sample = sum(x)) %>% 
-  distinct(all_genotyped, mut_sample) %>% 
-  mutate(prop_sample = mut_sample/all_genotyped) %>%
-  ggplot(aes(x=year, y=prop_sample*100, fill=Locus)) +
+  mutate(all_genotyped = sum(n), 
+         mut_sample = sum(x), 
+         prev_sum = sum(med)) %>%
+  ungroup %>%
+  group_by(year) %>%
+  mutate(n = length(unique(District))) %>% 
+  select(Locus, year, adj_year, n, all_genotyped, mut_sample, prev_sum) %>%
+  distinct(all_genotyped, mut_sample, prev_sum, .keep_all = TRUE) %>% 
+  mutate(prev_all = mut_sample*100/all_genotyped,
+         prev_sum = prev_sum*100/n) %>%
+  ggplot(aes(x = year, y = prev_sum, fill=Locus)) +
   geom_col() +
   theme_bw() +
   scale_fill_manual(values = c("#D55E00", 
@@ -65,6 +73,47 @@ prev <- df %>%
 
 print(prev, width = 4, height =  6.5)
 ```
+
+# Figure1A: Prevalence plot based on adjusted year
+```{r}
+prev <- df %>% 
+  group_by(year, Locus) %>%
+  mutate(all_genotyped = sum(n), 
+         mut_sample = sum(x), 
+         prev_sum = sum(med)) %>%
+  ungroup %>%
+  group_by(Locus) %>%
+  mutate(min_year = min(year[x>0]),
+         min_year = replace(min_year, is.na(min_year), 0),
+         adj_year = year - min_year) %>%
+  filter(adj_year >= 0) %>%
+  ungroup %>%
+  group_by(year) %>%
+  mutate(n = length(unique(District))) %>% 
+  select(Locus, year, adj_year, n, all_genotyped, mut_sample, prev_sum) %>%
+  distinct(all_genotyped, mut_sample, prev_sum, .keep_all = TRUE) %>% 
+  mutate(prev_all = mut_sample*100/all_genotyped,
+         prev_sum = prev_sum*100/n) %>%
+  ggplot(aes(x=adj_year, y=prev_sum, fill=Locus)) +
+  geom_col() +
+  theme_bw() +
+  scale_fill_manual(values = c("#D55E00", 
+                               "#0072B2", 
+                               "#009E73", 
+                               "#F0E442"), 
+                    labels = c("675V", 
+                               "469F", 
+                               "469Y", 
+                               "561H")) +
+  xlab("Year") +
+  ylab("Prevalence") + 
+  ylim(0, 100) +
+  scale_x_continuous("Year of first occurance", labels = as.character(df$adj_year), breaks = df$adj_year) +
+  theme(legend.title=element_blank(), axis.text = element_text(size = 10), axis.title=element_text(size=12), legend.text=element_text(size=10), strip.text.x = element_text(size = 10), legend.position = c(.25 , .97), legend.justification = c("right", "top"), legend.box.just = "right", legend.margin = margin(1, 1, 1, 1))
+
+print(prev, width = 4, height =  6.5)
+```
+
 ## Saving
 ```{r}
 ggsave(

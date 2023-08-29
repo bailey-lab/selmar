@@ -53,19 +53,28 @@ df <- df %>%
 c469y_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
-    filter(Locus == "C469Y" & nobs > numofobs) %>% 
-    mutate(adj_year = year - 2016),
+    filter(Locus == "C469Y" & nobs > numofobs),
   weights = wt_med,
   adapt_delta = 0.9975
 )
 
 # forecasting for C469Y
 new_data <- df %>%
-  filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "C469Y") %>% # this is for c469Y model
+  filter(nobs > numofobs, 
+         is.finite(df$lrsmed), 
+         Locus == "C469Y") %>% # this is for c469Y model
   group_by(District, Locus) %>% # we group by the District and Locus
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
-  mutate(adj_year = year - 2016) %>%
-  select(adj_year, year, District, Locus, min_year, max_year)
+  select(adj_year, year, District, Locus, min_year, max_year) %>%
+  mutate(min_year = replace(min_year, is.na(min_year), 0),
+         max_year = replace(max_year, is.na(max_year), 0)) 
+
+new_data <- new_data %>%
+    group_by(District, Locus) %>%
+    mutate(min_year = max(min_year),
+      adj_year = year - min_year) %>%
+    arrange(Locus, District, year) %>%
+    ungroup
 
 new_data$predict <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
 conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% 
@@ -79,19 +88,28 @@ df_predict <- new_data
 a675v_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
-    filter(Locus == "A675V" & nobs > numofobs) %>% 
-    mutate(adj_year = year - 2016),
+    filter(Locus == "A675V" & nobs > numofobs),
   weights = wt_med,
   adapt_delta = 0.9975
 )
 
 # forecasting for A467V
 new_data <- df %>%
-  filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "A675V") %>% # this is for c469Y model
+  filter(nobs > numofobs, 
+         is.finite(df$lrsmed), 
+         Locus == "A675V") %>% # this is for c469Y model
   group_by(District, Locus) %>% # we group by the District and Locus
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
-  mutate(adj_year = year - 2016) %>%
-  select(adj_year, year, District, Locus, min_year, max_year)
+  select(adj_year, year, District, Locus, min_year, max_year) %>%
+  mutate(min_year = replace(min_year, is.na(min_year), 0),
+         max_year = replace(max_year, is.na(max_year), 0)) 
+
+new_data <- new_data %>%
+    group_by(District, Locus) %>%
+    mutate(min_year = max(min_year),
+      adj_year = year - min_year) %>%
+    arrange(Locus, District, year) %>%
+    ungroup
 
 new_data$predict <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
 conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% 
@@ -105,8 +123,7 @@ df_predict <- rbind(df_predict, new_data)
 c469f_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
-    filter(Locus == "C469F" , nobs > numofobs) %>% 
-    mutate(adj_year = year - 2016),
+    filter(Locus == "C469F" , nobs > numofobs),
   weights = wt_med,
   adapt_delta = 0.9975
 )
@@ -117,8 +134,16 @@ new_data <- df %>%
   filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "C469F") %>% # this is for c469Y model
   group_by(District, Locus) %>% # we group by the District and Locus
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
-  mutate(adj_year = year - 2016) %>%
-  select(adj_year, year, District, Locus, min_year, max_year)
+  select(adj_year, year, District, Locus, min_year, max_year) %>%
+  mutate(min_year = replace(min_year, is.na(min_year), 0),
+         max_year = replace(max_year, is.na(max_year), 0)) 
+
+new_data <- new_data %>%
+    group_by(District, Locus) %>%
+    mutate(min_year = max(min_year),
+      adj_year = year - min_year) %>%
+    arrange(Locus, District, year) %>%
+    ungroup
 
 new_data$predict <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
 conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% 
@@ -128,11 +153,12 @@ new_data$conf.high <- conf_val[2,]
 
 df_predict <- rbind(df_predict, new_data)
 
-df_predict_allyear <-
-  df_predict %>% group_by(District, Locus) %>% mutate(min_year = replace_na(min_year, 0),
-                                                      min_year = max(min_year),
-                                                      max_year = replace_na(max_year, 0),
-                                                      max_year = max(max_year))
+df_predict_allyear <- df_predict %>% 
+  group_by(District, Locus) %>% 
+  mutate(min_year = replace_na(min_year, 0),
+         min_year = max(min_year),
+         max_year = replace_na(max_year, 0),
+         max_year = max(max_year))
 ```
 
 ## Convert to prevalence

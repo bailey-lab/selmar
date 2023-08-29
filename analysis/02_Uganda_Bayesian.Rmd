@@ -45,14 +45,15 @@ fileLocManuscript <- "figures/"
 # Bayesian stan model with slopes and intercepts
 # Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
 Uganda_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ year + (1 + year | District),
-  data = df_comb %>% filter(nobs > numofobs) %>% mutate(year = year - 2016),
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df_comb %>% filter(nobs > numofobs),
   weights = wt_med, adapt_delta = 0.9975
 )
 
+## C469Y
 c469y_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ year + (1 + year | District),
-  data = df %>% filter(Locus == "C469Y" & nobs > numofobs) %>% mutate(year = year - 2016),
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469Y" & nobs > numofobs),
   weights = wt_med, adapt_delta = 0.9975
 )
 vals <- summary(c469y_stanmod$stanfit)$summary[,1]
@@ -61,9 +62,10 @@ ranef_c469y_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
 ranef_c469y_stanmod$mutation <- rep("C469Y", dim(ranef_c469y_stanmod)[1])
 
+## A675V
 a675v_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ year + (1 + year | District),
-  data = df %>% filter(Locus == "A675V" & nobs > numofobs) %>% mutate(year = year - 2016),
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "A675V" & nobs > numofobs),
   weights = wt_med, adapt_delta = 0.9975
   )
 vals <- summary(a675v_stanmod$stanfit)$summary[,1]
@@ -72,9 +74,10 @@ ranef_a675v_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
 ranef_a675v_stanmod$mutation <- rep("A675V", dim(ranef_a675v_stanmod)[1])
 
+## C469F
 c469f_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ year + (1 + year | District),
-  data = df %>% filter(Locus == "C469F" & nobs > numofobs) %>% mutate(year = year - 2016),
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469F" & nobs > numofobs),
   weights = wt_med, adapt_delta = 0.9975
 )
 vals <- summary(c469f_stanmod$stanfit)$summary[,1]
@@ -225,7 +228,7 @@ stan_eff_c469f <- as.data.frame(c469f_stanmod$stan_summary[grep("year District",
 coef_a675v <- ranef(a675v_stanmod)$District %>% 
   mutate(District = rownames(ranef(a675v_stanmod)$District), 
          mutation = "A675V", 
-         estimate = ranef(a675v_stanmod)$District$year, 
+         estimate = ranef(a675v_stanmod)$District$adj_year, 
          conf.low = stan_eff_a675v$conf.low, 
          conf.high = stan_eff_a675v$conf.high) %>% 
   select(conf.low, estimate, conf.high, mutation, District) %>% 
@@ -233,7 +236,7 @@ coef_a675v <- ranef(a675v_stanmod)$District %>%
 coef_c469y <- ranef(c469y_stanmod)$District %>% 
   mutate(District = rownames(ranef(c469y_stanmod)$District), 
          mutation = "C469Y", 
-         estimate = ranef(c469y_stanmod)$District$year, 
+         estimate = ranef(c469y_stanmod)$District$adj_year, 
          conf.low = stan_eff_c469y$conf.low, 
          conf.high = stan_eff_c469y$conf.high) %>% 
   select(conf.low, estimate, conf.high, mutation, District) %>% 
@@ -241,7 +244,7 @@ coef_c469y <- ranef(c469y_stanmod)$District %>%
 coef_c469f <- ranef(c469f_stanmod)$District %>% 
   mutate(District = rownames(ranef(c469f_stanmod)$District), 
          mutation = "C469F",
-         estimate = ranef(c469f_stanmod)$District$year, 
+         estimate = ranef(c469f_stanmod)$District$adj_year, 
          conf.low = stan_eff_c469f$conf.low, 
          conf.high = stan_eff_c469f$conf.high) %>% 
   select(conf.low, estimate, conf.high, mutation, District) %>% 

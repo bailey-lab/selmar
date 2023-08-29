@@ -74,9 +74,14 @@ df_comb2 <- df_comb %>% group_by(District, year) %>% mutate(n = min(n)) %>% dist
 
 df_comb2$lrsmed[df_comb2$lrsmed == -Inf] <- NA
 
-df_comb <- df_comb2
+df_comb <- df_comb2 %>%
+  group_by(District) %>%
+  mutate(min_year = min(year[comb>0])) %>%
+  ungroup %>%
+  mutate(adj_year = year - min_year)
+
 df_comb$wt_med <- NA
 df_comb$wt_med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)] <- 1/(se_ln_ratio_noZeros(round(df_comb$med[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]*df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)]), df_comb$n[df_comb$nobs > numofobs & is.finite(df_comb$lrsmed)])^2)
 
-write.table(df_comb, "analysis/data/Ugandan_comb_data.txt")
-write.table(df, "analysis/data/Ugandan_data.txt")
+write.table(df_comb, "analysis/data/data-derived/Ugandan_comb_data.txt")
+write.table(df, "analysis/data/data-derived/Ugandan_data.txt")

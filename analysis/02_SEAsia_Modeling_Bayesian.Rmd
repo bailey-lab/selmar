@@ -46,7 +46,8 @@ fileLocManuscript_pfK7 <- "figures/"
 # ---- Model for c580y -----
 c580y_stanmod <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(Locus == "C580Y", nobs > numofobs),
+  data = pfk7_data %>% 
+    filter(Locus == "C580Y", nobs > numofobs),
   weights = wt_med, 
   adapt_delta = 0.9975
 )
