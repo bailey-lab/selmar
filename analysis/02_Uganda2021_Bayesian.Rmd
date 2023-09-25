@@ -1,0 +1,424 @@
+---
+title: "Kelch Selection Coefficient Modeling - MANUSCRIPT --> updated combined data & no Binomial model"
+output: html_document
+date: "2023-03-29"
+---
+
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+# Load data
+```{r cars}
+#load data
+df_raw <- read.table("data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+df <-  df_raw %>% select(-x_org, -value) %>%
+  rbind(df_comb %>% mutate(Locus = "PfK13") %>% rename(x = comb)) %>%
+  filter(year < 2022)
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures/"
+```
+
+# Bayesian GMM with slopes and intercepts
+```{r}
+# Bayesian stan model with slopes and intercepts
+# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+PfK13_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "PfK13" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+vals <- summary(PfK13_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_PfK13_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_PfK13_stanmod$mutation <- rep("PfK13", dim(ranef_PfK13_stanmod)[1])
+
+## C469Y
+c469y_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469Y" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+vals <- summary(c469y_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c469y_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c469y_stanmod$mutation <- rep("C469Y", dim(ranef_c469y_stanmod)[1])
+
+## A675V
+a675v_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "A675V" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+  )
+vals <- summary(a675v_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_a675v_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_a675v_stanmod$mutation <- rep("A675V", dim(ranef_a675v_stanmod)[1])
+
+## C469F
+c469f_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469F" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+vals <- summary(c469f_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c469f_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c469f_stanmod$mutation <- rep("C469F", dim(ranef_c469f_stanmod)[1])
+
+## P441L
+p441l_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "P441L" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+vals <- summary(p441l_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_p441l_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_p441l_stanmod$mutation <- rep("P441L", dim(ranef_p441l_stanmod)[1])
+
+ranef_stanmod <- rbind(ranef_c469y_stanmod, ranef_a675v_stanmod, ranef_c469f_stanmod, ranef_p441l_stanmod, ranef_PfK13_stanmod)
+ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
+ranef_stanmod$site <- str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
+``` 
+
+
+## Posterior of the model
+```{r}
+df$predict_stan <- NA
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <-  rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469f_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "P441L" & df$nobs > numofobs] <-  rstanarm::posterior_predict(p441l_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "PfK13" & df$nobs > numofobs] <-  rstanarm::posterior_predict(PfK13_stanmod, type = "response") %>% colMeans
+
+```
+
+## Confidence interval
+```{r}
+#Selection coefficient for individual mutations
+df$conf.low <- NA
+df$conf.high <- NA
+c469y_conf <- rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+c469f_conf <- rstanarm::posterior_predict(c469f_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+a675v_conf <- rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+p441l_conf <- rstanarm::posterior_predict(p441l_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+PfK13_conf <- rstanarm::posterior_predict(PfK13_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+
+# here just add predictions  for the c469Y rows
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "P441L" & df$nobs > numofobs] <- p441l_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "PfK13" & df$nobs > numofobs] <- PfK13_conf[1,]
+
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469F" & df$nobs > numofobs] <- c469f_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "P441L" & df$nobs > numofobs] <- p441l_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "PfK13" & df$nobs > numofobs] <- PfK13_conf[2,]
+```
+
+## Prevalence scale
+```{r}
+# Plot the predictions in each site with only Bayesian
+#convert to prevalence scale
+df$predict_stan_prev <- NA
+df$conf.high_prev <- NA
+df$conf.low_prev <- NA
+
+df$predict_stan_prev <- exp(df$predict_stan)*100/(1+exp(df$predict_stan))
+df$conf.high_prev <- exp(df$conf.high)*100/(1+exp(df$conf.high))
+df$conf.low_prev <- exp(df$conf.low)*100/(1+exp(df$conf.low))
+```
+
+# Figure Supplement 7: Plot for selection coefficient 
+## Preprocessing
+```{r}
+# Plot the effect sizes
+stan_eff <- as.data.frame(t(data.frame(c469y_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
+mutate(method = "Bayesian (Intercept + Slope)") %>%
+setNames(c("conf.low", "estimate", "conf.high", "method"))
+
+effect_size <- stan_eff %>% mutate(mutation = "C469Y")
+
+stan_eff <- as.data.frame(t(data.frame(a675v_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
+mutate(method = "Bayesian (Intercept + Slope)") %>%
+setNames(c("conf.low", "estimate", "conf.high", "method"))
+
+pl <- stan_eff %>% mutate(mutation = "A675V")
+effect_size <- rbind(effect_size, pl)
+
+stan_eff <- as.data.frame(t(data.frame(c469f_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
+mutate(method = "Bayesian (Intercept + Slope)") %>%
+setNames(c("conf.low", "estimate", "conf.high", "method"))
+
+pl <- stan_eff %>% mutate(mutation = "C469F")
+effect_size <- rbind(effect_size, pl)
+
+stan_eff <- as.data.frame(t(data.frame(p441l_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
+mutate(method = "Bayesian (Intercept + Slope)") %>%
+setNames(c("conf.low", "estimate", "conf.high", "method"))
+
+pl <- stan_eff %>% mutate(mutation = "P441L")
+effect_size <- rbind(effect_size, pl)
+
+stan_eff <- as.data.frame(t(data.frame(PfK13_stanmod$stan_summary[2, c("2.5%", "50%","97.5%")]))) %>%
+mutate(method = "Bayesian (Intercept + Slope)") %>%
+setNames(c("conf.low", "estimate", "conf.high", "method"))
+
+pl <- stan_eff %>% mutate(mutation = "PfK13")
+effect_size <- rbind(effect_size, pl)
+
+
+#confidence interval per site and mutation
+stan_eff_a675v <- as.data.frame(a675v_stanmod$stan_summary[grep("year District", rownames(a675v_stanmod$stan_summary)),]) %>% select(c("2.5%","97.5%")) %>% setNames(c("conf.low", "conf.high")) %>% slice(1:(n()-1))
+stan_eff_c469y <- as.data.frame(c469y_stanmod$stan_summary[grep("year District", rownames(c469y_stanmod$stan_summary)),]) %>% select(c("2.5%","97.5%")) %>% setNames(c("conf.low", "conf.high")) %>% slice(1:(n()-1))
+stan_eff_c469f <- as.data.frame(c469f_stanmod$stan_summary[grep("year District", rownames(c469f_stanmod$stan_summary)),]) %>% select(c("2.5%","97.5%")) %>% setNames(c("conf.low", "conf.high")) %>% slice(1:(n()-1))
+stan_eff_p441l <- as.data.frame(p441l_stanmod$stan_summary[grep("year District", rownames(p441l_stanmod$stan_summary)),]) %>% select(c("2.5%","97.5%")) %>% setNames(c("conf.low", "conf.high")) %>% slice(1:(n()-1))
+stan_eff_PfK13 <- as.data.frame(PfK13_stanmod$stan_summary[grep("year District", rownames(PfK13_stanmod$stan_summary)),]) %>% select(c("2.5%","97.5%")) %>% setNames(c("conf.low", "conf.high")) %>% slice(1:(n()-1))
+
+coef_a675v <- ranef(a675v_stanmod)$District %>% 
+  mutate(District = rownames(ranef(a675v_stanmod)$District), 
+         mutation = "A675V", 
+         estimate = ranef(a675v_stanmod)$District$adj_year, 
+         conf.low = stan_eff_a675v$conf.low, 
+         conf.high = stan_eff_a675v$conf.high) %>% 
+  select(conf.low, estimate, conf.high, mutation, District) %>% 
+  remove_rownames()
+coef_c469y <- ranef(c469y_stanmod)$District %>% 
+  mutate(District = rownames(ranef(c469y_stanmod)$District), 
+         mutation = "C469Y", 
+         estimate = ranef(c469y_stanmod)$District$adj_year, 
+         conf.low = stan_eff_c469y$conf.low, 
+         conf.high = stan_eff_c469y$conf.high) %>% 
+  select(conf.low, estimate, conf.high, mutation, District) %>% 
+  remove_rownames()
+coef_c469f <- ranef(c469f_stanmod)$District %>% 
+  mutate(District = rownames(ranef(c469f_stanmod)$District), 
+         mutation = "C469F",
+         estimate = ranef(c469f_stanmod)$District$adj_year, 
+         conf.low = stan_eff_c469f$conf.low, 
+         conf.high = stan_eff_c469f$conf.high) %>% 
+  select(conf.low, estimate, conf.high, mutation, District) %>% 
+  remove_rownames()
+coef_p441l <- ranef(p441l_stanmod)$District %>% 
+  mutate(District = rownames(ranef(p441l_stanmod)$District), 
+         mutation = "P441L",
+         estimate = ranef(p441l_stanmod)$District$adj_year, 
+         conf.low = stan_eff_p441l$conf.low, 
+         conf.high = stan_eff_p441l$conf.high) %>% 
+  select(conf.low, estimate, conf.high, mutation, District) %>% 
+  remove_rownames()
+coef_PfK13 <- ranef(PfK13_stanmod)$District %>% 
+  mutate(District = rownames(ranef(PfK13_stanmod)$District), 
+         mutation = "PfK13",
+         estimate = ranef(PfK13_stanmod)$District$adj_year, 
+         conf.low = stan_eff_PfK13$conf.low, 
+         conf.high = stan_eff_PfK13$conf.high) %>% 
+  select(conf.low, estimate, conf.high, mutation, District) %>% 
+  remove_rownames()
+
+selec_coef <- rbind(coef_a675v, coef_c469y, coef_c469f, coef_p441l, coef_PfK13)
+conf_val <- as.data.frame(selec_coef$estimate[1]) %>% 
+  apply(2, quantile, prob = (c(0.025, 0.975))) 
+
+# plot the effect sizes for the mutation
+effect_size_bay <- effect_size %>% 
+  filter(method == "Bayesian (Intercept + Slope)") %>% 
+  mutate(District = "Uganda") %>% 
+  select(conf.low, estimate, conf.high, mutation, District)
+
+selec_coef$estimate[selec_coef$mutation == "A675V"] <- selec_coef$estimate[selec_coef$mutation == "A675V"] + effect_size_bay$estimate[effect_size_bay$mutation == "A675V"]
+selec_coef$estimate[selec_coef$mutation == "C469Y"] <- selec_coef$estimate[selec_coef$mutation == "C469Y"] + effect_size_bay$estimate[effect_size_bay$mutation == "C469Y"]
+selec_coef$estimate[selec_coef$mutation == "C469F"] <- selec_coef$estimate[selec_coef$mutation == "C469F"] + effect_size_bay$estimate[effect_size_bay$mutation == "C469F"]
+selec_coef$estimate[selec_coef$mutation == "P441L"] <- selec_coef$estimate[selec_coef$mutation == "P441L"] + effect_size_bay$estimate[effect_size_bay$mutation == "P441L"]
+selec_coef$estimate[selec_coef$mutation == "PfK13"] <- selec_coef$estimate[selec_coef$mutation == "PfK13"] + effect_size_bay$estimate[effect_size_bay$mutation == "PfK13"]
+
+selec_coef$conf.low[selec_coef$mutation == "A675V"] <- selec_coef$conf.low[selec_coef$mutation == "A675V"] + effect_size_bay$conf.low[effect_size_bay$mutation == "A675V"]
+selec_coef$conf.low[selec_coef$mutation == "C469Y"] <- selec_coef$conf.low[selec_coef$mutation == "C469Y"] + effect_size_bay$conf.low[effect_size_bay$mutation == "C469Y"]
+selec_coef$conf.low[selec_coef$mutation == "C469F"] <- selec_coef$conf.low[selec_coef$mutation == "C469F"] + effect_size_bay$conf.low[effect_size_bay$mutation == "C469F"]
+selec_coef$conf.low[selec_coef$mutation == "P441L"] <- selec_coef$conf.low[selec_coef$mutation == "P441L"] + effect_size_bay$conf.low[effect_size_bay$mutation == "P441L"]
+selec_coef$conf.low[selec_coef$mutation == "PfK13"] <- selec_coef$conf.low[selec_coef$mutation == "PfK13"] + effect_size_bay$conf.low[effect_size_bay$mutation == "PfK13"]
+
+selec_coef$conf.high[selec_coef$mutation == "A675V"] <- selec_coef$conf.high[selec_coef$mutation == "A675V"] + effect_size_bay$conf.high[effect_size_bay$mutation == "A675V"]
+selec_coef$conf.high[selec_coef$mutation == "C469Y"] <- selec_coef$conf.high[selec_coef$mutation == "C469Y"] + effect_size_bay$conf.high[effect_size_bay$mutation == "C469Y"]
+selec_coef$conf.high[selec_coef$mutation == "C469F"] <- selec_coef$conf.high[selec_coef$mutation == "C469F"] + effect_size_bay$conf.high[effect_size_bay$mutation == "C469F"]
+selec_coef$conf.high[selec_coef$mutation == "P441L"] <- selec_coef$conf.high[selec_coef$mutation == "P441L"] + effect_size_bay$conf.high[effect_size_bay$mutation == "P441L"]
+selec_coef$conf.high[selec_coef$mutation == "PfK13"] <- selec_coef$conf.high[selec_coef$mutation == "PfK13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "PfK13"]
+
+effect_size_bay$s <- 18
+effect_size_bay$sizes <- 1
+selec_coef$s <- 19
+selec_coef$sizes <- 0.5
+
+stan_eff_bay_overall <- effect_size_bay %>% 
+  mutate(method = "Baysian") %>% 
+  relocate(District, conf.low, estimate, conf.high, method, mutation, s, sizes)
+rownames(stan_eff_bay_overall) <- NULL
+
+effect_size_bay <- rbind(effect_size_bay, selec_coef)
+effect_size_bay <- effect_size_bay %>% 
+  group_by(mutation) %>%
+  arrange(District)
+
+effect_size_bay <- effect_size_bay %>% 
+  mutate(mutation = replace(mutation, mutation == "A675V", "675V")) %>% 
+  mutate(mutation = replace(mutation, mutation == "C469Y", "469Y")) %>% 
+  mutate(mutation = replace(mutation, mutation == "C469F", "469F")) %>%
+  mutate(mutation = replace(mutation, mutation == "P441L", "441L"))
+
+effect_size_bay <- effect_size_bay %>% 
+  relocate(District, mutation) %>% 
+  mutate(conf.low = round(conf.low, 3), 
+         conf.high = round(conf.high, 3), 
+         estimate = round(estimate, 3))
+```
+
+## Plotting Selection Coefficients
+```{r}
+selection_coef_bay <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_pointrange(data = effect_size_bay, 
+                  aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
+                  position=position_dodge(width = 0.9), 
+                  shape = effect_size_bay$s, 
+                  size = effect_size_bay$sizes) +
+  ylab("Mutation") +
+  xlab("Selection Coefficient") +
+  scale_color_manual(values=c("#4477AA",
+                              "#66CCEE",
+                              "#228833",
+                              "#CCBB44",
+                              "#EE6677",
+                              "#AA3377",
+                              "#DDAA33",
+                              "#004488",
+                              "#CC3311",
+                              "#44AA99",
+                              "#EE99AA",
+                              "#EE7733",
+                              "#F0E442",
+                              "black")) +
+  theme_bw() +
+  xlim(-2.5,4) +
+  theme(legend.title=element_blank(), 
+        axis.line = element_line(), 
+        legend.position = "right", 
+        plot.title = element_text(hjust = 0.5, size = 20), 
+        axis.text = element_text(size = 14), 
+        axis.title=element_text(size=16), 
+        legend.text=element_text(size=16))
+```
+
+## Saving plots
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure7-Uganda2021/Uganda2021_Effectsize.png"),
+  selection_coef_bay,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "supplement/Figure7-Uganda2021/Uganda2021_Effectsize.pdf"),
+  selection_coef_bay,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+write.csv(
+  effect_size_bay %>% select(!c(s, sizes)),
+  paste0(fileLocManuscript, "/supplement/Figure7-Uganda2021/2021Uganda_selectioncoefficients.csv"),
+  row.names = F,
+  quote = F
+)
+```
+
+## Statistical analysis of selection coefficients
+```{r}
+selec_ceof_stats <- data.frame(matrix(ncol = 5, nrow = 5))
+min_675V <- min(effect_size_bay %>% 
+                  filter(mutation == "675V" & District != "Uganda") %>% 
+                  pull(estimate))
+max_675V <- max(effect_size_bay %>% 
+                  filter(mutation == "675V" & District != "Uganda") %>% 
+                  pull(estimate))
+selec_ceof_stats[1, ] <- cbind("675V", min_675V, effect_size_bay[which(effect_size_bay$estimate == min_675V),][1], max_675V, effect_size_bay[which(effect_size_bay$estimate == max_675V),][1])
+
+min_469Y <- min(effect_size_bay %>% 
+                  filter(mutation == "469Y" & District != "Uganda") %>% 
+                  pull(estimate))
+max_469Y <- max(effect_size_bay %>% 
+                  filter(mutation == "469Y" & District != "Uganda") %>% 
+                  pull(estimate))
+selec_ceof_stats[2:3, ] <- cbind("469Y", min_469Y, effect_size_bay[which(effect_size_bay$estimate == min_469Y),][1], max_469Y, effect_size_bay[which(effect_size_bay$estimate == max_469Y),][1])
+
+min_469F <- min(effect_size_bay %>% 
+                  filter(mutation == "469F" & District != "Uganda") %>% 
+                  pull(estimate))
+max_469F <- max(effect_size_bay %>% 
+                  filter(mutation == "469F" & District != "Uganda") %>% 
+                  pull(estimate))
+selec_ceof_stats[3, ] <- cbind("469F", min_469F, effect_size_bay[which(effect_size_bay$estimate == min_469F),][1], max_469F, effect_size_bay[which(effect_size_bay$estimate == max_469F),][1])
+
+min_441L <- min(effect_size_bay %>% 
+                  filter(mutation == "441L" & District != "Uganda") %>% 
+                  pull(estimate))
+max_441L <- max(effect_size_bay %>% 
+                  filter(mutation == "441L" & District != "Uganda") %>% 
+                  pull(estimate))
+selec_ceof_stats[4, ] <- cbind("441L", min_441L, effect_size_bay[which(effect_size_bay$estimate == min_441L),][1], max_441L, effect_size_bay[which(effect_size_bay$estimate == max_441L),][1])
+
+min_PfK13 <- min(effect_size_bay %>% 
+                  filter(mutation == "PfK13" & District != "Uganda") %>% 
+                  pull(estimate))
+max_PfK13 <- max(effect_size_bay %>% 
+                  filter(mutation == "PfK13" & District != "Uganda") %>% 
+                  pull(estimate))
+selec_ceof_stats[5, ] <- cbind("PfK13", min_PfK13, effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][1], max_PfK13, effect_size_bay[which(effect_size_bay$estimate == max_PfK13),][1])
+
+colnames(selec_ceof_stats) <- c("Mutation", "Min Select Ceof", "District", "Max Select Ceof", "District")
+```
+
+## Saving dataframe
+```{r}
+write.csv(
+  selec_ceof_stats,
+  paste0(fileLocManuscript, "/supplement/Figure7-Uganda2021/2021Uganda_selectioncoefficients_stats.csv"),
+  row.names = F,
+  quote = F
+)
+```
+

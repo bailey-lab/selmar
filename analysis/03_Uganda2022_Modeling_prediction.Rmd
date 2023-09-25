@@ -34,7 +34,7 @@ library(gt)
 ```{r}
 #load data
 df <- read.table("data/data-derived/Ugandan_data.txt")
-df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+
 #set the limit of number of observations
 numofobs <- 2
 
@@ -147,6 +147,45 @@ new_data <- new_data %>%
 
 new_data$predict <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
 conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% 
+  apply(2, quantile, prob = (c(0.025, 0.975)))
+new_data$conf.low <- conf_val[1,]
+new_data$conf.high <- conf_val[2,] 
+
+df_predict <- rbind(df_predict, new_data)
+
+df_predict_allyear <- df_predict %>% 
+  group_by(District, Locus) %>% 
+  mutate(min_year = replace_na(min_year, 0),
+         min_year = max(min_year),
+         max_year = replace_na(max_year, 0),
+         max_year = max(max_year))
+
+#------ Model prediction for P441L ------
+p441l_pred <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% 
+    filter(Locus == "P441L" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+
+# forecasting for P441L
+new_data <- df %>%
+  filter(nobs > numofobs, is.finite(df$lrsmed), Locus == "P441L") %>% # this is for c469Y model
+  group_by(District, Locus) %>% # we group by the District and Locus
+  complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
+  select(adj_year, year, District, Locus, min_year, max_year) %>%
+  mutate(min_year = replace(min_year, is.na(min_year), 0),
+         max_year = replace(max_year, is.na(max_year), 0)) 
+
+new_data <- new_data %>%
+    group_by(District, Locus) %>%
+    mutate(min_year = max(min_year),
+      adj_year = year - min_year) %>%
+    arrange(Locus, District, year) %>%
+    ungroup
+
+new_data$predict <- rstanarm::posterior_predict(p441l_pred, type = "response", newdata = new_data) %>% colMeans
+conf_val <- rstanarm::posterior_predict(p441l_pred, type = "response", newdata = new_data) %>% 
   apply(2, quantile, prob = (c(0.025, 0.975)))
 new_data$conf.low <- conf_val[1,]
 new_data$conf.high <- conf_val[2,] 
@@ -309,6 +348,52 @@ pred_c469f <- ggplot() +
     legend.text = element_text(size = 8),
     legend.position = "none",
     panel.spacing = unit(0.2, "lines")) 
+
+################ PLOT FOR P441L ################
+df_true <- df_predict_allyear %>% 
+  filter(Locus == "P441L", 
+         year <= max_year) %>%
+  mutate(label = "true")
+df_pred <- df_predict_allyear %>% 
+  filter(Locus == "P441L",
+         year >= max_year) %>%
+  mutate(label = "predicted")
+ex_pt <-df %>% 
+  filter(nobs > numofobs, Locus == "P441L", District %in% unique(df_pred$District)) 
+
+pred_p441l <- ggplot() +
+  geom_line(data = df_true, 
+            aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, 
+            aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), 
+              linetype = "dashed", 
+              alpha = 0.2,  
+              show.legend = FALSE) +
+  geom_point(data = ex_pt, 
+             aes(x = year, y = med * 100, color = "true")) +
+  theme_bw() +
+  facet_wrap(~District) +
+  ylab("P441L Prevalence") +
+  xlab("Year") +
+  scale_color_manual(
+    values = c("#CC79A7", "grey"),
+    labels = c("Forecasting",  "True")
+  ) +
+  scale_fill_manual(
+    values = c("#CC79A7", "grey"),
+    labels = c("Forecasting",  "True")
+  ) +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "none",
+    panel.spacing = unit(0.2, "lines")) 
 ```
 
 ## Saving plots
@@ -354,6 +439,20 @@ ggsave(
 ggsave(
   "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469F.pdf",
   pred_c469f,
+  width = fig6_width,
+  height = 2.7,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_P441L.pdf",
+  pred_p441l,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_P441L.pdf",
+  pred_p441l,
   width = fig6_width,
   height = 2.7,
   dpi = 700

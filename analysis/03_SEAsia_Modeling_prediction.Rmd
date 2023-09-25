@@ -14,6 +14,7 @@ library(ggpubr)
 library(ggspatial)
 library(gt)
 library(lme4)
+library(Metrics)
 library(nlme)
 library(RColorBrewer)
 library(rnaturalearth)
@@ -124,7 +125,8 @@ for (i in pred_year) {
   data_c580y <- pfk7_data %>% 
     filter(
       Locus == "C580Y",
-      nobs > numofobs) 
+      nobs > numofobs,
+      District == c("Pailin", "Preah Vihear", "Ratanakiri", "Tak")) 
   
   selected_district <- data_c580y %>% 
     group_by(Locus, country, District) %>%
@@ -182,71 +184,73 @@ for (i in pred_year) {
 
   df_predict <- new_data
   
-  #------ Model prediction for R539T ------
-  data_r539t <- pfk7_data %>% 
-    filter(
-      Locus == "R539T",
-      nobs > numofobs)
-
-  selected_district <- data_r539t %>% 
-    group_by(Locus, country, District) %>%
-    filter(adj_year == min(adj_year),
-           prev <= prev_cutoff) %>%
-    ungroup %>%
-    select(District)
-  
-  selected_district <- array(t(selected_district)) #check if the prevalence in the first year observed is less than cutoff
-  
-  data_r539t <- data_r539t %>% 
-    filter(District %in% selected_district,
-           year >= min_year & year <= min_year + i)
-  
-  r539t_pred <- rstanarm::stan_glmer(
-    lrsmed ~ adj_year + (1 + adj_year | District),
-    data = data_r539t,
-    weights = wt_med,
-    adapt_delta = 0.9975
-  )
-  
-  new_data <- pfk7_data %>%
-    filter(nobs > numofobs, 
-           is.finite(lrsmed), 
-           District %in% selected_district,
-           Locus == "R539T") %>%
-    group_by(District, Locus) %>%
-    complete(year = seq(min(min_year) + i, 2023, 1)) %>% # this creates all the year values up to 2023
-    ungroup() %>% 
-    select(adj_year, year, District, country, min_year, Locus) %>%
-    mutate(min_year = replace(min_year, is.na(min_year), 0))
-
-  new_data <- new_data %>%
-      group_by(District, Locus) %>%
-      mutate(min_year = max(min_year),
-        adj_year = year - min_year,
-        country = unique(na.omit(country))) %>%
-      arrange(Locus, District, year) %>%
-      ungroup %>%
-    group_by(Locus, District, year) %>%
-    distinct(year, .keep_all = TRUE) %>%
-    ungroup
-  
-  predictions <-
-    rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% colMeans
-  conf_val <- rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% 
-  apply(2, quantile, prob = (c(0.025, 0.975)))
-
-  new_data <- new_data %>% 
-    mutate(predict = predictions,
-           conf.low = conf_val[1,],
-           conf.high = conf_val[2,])
-
-  df_predict <- rbind(df_predict, new_data)
+  # #------ Model prediction for R539T ------
+  # data_r539t <- pfk7_data %>%
+  #   filter(
+  #     Locus == "R539T",
+  #     nobs > numofobs)
+  #     #District == c("Pailin", ""))
+  # 
+  # selected_district <- data_r539t %>%
+  #   group_by(Locus, country, District) %>%
+  #   filter(adj_year == min(adj_year),
+  #          prev <= prev_cutoff) %>%
+  #   ungroup %>%
+  #   select(District)
+  # 
+  # selected_district <- array(t(selected_district)) #check if the prevalence in the first year observed is less than cutoff
+  # 
+  # data_r539t <- data_r539t %>%
+  #   filter(District %in% selected_district,
+  #          year >= min_year & year <= min_year + i)
+  # 
+  # r539t_pred <- rstanarm::stan_glmer(
+  #   lrsmed ~ adj_year + (1 + adj_year | District),
+  #   data = data_r539t,
+  #   weights = wt_med,
+  #   adapt_delta = 0.9975
+  # )
+  # 
+  # new_data <- pfk7_data %>%
+  #   filter(nobs > numofobs,
+  #          is.finite(lrsmed),
+  #          District %in% selected_district,
+  #          Locus == "R539T") %>%
+  #   group_by(District, Locus) %>%
+  #   complete(year = seq(min(min_year) + i, 2023, 1)) %>% # this creates all the year values up to 2023
+  #   ungroup() %>%
+  #   select(adj_year, year, District, country, min_year, Locus) %>%
+  #   mutate(min_year = replace(min_year, is.na(min_year), 0))
+  # 
+  # new_data <- new_data %>%
+  #     group_by(District, Locus) %>%
+  #     mutate(min_year = max(min_year),
+  #       adj_year = year - min_year,
+  #       country = unique(na.omit(country))) %>%
+  #     arrange(Locus, District, year) %>%
+  #     ungroup %>%
+  #   group_by(Locus, District, year) %>%
+  #   distinct(year, .keep_all = TRUE) %>%
+  #   ungroup
+  # 
+  # predictions <-
+  #   rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>% colMeans
+  # conf_val <- rstanarm::posterior_predict(r539t_pred, type = "response", newdata = new_data) %>%
+  # apply(2, quantile, prob = (c(0.025, 0.975)))
+  # 
+  # new_data <- new_data %>%
+  #   mutate(predict = predictions,
+  #          conf.low = conf_val[1,],
+  #          conf.high = conf_val[2,])
+  # 
+  # df_predict <- rbind(df_predict, new_data)
   
   #------ Model prediction for combined PfK13 mutations ------
   data_all_kelch <- pfk7_data %>% 
     filter(
       Locus == "PfK13",
-      nobs > numofobs)
+      nobs > numofobs,
+      District == c("Mandalay", "Preah Vihear", "Ratanakiri", "Tak")) 
 
   selected_district <- data_all_kelch %>% 
     group_by(Locus, country, District) %>%
@@ -346,10 +350,10 @@ ex_pt <- pfk7_data %>%
 ## PLOT FOR C580Y
 prev_cutoff_c580y_plot <- 
   ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
-  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true"), linewidth = 1) + 
   geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -363,7 +367,7 @@ prev_cutoff_c580y_plot <-
   ) + 
   theme(
       axis.line = element_line(),
-      axis.text = element_text(size = 6),
+      axis.text = element_text(size = 8),
       axis.title = element_text(size = 10),
       strip.text.x = element_text(size = 10),
       legend.title = element_text(size = 10),
@@ -372,45 +376,45 @@ prev_cutoff_c580y_plot <-
       panel.spacing = unit(0.2, "lines")
     )
 
-################ PLOT FOR R539T ################
-df_pred <- df_predict_cutoff_allyear %>% 
-  filter(year >= min_year +  pred_y, Locus == "R539T")  
-ex <- pfk7_data %>% 
-  filter(is.finite(lrsmed), nobs > numofobs, District %in% unique(df_pred$District), Locus == "R539T")
-ex_pt <- pfk7_data %>% 
-  filter(nobs > numofobs, District %in% unique(df_pred$District), Locus == "R539T") %>% #, year >= min_year & year <= min_year+4
-  mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
-                               year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
-                               year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
-                               year > min_year + 4 ~ "black",
-                               year < min_year ~ "black")) 
-prev_cutoff_r539t_plot <- 
-  ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
-  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
-  geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
-  geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
-  labs(shape="Mutations", size = "Sample Size") +
-  theme_bw() +
-  facet_wrap(~District) +
-  ylab("R539T Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  scale_color_manual(
-    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
-    labels = c("2 years", "3 years", "4 years", "true"),
-    guide = "none"
-  ) + 
-  theme(
-      axis.line = element_line(),
-      axis.text = element_text(size = 6),
-      axis.title = element_text(size = 10),
-      strip.text.x = element_text(size = 10),
-      legend.title = element_text(size = 10),
-      legend.text = element_text(size = 8),
-      legend.position = "right",
-      panel.spacing = unit(0.2, "lines")
-    )
+# # ################ PLOT FOR R539T ################
+# df_pred <- df_predict_cutoff_allyear %>%
+#   filter(year >= min_year +  pred_y, Locus == "R539T")
+# ex <- pfk7_data %>%
+#   filter(is.finite(lrsmed), nobs > numofobs, District %in% unique(df_pred$District), Locus == "R539T")
+# ex_pt <- pfk7_data %>%
+#   filter(nobs > numofobs, District %in% unique(df_pred$District), Locus == "R539T") %>% #, year >= min_year & year <= min_year+4
+#   mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
+#                                year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
+#                                year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
+#                                year > min_year + 4 ~ "black",
+#                                year < min_year ~ "black"))
+# prev_cutoff_r539t_plot <-
+#   ggplot() +
+#   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) +
+#   geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
+#   geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
+#   scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
+#   labs(shape="Mutations", size = "Sample Size") +
+#   theme_bw() +
+#   facet_wrap(~District) +
+#   ylab("R539T Prevalence") +
+#   xlab("Year") +
+#   ggpubr::theme_pubclean(base_size = 12) +
+#   scale_color_manual(
+#     values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
+#     labels = c("2 years", "3 years", "4 years", "true"),
+#     guide = "none"
+#   ) +
+#   theme(
+#       axis.line = element_line(),
+#       axis.text = element_text(size = 8),
+#       axis.title = element_text(size = 10),
+#       strip.text.x = element_text(size = 10),
+#       legend.title = element_text(size = 10),
+#       legend.text = element_text(size = 8),
+#       legend.position = "right",
+#       panel.spacing = unit(0.2, "lines")
+#     )
 
 ################ PLOT FOR ALL KELCH ################
 df_pred <- df_predict_cutoff_allyear %>% 
@@ -425,10 +429,10 @@ ex_pt <- pfk7_data %>%
                                year > min_year + 4 ~ "black",
                                year < min_year ~ "black")) 
  prev_cutoff_all_kelch_plot <- ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
-  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   geom_line(data=ex, aes(year, predict_stan_prev, color = "true")) + 
   geom_line(data=df_pred, aes(year, predict_prev, group = label,color = label), linetype = "dashed") +
+  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,2)) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
   facet_wrap(~District) +
@@ -442,7 +446,7 @@ ex_pt <- pfk7_data %>%
   ) + 
   theme(
       axis.line = element_line(),
-      axis.text = element_text(size = 6),
+      axis.text = element_text(size = 8),
       axis.title = element_text(size = 10),
       strip.text.x = element_text(size = 10),
       legend.title = element_text(size = 10),
@@ -478,30 +482,30 @@ ggsave(
   dpi = 700
 )
 
-
-################ PLOT FOR R539T ################
-ggsave(
-  paste0(
-    "figures/Figure5-ForecastingCorrelation/forecasting/SEAsia_cutoff_pred_R539T_",
-    prev_cutoff_perc,
-    "prev_pred.png"
-  ),
-  prev_cutoff_r539t_plot,
-  width = 6,
-  height = 2.7,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/Figure5-ForecastingCorrelation/forecasting/SEAsia_cutoff_pred_R539T_",
-    prev_cutoff_perc,
-    "prev_pred.pdf"
-  ),
-  prev_cutoff_r539t_plot,
-  width = 6,
-  height = 2.7,
-  dpi = 700
-)
+# 
+# # ################ PLOT FOR R539T ################
+# ggsave(
+#   paste0(
+#     "figures/Figure5-ForecastingCorrelation/forecasting/SEAsia_cutoff_pred_R539T_",
+#     prev_cutoff_perc,
+#     "prev_pred.png"
+#   ),
+#   prev_cutoff_r539t_plot,
+#   width = 6,
+#   height = 2.7,
+#   dpi = 700
+# )
+# ggsave(
+#   paste0(
+#     "figures/Figure5-ForecastingCorrelation/forecasting/SEAsia_cutoff_pred_R539T_",
+#     prev_cutoff_perc,
+#     "prev_pred.pdf"
+#   ),
+#   prev_cutoff_r539t_plot,
+#   width = 6,
+#   height = 2.7,
+#   dpi = 700
+# )
 
 ################ PLOT FOR ALL KELCH ################
 ggsave(
@@ -560,13 +564,19 @@ for(l in unique(df_predict_cutoff_allyear$label)) {
   colnames(df)[ncol(df)-1] <- "label"
   colnames(df)[ncol(df)] <- "pred_y"
   corr_df_cutoff <- rbind(corr_df_cutoff, df) %>% 
-    filter(year >= min_year + pred_y)
+    filter(year > min_year + pred_y)
 }
 
-corr_df_cutoff <- corr_df_cutoff %>% 
-  mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred))) %>% 
-  mutate(t_pred_prev = prev*100) %>%
-  group_by(country, District, label)
+corr_df_cutoff <- corr_df_cutoff %>%
+  mutate(p_pred_prev = exp(p_pred) * 100 / (1 + exp(p_pred)),
+           t_pred_prev = prev*100) %>%
+  group_by(Locus, label) %>%
+  mutate(mae = round(mean(abs(t_pred_prev - p_pred_prev)), 2), #mean absolute error  -> mean(abs(true-prediction)
+         bias = round(mean(t_pred_prev - p_pred_prev), 2), #mean bias -> mean(true - prediction)
+         corr = round(cor(t_pred_prev, p_pred_prev), 2)) %>%
+  select(country, District, year, Locus, p_pred_prev, t_pred_prev, mae, bias, corr, nobs, adj_year, val , label) %>%
+  arrange(Locus, label)
+
 ```                                            
 
 ## Figure 5: Plotting per district
@@ -591,7 +601,7 @@ for (mu in unique(corr_df_cutoff$Locus)){
     ggpubr::theme_pubclean(base_size = 12) +
     theme(
       axis.line = element_line(),
-      axis.text = element_text(size = 6),
+      axis.text = element_text(size = 8),
       axis.title = element_text(size = 10),
       strip.text.x = element_text(size = 10),
       legend.position = "none",
@@ -606,20 +616,9 @@ for (mu in unique(corr_df_cutoff$Locus)){
 
 ## Correlation table
 ```{r}
-correlation_table <- data.frame(matrix(ncol = 3, nrow = 9))
-count <- 0
-for(mu in unique(corr_df_cutoff$Locus)){
-  for (y in c(2, 3, 4)){
-    count <- count + 1
-    corr_df <- corr_df_cutoff %>% filter(Locus == mu, pred_y == y)
-    correlation_year <- cor(corr_df$p_pred_prev, corr_df$t_pred_prev)
-    correlation_table[count, ] <- cbind(mu, y, round(correlation_year, 2))
-  }
-}
-
-colnames(correlation_table) <- c("Mutation", "Forecasting", "Correlation")
-write.table(correlation_table, 
-            paste0("figures/Figure5-ForecastingCorrelation/correlation/SEAsia_correlation_table.txt"))
+correlation_table <- corr_df_cutoff %>% distinct(Locus, label, mae, bias, corr)
+write.csv(correlation_table, 
+            paste0("figures/Figure5-ForecastingCorrelation/correlation/SEAsia_correlation_table.csv"))
 ```
 
 ### Saving plots
@@ -648,29 +647,29 @@ ggsave(
   dpi = 700
 )
 
-################# R539T #################
-ggsave(
-  paste0(
-    "figures/Figure5-ForecastingCorrelation/correlation/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_correlation.png"
-  ),
-  R539T_correlation_raw_plot_cutoff,
-  width = 6,
-  height = 2.7,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/Figure5-ForecastingCorrelation/correlation/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R39T_correlation.pdf"
-  ),
-  R539T_correlation_raw_plot_cutoff,
-  width = 6,
-  height = 2.7,
-  dpi = 700
-)
+# ################# R539T #################
+# ggsave(
+#   paste0(
+#     "figures/Figure5-ForecastingCorrelation/correlation/SEAsia_cutoff_",
+#     prev_cutoff_perc,
+#     "prev_R539T_correlation.png"
+#   ),
+#   R539T_correlation_raw_plot_cutoff,
+#   width = 6,
+#   height = 2.7,
+#   dpi = 700
+# )
+# ggsave(
+#   paste0(
+#     "figures/Figure5-ForecastingCorrelation/correlation/SEAsia_cutoff_",
+#     prev_cutoff_perc,
+#     "prev_R39T_correlation.pdf"
+#   ),
+#   R539T_correlation_raw_plot_cutoff,
+#   width = 6,
+#   height = 2.7,
+#   dpi = 700
+# )
 
 ################# PfK13 #################
 ggsave(
@@ -729,9 +728,9 @@ ex_pt <- pfk7_data %>%
 ```{r}
 prev_cutoff_c580y_Pailin_plot <- 
   ggplot() +
-  geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
   geom_line(data = df_Pailin_pred, aes(year, predict_prev, group = label, color = label)) +
   geom_line(data=df_Pailin_forecasting, aes(year, exp(predict)*100/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
+    geom_point(data = ex_pt, aes(x=year, y=prev*100, size = n), color = ex_pt$point_col) +
   labs(shape="Mutations", size = "Sample Size") +
   scale_x_continuous(breaks = seq(min(ex_pt$year), max(df_pred$year), by = 2)) +
   theme_bw() +
@@ -783,13 +782,6 @@ write.csv(
     mutate(predict_prev = round(predict_prev, 2)),
   "figures/Figure4-ForecastingOverview/Figure4-Pailin-forecasting.csv"
 )
-```
-
-## Figure 6
-## Saving dataframes for supplemnent plotting (see supplement/Figure6/)
-```{r}
-write.table(pfk7_data, "data/data-derived/supplement-figure6-pfk7_data.txt")
-write.table(df_predict_cutoff_allyear, "data/data-derived/supplement-figure6-forecasting.txt")
 ```
 
 ## Figure 6: Plotting forecasting of predictions for the first 2, 3, and 4 years with confidence intervals
@@ -844,53 +836,53 @@ fig6_prev_cutoff_c580y_plot <-
       panel.spacing = unit(0.2, "lines")
     )
 
-################ PLOT FOR R539T ################
-R539T_df_pred <- df_predict_cutoff_allyear %>% 
-  filter(year >= min_year +  pred_y, 
-         Locus == "R539T",
-         pred_y == 4)  
-R539T_df_true <- df_predict_cutoff_allyear %>% 
-  filter(year <= min_year + pred_y, 
-         Locus == "R539T",
-         pred_y == 4) %>%
-  mutate(label = "true")
-R539T_ex_pt <- pfk7_data %>% 
-  filter(nobs > numofobs, 
-         District %in% unique(R539T_df_pred$District),
-         Locus == "R539T")
-
-## PLOT FOR R539T
-fig6_prev_cutoff_r539t_plot <- 
-  ggplot() +
-  geom_point(data = R539T_ex_pt, aes(x=year, y=prev*100, color = "true")) +
-  scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
-  geom_line(data = R539T_df_true, aes(year, predict_prev, color = "true")) + 
-  geom_line(data = R539T_df_pred, aes(year, predict_prev, color = "forecasting")) +
-  geom_ribbon(data = R539T_df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-  theme_bw() +
-  facet_wrap(~District) +
-  ylab("R539T Prevalence") +
-  xlab("Year") +
-  guides(col = FALSE, fill = FALSE) + 
-  ggpubr::theme_pubclean(base_size = 12) +
-  scale_color_manual(
-    values = c("#0072B2", "grey"),
-    labels = c("Forecasting",  "True"),
-    name = "") +
-  scale_fill_manual(
-    values = c("#0072B2", "grey"),
-    labels = c("Forecasting",  "True"),
-    name = "") + 
-  theme(
-      axis.line = element_line(),
-      axis.text = element_text(size = 6),
-      axis.title = element_text(size = 10),
-      strip.text.x = element_text(size = 10),
-      legend.title = element_text(size = 10),
-      legend.text = element_text(size = 8),
-      legend.position = "none",
-      panel.spacing = unit(0.2, "lines")
-    )
+# ################ PLOT FOR R539T ################
+# R539T_df_pred <- df_predict_cutoff_allyear %>% 
+#   filter(year >= min_year +  pred_y, 
+#          Locus == "R539T",
+#          pred_y == 4)  
+# R539T_df_true <- df_predict_cutoff_allyear %>% 
+#   filter(year <= min_year + pred_y, 
+#          Locus == "R539T",
+#          pred_y == 4) %>%
+#   mutate(label = "true")
+# R539T_ex_pt <- pfk7_data %>% 
+#   filter(nobs > numofobs, 
+#          District %in% unique(R539T_df_pred$District),
+#          Locus == "R539T")
+# 
+# ## PLOT FOR R539T
+# fig6_prev_cutoff_r539t_plot <- 
+#   ggplot() +
+#   geom_point(data = R539T_ex_pt, aes(x=year, y=prev*100, color = "true")) +
+#   scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
+#   geom_line(data = R539T_df_true, aes(year, predict_prev, color = "true")) + 
+#   geom_line(data = R539T_df_pred, aes(year, predict_prev, color = "forecasting")) +
+#   geom_ribbon(data = R539T_df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
+#   theme_bw() +
+#   facet_wrap(~District) +
+#   ylab("R539T Prevalence") +
+#   xlab("Year") +
+#   guides(col = FALSE, fill = FALSE) + 
+#   ggpubr::theme_pubclean(base_size = 12) +
+#   scale_color_manual(
+#     values = c("#0072B2", "grey"),
+#     labels = c("Forecasting",  "True"),
+#     name = "") +
+#   scale_fill_manual(
+#     values = c("#0072B2", "grey"),
+#     labels = c("Forecasting",  "True"),
+#     name = "") + 
+#   theme(
+#       axis.line = element_line(),
+#       axis.text = element_text(size = 6),
+#       axis.title = element_text(size = 10),
+#       strip.text.x = element_text(size = 10),
+#       legend.title = element_text(size = 10),
+#       legend.text = element_text(size = 8),
+#       legend.position = "none",
+#       panel.spacing = unit(0.2, "lines")
+#     )
 
 ################ PLOT FOR ALL KELCH ################
 PfK13_df_pred <- df_predict_cutoff_allyear %>% 
@@ -970,29 +962,29 @@ ggsave(
   dpi = 700
 )
 
-################ PLOT FOR R539T ################
-ggsave(
-  paste0(
-    "figures/Figure6-Forecasting/SE_Asia/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_4year_pred.png"
-  ),
-  fig6_prev_cutoff_r539t_plot,
-  width = fig6_width,
-  height = 2.7,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/Figure6-Forecasting/SE_Asia/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_4year_pred.pdf"
-  ),
-  fig6_prev_cutoff_r539t_plot,
-  width = fig6_width,
-  height = 2.7,
-  dpi = 700
-)
+# ################ PLOT FOR R539T ################
+# ggsave(
+#   paste0(
+#     "figures/Figure6-Forecasting/SE_Asia/SEAsia_cutoff_",
+#     prev_cutoff_perc,
+#     "prev_R539T_4year_pred.png"
+#   ),
+#   fig6_prev_cutoff_r539t_plot,
+#   width = fig6_width,
+#   height = 2.7,
+#   dpi = 700
+# )
+# ggsave(
+#   paste0(
+#     "figures/Figure6-Forecasting/SE_Asia/SEAsia_cutoff_",
+#     prev_cutoff_perc,
+#     "prev_R539T_4year_pred.pdf"
+#   ),
+#   fig6_prev_cutoff_r539t_plot,
+#   width = fig6_width,
+#   height = 2.7,
+#   dpi = 700
+# )
 
 ################ PLOT FOR ALL KELCH ################
 ggsave(
@@ -1021,13 +1013,15 @@ ggsave(
 
 ### Get x% of data points within the 95% CrI
 ```{r}
-df_pred <- rbind(C580Y_df_pred, R539T_df_pred, PfK13_df_pred)
-ex_pt <- rbind(C580Y_ex_pt, R539T_ex_pt, PfK13_ex_pt)
+df_pred <- rbind(C580Y_df_pred, PfK13_df_pred)
+ex_pt <- rbind(C580Y_ex_pt, PfK13_ex_pt)
 
 pred_data <- df_pred %>% filter(pred_y == 4) %>% mutate(label = paste0(country, District, year, Locus))
 true_data <- ex_pt %>% mutate(label = paste0(country, District, year, Locus))
 
-true_prev <- true_data[true_data$label %in% pred_data$label,] %>% mutate(prev = prev*100) %>% select(prev)
+true_prev <- true_data[true_data$label %in% pred_data$label,] %>% 
+  mutate(prev = prev*100) %>% 
+  select(prev)
 pred_data_filter <- pred_data[pred_data$label %in% true_data$label,]
 pred_data_filter <- cbind(pred_data_filter, true_prev)
 colnames(pred_data_filter)[15] <- "prev"
@@ -1036,8 +1030,11 @@ pred_data_filter <- pred_data_filter %>%
   group_by(Locus) %>%
   mutate(val = case_when(prev >= conf.low_prev & prev <= conf.high_prev ~ "yes",
                           prev < conf.low_prev | prev > conf.high_prev ~ "no"),
-         perc = sum(val == "yes")*100/(sum(val == "yes") + sum(val == "no"))) %>%
-  select(adj_year, year, District, country, min_year, Locus, prev, conf.low_prev, predict_prev, conf.high_prev, val, perc) %>%
+         perc = sum(val == "yes")*100/(sum(val == "yes") + sum(val == "no")),
+         num = sum(val == "yes"),
+         den = sum(val == "yes") + sum(val == "no")) %>%
+  distinct(perc, .keep_all = T) %>%
+  select(Locus, perc, num, den) %>%
   ungroup 
   
 write.csv(
@@ -1045,5 +1042,4 @@ write.csv(
   "figures/Figure5-ForecastingCorrelation/correlation/Datapoint%_95Crl.csv"
 )
 ```
-
 

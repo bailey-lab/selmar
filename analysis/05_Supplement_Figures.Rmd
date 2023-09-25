@@ -34,72 +34,20 @@ library(ggbreak)
 ```{r}
 #load data
 df_uganda <- read.table("data/data-derived/Ugandan_data.txt")
+df_comb_uganda <- read.table("data/data-derived/Ugandan_comb_data.txt")
 df_pfk7 <- read.table("data/data-derived/pfk7_data.txt")
-figure5_pfk7_data <- read.table("data/data-derived/supplement-figure5-pfk7_data.txt")
-figure5_forecasting <- read.table("data/data-derived/supplement-figure5-forecasting.txt")
+# figure5_pfk7_data <- read.table("data/data-derived/supplement-figure5-pfk7_data.txt")
+# figure5_forecasting <- read.table("data/data-derived/supplement-figure5-forecasting.txt")
 #set the limit of number of observations
 numofobs <- 2
 
 fileLocManuscript <- "figures"
 ```
 
-# Figure1: Overview of data plot Uganda with more than two observations --> data included in analysis
+# Figure1: Overview of data plot Uganda with less than three observations --> data not included in analysis
 ```{r}
 plot_overview_uganda <- df_uganda %>%
-  filter(nobs > numofobs) %>% 
-  ggplot(aes(year, med * 100, group = Locus, color = Locus)) +
-  geom_point(aes(size = n)) +
-  scale_size_binned(name = "Sample Size",range = c(0.2,2.5)) +
-  labs(shape = "Mutations", 
-       size = "Sample Size") +
-  theme_bw() +
-  facet_wrap( ~ District) +
-  ylab("Prevalence") +
-  xlab("Year") +
-  scale_color_manual("Mutations",
-    values = c("#D55E00", 
-               "#0072B2", 
-               "#009E73", 
-               "#F0E442"),
-    labels = c("675V", 
-               "469F", 
-               "469Y", 
-               "561H")
-  ) +
-  ggpubr::theme_pubclean(base_size = 12) +
-  theme(
-    axis.line = element_line(),
-    legend.title = element_text(size = 12),
-    axis.text = element_text(size = 9),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    strip.text.x = element_text(size = 10),
-    legend.position = c(0.85, 0.1),
-    legend.box = "horizontal"
-  )
-```
-
-### Saving plot
-```{r}
-ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure1-Uganda-DataOverview-Analysis/Uganda_dataoverview.pdf"),
-  plot_overview_uganda,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure1-Uganda-DataOverview-Analysis/Uganda_dataoverview.png"),
-  plot_overview_uganda,
-  width = 8,
-  height = 5,
-  dpi = 700
-)
-```
-
-# Figure2: Overview of data plot Uganda with less than three observations --> data not included in analysis
-```{r}
-plot_overview_uganda <- df_uganda %>%
+  arrange(desc(Locus)) %>%
   filter(nobs <= numofobs) %>% 
   ggplot(aes(year, med * 100, group = Locus, color = Locus)) +
   geom_point(aes(size = n)) +
@@ -111,21 +59,21 @@ plot_overview_uganda <- df_uganda %>%
   facet_wrap( ~ District) +
   ylab("Prevalence") +
   xlab("Year") +
-  scale_color_manual("Mutations",
-    values = c("#D55E00", 
-               "#0072B2", 
-               "#009E73", 
-               "#F0E442"),
-    labels = c("675V", 
-               "469F", 
-               "469Y", 
-               "561H")
-  ) +
+  scale_color_manual(values = c("#D55E00",
+                              "#0072B2",
+                              "#009E73",
+                              "#59386c",
+                              "#F0E442"),
+                   labels = c("675V",
+                              "469F",
+                              "469Y",
+                              "441L",
+                              "561H")) +
   ggpubr::theme_pubclean(base_size = 12) +
   theme(
     axis.line = element_line(),
     legend.title = element_text(size = 12),
-    axis.text = element_text(size = 9),
+    axis.text = element_text(size = 6),
     axis.title = element_text(size = 12),
     legend.text = element_text(size = 10),
     strip.text.x = element_text(size = 10),
@@ -136,14 +84,14 @@ plot_overview_uganda <- df_uganda %>%
 ### Saving plot
 ```{r}
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure2-Uganda-DataOverview-NotAnalysis/Uganda_dataoverview.pdf"),
+  paste0(fileLocManuscript, "/supplement/Figure1-Uganda-DataOverview/Uganda_dataoverview.pdf"),
   plot_overview_uganda,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure2-Uganda-DataOverview-NotAnalysis/Uganda_dataoverview.png"),
+  paste0(fileLocManuscript, "/supplement/Figure1-Uganda-DataOverview/Uganda_dataoverview.png"),
   plot_overview_uganda,
   width = 8,
   height = 5,
@@ -151,7 +99,7 @@ ggsave(
 )
 ```
 
-# Figure 3: Uganda Map for 2016-2020
+# Figure 2: Uganda Map for 2016-2020
 ## Download map components
 ```{r}
 #load base map layers
@@ -213,7 +161,7 @@ pie_data <- pie_data %>%
 #add long and lat to dataframe for plotting
 pie_data$lat <- NA
 pie_data$long <- NA
-for (i in unique(pie_data$District)){
+for (i in unique(uganda$name)){
   pie_data$lat[pie_data$District == i] <- rep(uganda$latitude[uganda$name == i], sum((pie_data$District == i)))
   pie_data$long[pie_data$District == i] <- rep(uganda$longitude[uganda$name == i], sum((pie_data$District == i)))
 }
@@ -224,6 +172,7 @@ pie_data2$A675V <- NA
 pie_data2$C469Y <- NA
 pie_data2$C469F <- NA
 pie_data2$R561H <- NA
+pie_data2$P441L <- NA
 pie_data2$AllGenotyped <- NA
 
 #obtain districts that obtain each mutation
@@ -231,43 +180,47 @@ C469Y_dist <- unique(df_uganda$District[df_uganda$Locus == "C469Y"])
 A675V_dist <- unique(df_uganda$District[df_uganda$Locus == "A675V"])
 C469F_dist <- unique(df_uganda$District[df_uganda$Locus == "C469F"])
 R561H_dist <- unique(df_uganda$District[df_uganda$Locus == "R561H"])
+P441L_dist <- unique(df_uganda$District[df_uganda$Locus == "P441L"])
 
 #add prevalence for each mutation to dataframe
 pie_data2$A675V[pie_data2$District %in% A675V_dist] <- pie_data$sum_district_locus[pie_data$Locus == "A675V"]
 pie_data2$C469Y[pie_data2$District %in% C469Y_dist] <- pie_data$sum_district_locus[pie_data$Locus == "C469Y"]
 pie_data2$C469F[pie_data2$District %in% C469F_dist] <- pie_data$sum_district_locus[pie_data$Locus == "C469F"]
 pie_data2$R561H[pie_data2$District %in% R561H_dist] <- pie_data$sum_district_locus[pie_data$Locus == "R561H"]
+pie_data2$P441L[pie_data2$District %in% P441L_dist] <- pie_data$sum_district_locus[pie_data$Locus == "P441L"]
 pie_data2$AllGenotyped <- pie_data$sum_district_locus[pie_data$Locus == "AllGenotyped"]
 pie_data2[is.na(pie_data2)] <- 0
 
-pie_data2$radius <- (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F + pie_data2$R561H) / pie_data2$AllGenotyped
+pie_data2 <- pie_data2 %>%
+  mutate(radius = (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F + pie_data2$R561H) / pie_data2$AllGenotyped) %>%
+  filter(radius >0)
 
 #rescale radius
 minr<-min(pie_data2$radius)  # min in the data original scale
 maxr<-max(pie_data2$radius)  # max in the data original scale
 min_scale<-0.1  ## min in the new scale
-max_scale<-0.4 ## max in the new scale
-pie_data2$radius_adj <- min_scale+ (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
+max_scale<-0.45 ## max in the new scale
+pie_data2$radius_adj <- min_scale + (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
 ```
 
 ```{r} 
 pie_data <- pie_data2 %>% 
-  select(year, District, A675V,C469Y, C469F, R561H, AllGenotyped) %>%
+  select(year, District, A675V,C469Y, C469F, R561H, P441L, AllGenotyped) %>%
   group_by(year) %>%
   mutate(mutations = round(((rowSums(across(where(is.numeric))) - AllGenotyped)*100/AllGenotyped), 2),
          max_mutations = max(mutations),
          max_district = District[which(max_mutations == mutations)]) %>%
   distinct(year, max_mutations, max_district)
 
-write.csv(pie_data, file = paste0(fileLocManuscript,"/supplement/Figure3-UgandaMap/Figure3_stas.csv"))
+write.csv(pie_data, file = paste0(fileLocManuscript,"/supplement/Figure2-UgandaMap/Figure2_stas.csv"))
 ```
 
 ## Plotting
 ```{r}
 # make plot with wild_type
-pie_chart_size <- c(6, 5, 4, 2.5, 2,2)
+pie_chart_size <- c(8, 8, 6.5, 4.5, 3, 4, 3)
 count <- 0
-for (y in 2016:2021){
+for (y in 2016:2022){
   count <- count + 1
   pie_chart_df <- pie_data2 %>% filter(year == y)
   val <- pie_chart_size[count]
@@ -300,27 +253,29 @@ for (y in 2016:2021){
   ylab("") +
   geom_scatterpie(data = pie_chart_df, 
                   aes(x=long, y=lat, group=District, r = radius_adj), 
-                  cols=c("A675V", "C469F", "C469Y", "R561H")) +
+                  cols=c("A675V", "C469F", "C469Y", "R561H", "P441L")) +
   geom_scatterpie_legend(pie_chart_df$radius*val, 
-                         x=28.7, y=2.3, 
+                         x=28.7, y=2.0, 
                          labeller = function(x) round(x * 100/val)) +
-    scale_fill_manual(values = c("#D55E00", 
-                                 "#0072B2", 
-                                 "#009E73", 
-                                 "#F0E442"), 
-                      labels = c("675V", 
-                                 "469F", 
-                                 "469Y", 
-                                 "561H"), 
-                      name = "")  +
+    scale_fill_manual(values = c("#D55E00",
+                               "#0072B2",
+                               "#009E73",
+                               "#F0E442",
+                               "#59386c"),
+                      labels = c("675V",
+                                "469F",
+                                "469Y",
+                                "561H",
+                                "441L"),
+                      name = "") +
   theme(legend.text=element_text(size=10), 
         axis.text = element_text(size = 10), 
-        legend.position = c(0.085,0.91))
+        legend.position = c(0.085,0.89))
   
     ggsave(
   paste0(
     fileLocManuscript,
-    paste0("/supplement/Figure3-UgandaMap/Figure3_MapUganda", y,".pdf")
+    paste0("/supplement/Figure2-UgandaMap/Figure2_MapUganda", y,".pdf")
   ),
   map,
   width = 6,
@@ -330,7 +285,7 @@ for (y in 2016:2021){
   ggsave(
     paste0(
       fileLocManuscript,
-      paste0("/supplement/Figure3-UgandaMap/Figure3_MapUganda", y,".png")
+      paste0("/supplement/Figure2-UgandaMap/Figure2_MapUganda", y,".png")
     ),
     map,
     width = 6,
@@ -342,62 +297,82 @@ for (y in 2016:2021){
 ```
 
 
-# Figure 4
-## Figure 4A: SE Asia Prevalence
+# Figure 3
+## Figure 3A: SE Asia Prevalence
 ### Prevalence plot overview
 ```{r}
-prev_df <- df_pfk7 %>% 
-  group_by(year, Locus) %>% 
-  filter(Locus != "PfK13") %>%
-  mutate(all_genotyped = sum(n), mut_sample = sum(x)) %>%
-  distinct(all_genotyped, mut_sample) %>%
-  mutate(prop_sample = mut_sample / all_genotyped) %>%
-  ungroup
-
-prev <- prev_df %>%
-  ggplot(aes(x = year, y = prop_sample, fill = Locus)) +
-  geom_col() +
+prev <- df_pfk7 %>%
+  group_by(year, Locus) %>%
+  mutate(all_genotyped = sum(n),
+         mut_sample = sum(x),
+         prev_sum = sum(prev)) %>%
+  ungroup %>%
+  group_by(year) %>%
+  mutate(all_genotyped = max(all_genotyped)) %>%
+  group_by(year) %>%
+  mutate(n = length(unique(District))) %>%
+  select(Locus, year, adj_year, n, all_genotyped, mut_sample, prev_sum) %>%
+  distinct(Locus, all_genotyped, mut_sample, prev_sum, .keep_all = TRUE) %>%
+  mutate(prev_all = mut_sample/all_genotyped,
+         prev_sum = prev_sum/n) %>%
+  ungroup() %>%
+  complete(year, Locus, fill = list(prev_all = 0)) %>%
+  ggplot(aes(x = year, y = prev_all, fill=Locus, color = Locus)) +
+  geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
   theme_bw() +
+  scale_color_manual("Mutations",
+    values = c("#56B4E9",
+               "#009E73",
+               "#BBBBBB",
+               "#E69F00"),
+    labels = c("580Y",
+               "other PfK13",
+               "PfK13",
+               "539T")) +
   scale_fill_manual("Mutations",
-    values = c("#56B4E9", 
-               "#E69F00", 
-               "#009E73"),
-    labels = c("580Y", 
-               "other PfK13", 
+    values = c("#56B4E9",
+               "#009E73",
+               "#BBBBBB",
+               "#E69F00"),
+    labels = c("580Y",
+               "other PfK13",
+               "PfK13",
                "539T")) +
   xlab("Year") +
-  ylab("Allele frequency") +
-  ylim(0,1) +
-  scale_x_continuous(breaks = seq(1993, 2018, 3)) +
-  theme(
-    legend.title = element_blank(),
-    axis.text = element_text(size = 10),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    strip.text.x = element_text(size = 10),
-    legend.position = c(0.18, 0.9)
-  )
+  ylab("Prevalence") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous("Year",  
+                     breaks = seq(2001, 2018, 2)) +
+  theme(legend.title=element_blank(), 
+        axis.text = element_text(size = 10), 
+        axis.title=element_text(size=12), 
+        legend.text=element_text(size=10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = c(.25 , .99), 
+        legend.justification = c("right", "top"), 
+        legend.box.just = "right", 
+        legend.margin = margin(1, 1, 1, 1))
 ```
 
 ### Saving plot
 ```{r}
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure4-SEAsia-PrevMap/SEAsia_prevalence.pdf"),
+  paste0(fileLocManuscript, "/supplement/Figure3-SEAsia-PrevMap/SEAsia_prevalence.pdf"),
   prev,
-  width = 4.5,
+  width = 6,
   height = 6.25,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure4-SEAsia-PrevMap/SEAsia_prevalence.png"),
+  paste0(fileLocManuscript, "/supplement/Figure3-SEAsia-PrevMap/SEAsia_prevalence.png"),
   prev,
-  width = 4.5,
+  width = 6,
   height = 6.25,
   dpi = 700
 )
 ```
 
-## Figure 4B: SE Asia Map
+## Figure 3B: SE Asia Map
 ### Download maps
 ```{r}
 #load base map layers
@@ -515,8 +490,10 @@ pie_data <- df_pfk7 %>%
   ungroup() 
 #sum sample size for each District
 all_genotyped <- df_pfk7 %>% 
-  group_by(District) %>% 
+  group_by(Locus, District) %>% 
   mutate(sum_district_locus = sum(n)) %>% 
+  group_by(District) %>% 
+  mutate(sum_district_locus = max(sum_district_locus)) %>% 
   select(District, sum_district_locus) %>% 
   distinct(District, .keep_all = TRUE) %>% 
   ungroup() 
@@ -603,7 +580,7 @@ map_SEAsia <- ggplot() +
                          style = north_arrow_fancy_orienteering,
                          height = unit(1, "cm"),
                          width = unit(1, "cm")) +
-  coord_sf(xlim = c(109, 92.5),
+  coord_sf(xlim = c(111, 92.5),
            ylim = c(6.5, 28),
            expand = TRUE) +
   annotate("text", 
@@ -655,8 +632,8 @@ map_SEAsia <- ggplot() +
     aes(x = long, y = lat, group = District, r = radius_adj),
     cols = c("c580y", "r539t", "other_PfK13")) +
   geom_scatterpie_legend(pie_data$radius_adj*2,
-                         x = 106,
-                         y = 24, labeller = function(x) round(100*(34*x/2 - 10.2))) +
+                         x = 108,
+                         y = 24, labeller = function(x) round(100*x/2)) +
   scale_fill_manual(values = c("#56B4E9", 
                                "#009E73", 
                                "#E69F00"), 
@@ -675,7 +652,7 @@ map_SEAsia <- ggplot() +
 ggsave(
   paste0(
     fileLocManuscript,
-    "/supplement/Figure4-SEAsia-PrevMap/SEAsia_map.pdf"
+    "/supplement/Figure3-SEAsia-PrevMap/SEAsia_map.pdf"
   ),
   map_SEAsia,
   width = 5.625,
@@ -685,7 +662,7 @@ ggsave(
 ggsave(
   paste0(
     fileLocManuscript,
-    "/supplement/Figure4-SEAsia-PrevMap/SEAsia_map.png"
+    "/supplement/Figure3-SEAsia-PrevMap/SEAsia_map.png"
   ),
   map_SEAsia,
   width = 5.625,
@@ -694,7 +671,7 @@ ggsave(
 )
 ```
 
-# Figure 5: Overview of data plot SE Asia (PfK7 data) - included in analysis
+# Figure 4: Overview of data plot SE Asia (PfK7 data) - included in analysis
 ```{r}
 plot_overview_seAsia_included <- df_pfk7 %>% 
   filter(Locus != "other_PfK13", is.finite(lrsmed), nobs > numofobs) %>% 
@@ -725,14 +702,14 @@ plot_overview_seAsia_included <- df_pfk7 %>%
 ### Saving plot
 ```{r}
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure5-SEAsia-DataOverview-Ananlysis/SEAsia_dataoverview.pdf"),
+  paste0(fileLocManuscript, "/supplement/Figure4-SEAsia-DataOverview-Ananlysis/SEAsia_dataoverview.pdf"),
   plot_overview_seAsia_included,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure5-SEAsia-DataOverview-Ananlysis/SEAsia_dataoverview.png"),
+  paste0(fileLocManuscript, "/supplement/Figure4-SEAsia-DataOverview-Ananlysis/SEAsia_dataoverview.png"),
   plot_overview_seAsia_included,
   width = 8,
   height = 5,
@@ -740,7 +717,7 @@ ggsave(
 )
 ```
 
-# Figure 6: Overview of data plot SE Asia (PfK7 data)
+# Figure 5: Overview of data plot SE Asia (PfK7 data)
 ```{r}
 plot_overview_seAsia_notincluded <- df_pfk7 %>% 
   filter(Locus != "other_PfK13", nobs <= numofobs) %>% 
@@ -772,386 +749,17 @@ plot_overview_seAsia_notincluded <- df_pfk7 %>%
 ### Saving plot
 ```{r}
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure6-SEAsia-DataOverview-NotAnanlysis/SEAsia_dataoverview.pdf"),
+  paste0(fileLocManuscript, "/supplement/Figure5-SEAsia-DataOverview-NotAnanlysis/SEAsia_dataoverview.pdf"),
   plot_overview_seAsia_notincluded,
   width = 8,
   height = 8.5,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure6-SEAsia-DataOverview-NotAnanlysis/SEAsia_dataoverview.png"),
+  paste0(fileLocManuscript, "/supplement/Figure5-SEAsia-DataOverview-NotAnanlysis/SEAsia_dataoverview.png"),
   plot_overview_seAsia_notincluded,
   width = 8,
   height = 8.5,
-  dpi = 700
-)
-```
-
-# Figure 8: Plotting forecasting of predictions for the first 2, 3, and 4 years with confidence values
-```{r}
-prev_cutoff_perc <- 50
-plot_colors <- c("#E69F00", "#56B4E9", "#0072B2")
-count <- 0
-for(y in c(2, 3, 4)){
-  count <- count + 1
-  col <- plot_colors[count]
-  ################ PLOT FOR C580Y ################
-  df_pred <- figure5_forecasting %>% 
-    filter(year >= min_year + y, 
-           Locus == "C580Y",
-           pred_y == y) 
-  df_true <- figure5_forecasting %>% 
-    filter(year <= min_year + y, 
-           Locus == "C580Y",
-           pred_y == y) %>%
-    mutate(label = "true")
-  ex_pt <- figure5_pfk7_data %>% 
-    filter(nobs > numofobs, 
-           District %in% unique(df_pred$District), 
-           Locus == "C580Y")
-  
-  ## PLOT FOR C580Y
-  prev_cutoff_c580y_plot <- 
-    ggplot() +
-    geom_point(data = ex_pt, aes(x=year, y=prev*100, color = "true")) +
-    geom_line(data = df_true, aes(year, predict_prev, color = "true")) + 
-    geom_line(data = df_pred, aes(year, predict_prev, color = "forecasting")) +
-    geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-    theme_bw() +
-    facet_wrap(~District) +
-    ylab("C580Y Prevalence") +
-    xlab("Year") +
-    scale_color_manual(
-      values = c(col, "grey"),
-      labels = c("Forecasting",  "True"),
-      name = "") +
-    scale_fill_manual(
-      values = c(col, "grey"),
-      labels = c("Forecasting",  "True"),
-      name = "") +
-    guides(col = FALSE, fill = FALSE) +  
-    ggpubr::theme_pubclean(base_size = 8) +
-    theme(
-        axis.line = element_line(),
-        axis.text = element_text(size = 6),
-        axis.title = element_text(size = 8),
-        strip.text.x = element_text(size = 8),
-        legend.title = element_text(size = 8),
-        legend.text = element_text(size = 6),
-        legend.position = "right",
-        panel.spacing = unit(0.45, "lines")
-      )
-  
-  var_name <- paste0("prev_cutoff_c580y_plot_", y, "year")
-  assign(var_name, prev_cutoff_c580y_plot)
-  
-  ################ PLOT FOR R539T ################
-  df_pred <- figure5_forecasting %>% 
-    filter(year >= min_year +  pred_y, 
-           Locus == "R539T",
-           pred_y == y)  
-  df_true <- figure5_forecasting %>% 
-    filter(year <= min_year + y, 
-           Locus == "R539T",
-           pred_y == y) %>%
-    mutate(label = "true")
-  ex_pt <- figure5_pfk7_data %>% 
-    filter(nobs > numofobs, 
-           District %in% unique(df_pred$District),
-           Locus == "R539T")
-  
-  ## PLOT FOR R539T
-  prev_cutoff_r539t_plot <- 
-    ggplot() +
-    geom_point(data = ex_pt, aes(x=year, y=prev*100, color = "true")) +
-    geom_line(data = df_true, aes(year, predict_prev, color = "true")) + 
-    geom_line(data = df_pred, aes(year, predict_prev, color = "forecasting")) +
-    geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-    theme_bw() +
-    facet_wrap(~District) +
-    ylab("R539T Prevalence") +
-    xlab("Year") +
-    guides(col = FALSE, fill = FALSE) + 
-    ggpubr::theme_pubclean(base_size = 8) +
-    scale_color_manual(
-      values = c(col, "grey"),
-      labels = c("Forecasting",  "True"),
-      name = "") +
-    scale_fill_manual(
-      values = c(col, "grey"),
-      labels = c("Forecasting",  "True"),
-      name = "") + 
-    theme(
-        axis.line = element_line(),
-        axis.text = element_text(size = 6),
-        axis.title = element_text(size = 8),
-        strip.text.x = element_text(size = 8),
-        legend.title = element_text(size = 8),
-        legend.text = element_text(size = 6),
-        legend.position = "right",
-        panel.spacing = unit(0.45, "lines")
-      )
-  var_name <- paste0("prev_cutoff_r539t_plot_", y, "year")
-  assign(var_name, prev_cutoff_r539t_plot)
-  
-  ################ PLOT FOR ALL KELCH ################
-  df_pred <- figure5_forecasting %>% 
-    filter(year >= min_year +  y, 
-           Locus == "PfK13",
-           pred_y == y)  
-  df_true <- figure5_forecasting %>% 
-    filter(year <= min_year + y, 
-           Locus == "PfK13",
-           pred_y == y) %>%
-    mutate(label = "true")
-  ex_pt <- figure5_pfk7_data %>% 
-    filter(nobs > numofobs, 
-           District %in% unique(df_pred$District), 
-           Locus == "PfK13") 
-  
-  ## PLOT FOR PfK13
-   prev_cutoff_all_kelch_plot <- ggplot() +
-    geom_point(data = ex_pt, aes(x=year, y=prev*100, color = "true")) +
-    geom_line(data = df_true, aes(year, predict_prev,  color = "true")) + 
-    geom_line(data = df_pred, aes(year, predict_prev, color = "forecasting")) +
-     geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "forecasting", fill = "forecasting"), linetype = "dashed", alpha = 0.2,  show.legend = FALSE) +
-    theme_bw() +
-    facet_wrap(~District) +
-    ylab("Pfk13 Prevalence") +
-    xlab("Year") +
-    guides(col = FALSE, fill = FALSE) + 
-    ggpubr::theme_pubclean(base_size = 8) +
-    scale_color_manual(
-      values = c(col, "grey"),
-      labels = c("Forecasting",  "True"),
-      name = "") +
-    scale_fill_manual(
-      values = c(col, "grey"),
-      labels = c("Forecasting",  "True"),
-      name = "") +
-    theme(
-        axis.line = element_line(),
-        axis.text = element_text(size = 6),
-        axis.title = element_text(size = 8),
-        strip.text.x = element_text(size = 8),
-        legend.title = element_text(size = 8),
-        legend.text = element_text(size = 6),
-        legend.position = "right",
-        panel.spacing = unit(0.45, "lines")
-    )
-    var_name <- paste0("prev_cutoff_all_kelch_plot_", y, "year")
-    assign(var_name, prev_cutoff_all_kelch_plot)
- }
-```
-
-##### Saving plots
-```{r}
-################ PLOT FOR C580Y ################
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/C580Y/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_C580Y_2year_pred.png"
-  ),
-  prev_cutoff_c580y_plot_2year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/C580Y/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_C580Y_2year_pred.pdf"
-  ),
-  prev_cutoff_c580y_plot_2year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/C580Y/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_C580Y_3year_pred.png"
-  ),
-  prev_cutoff_c580y_plot_3year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/C580Y/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_C580Y_3year_pred.pdf"
-  ),
-  prev_cutoff_c580y_plot_3year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/C580Y/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_C580Y_4year_pred.png"
-  ),
-  prev_cutoff_c580y_plot_4year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/C580Y/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_C580Y_4year_pred.pdf"
-  ),
-  prev_cutoff_c580y_plot_4year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-################ PLOT FOR R539T ################
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/R539T/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_2year_pred.png"
-  ),
-  prev_cutoff_r539t_plot_2year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/R539T/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_2year_pred.pdf"
-  ),
-  prev_cutoff_r539t_plot_2year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/R539T/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_3year_pred.png"
-  ),
-  prev_cutoff_r539t_plot_3year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/R539T/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_3year_pred.pdf"
-  ),
-  prev_cutoff_r539t_plot_3year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/R539T/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_4year_pred.png"
-  ),
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/R539T/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_R539T_4year_pred.pdf"
-  ),
-  prev_cutoff_r539t_plot_4year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-################ PLOT FOR ALL KELCH ################
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/PfK13/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_PfK13_2year_pred.png"
-  ),
-  prev_cutoff_all_kelch_plot_2year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/PfK13/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_PfK13_2year_pred.pdf"
-  ),
-  prev_cutoff_all_kelch_plot_2year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/PfK13/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_PfK13_3year_pred.png"
-  ),
-  prev_cutoff_all_kelch_plot_3year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/PfK13/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_PfK13_3year_pred.pdf"
-  ),
-  prev_cutoff_all_kelch_plot_3year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/PfK13/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_PfK13_4year_pred.png"
-  ),
-  prev_cutoff_all_kelch_plot_4year,
-  width = 4.25,
-  height = 3,
-  dpi = 700
-)
-ggsave(
-  paste0(
-    "figures/supplement/Figure8-Forecasting/PfK13/SEAsia_cutoff_",
-    prev_cutoff_perc,
-    "prev_PfK13_4year_pred.pdf"
-  ),
-  prev_cutoff_all_kelch_plot_4year,
-  width = 4.25,
-  height = 3,
   dpi = 700
 )
 ```

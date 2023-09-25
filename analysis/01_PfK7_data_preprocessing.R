@@ -22,7 +22,7 @@ cam <- cam %>%
   group_by(country, site, year) %>%
   summarise(C580Y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
          R539T = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
-         PfK13 = sum(grepl("580Y|580y|446|458|476|493|539|543|553|561", kelch13_349.726_ns_changes)),
+         PfK13 = sum(grepl("446|458|469|476|493|539t|539T|543|553|561|574|580Y|580y|622|675", kelch13_349.726_ns_changes)),
          other_PfK13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
          n = n()) %>%
   ungroup %>%
@@ -40,6 +40,18 @@ pfk7_data <- cam %>%
          prev = x / n) %>%
   filter(is.finite(min_year)) %>%
   arrange(Locus, country, site, year)
+
+pfk7_data$x[pfk7_data$prev == 1] <- pfk7_data$x[pfk7_data$prev == 1] - 0.5
+pfk7_data$x[pfk7_data$prev == 0 & pfk7_data$adj_year == -1] <- pfk7_data$x[pfk7_data$prev == 0 & pfk7_data$adj_year == -1] + 0.5
+
+pfk7_data <- pfk7_data %>%
+  group_by(country, site, Locus) %>%
+  mutate(min_year = min(year[x>0])) %>%
+  mutate(nobs= sum(x > 0)) %>%
+  ungroup %>%
+  mutate(adj_year = year - min_year,
+         prev = x / n) %>%
+  filter(is.finite(min_year))
 
 # log ratio function
 se_ln_ratio_noZeros <- function(x, N) {
