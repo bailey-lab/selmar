@@ -144,7 +144,7 @@ pie_data <- df_uganda %>%
 #sum sample size for each District
 all_genotyped <- df_uganda %>% 
   group_by(District, year) %>% 
-  mutate(sum_district_locus = sum(n)) %>% 
+  mutate(sum_district_locus = max(n)) %>% 
   select(year, District, sum_district_locus) %>% 
   distinct(District, year, .keep_all = TRUE) %>% 
   ungroup() 

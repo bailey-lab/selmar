@@ -172,6 +172,7 @@ prev <- df %>%
   theme_bw() +
   geom_line(aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) + 
   geom_ribbon(aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,3)) +
   facet_wrap(~District) +
   #scale_y_log10() +
   ylab("Prevalence") +
@@ -200,6 +201,7 @@ prev_PfK13 <- df %>%
   theme_bw() +
   geom_line(aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) + 
   geom_ribbon(aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,3)) +
   facet_wrap(~District) +
   #scale_y_log10() +
   ylab("Prevalence") +
@@ -440,14 +442,14 @@ ggsave(
   paste0(fileLocManuscript, "/Figure3-SelectionCeof/Figure3_Uganda_Effectsize.png"),
   selection_coef_bay,
   width = 8,
-  height = 6,
+  height = 8,
   dpi = 700
 )
 ggsave(
   paste0(fileLocManuscript, "/Figure3-SelectionCeof/Figure3_Uganda_Effectsize.pdf"),
   selection_coef_bay,
   width = 8,
-  height = 6,
+  height = 8,
   dpi = 700
 )
 write.csv(

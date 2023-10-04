@@ -33,22 +33,59 @@ library(gt)
 # Load data
 ```{r}
 #load data
-df <- read.table("data/data-derived/Ugandan_data.txt")
+df_raw <- read.table("data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+df <-  df_raw %>% select(-x_org, -value) %>%
+  rbind(df_comb %>% mutate(Locus = "PfK13") %>% rename(x = comb))
 
 #set the limit of number of observations
 numofobs <- 2
-
-fileLocManuscript <- "figures/"
 
 df <- df %>%
   group_by(District, Locus) %>%
   mutate(min_year = min(year[x > 0]),
          max_year = max(year[x > 0])) %>%
   ungroup 
+
+fileLocManuscript <- "figures/"
 ```
 
 # Forecasting selection up until 2023
 ```{r}
+#------ Model prediction for PfK13 ------
+PfK13_pred <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% 
+    filter(Locus == "PfK13" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+
+new_data <- df %>%
+  filter(nobs > numofobs, 
+         is.finite(df$lrsmed), 
+         Locus == "PfK13") %>% # this is for c469Y model
+  group_by(District, Locus) %>% # we group by the District and Locus
+  complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
+  select(adj_year, year, District, Locus, min_year, max_year) %>%
+  mutate(min_year = replace(min_year, is.na(min_year), 0),
+         max_year = replace(max_year, is.na(max_year), 0)) 
+
+new_data <- new_data %>%
+    group_by(District, Locus) %>%
+    mutate(min_year = max(min_year),
+      adj_year = year - min_year) %>%
+    arrange(Locus, District, year) %>%
+    ungroup
+
+new_data$predict <- rstanarm::posterior_predict(PfK13_pred, type = "response", newdata = new_data) %>% colMeans
+conf_val <- rstanarm::posterior_predict(PfK13_pred, type = "response", newdata = new_data) %>% 
+  apply(2, quantile, prob = (c(0.025, 0.975)))
+new_data$conf.low <- conf_val[1,]
+new_data$conf.high <- conf_val[2,] 
+
+df_predict <- new_data
+
+
 #------ Model prediction for C469Y ------
 c469y_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
@@ -82,7 +119,7 @@ conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata =
 new_data$conf.low <- conf_val[1,]
 new_data$conf.high <- conf_val[2,] 
 
-df_predict <- new_data
+df_predict <- rbind(df_predict, new_data)
 
 #------ Model prediction for A675V ------
 a675v_pred <- rstanarm::stan_glmer(
@@ -198,6 +235,48 @@ df_predict_allyear <- df_predict %>%
          min_year = max(min_year),
          max_year = replace_na(max_year, 0),
          max_year = max(max_year))
+
+#------ Model prediction for PfK13 ------
+PfK13_pred <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% 
+    filter(Locus == "PfK13" & nobs > numofobs),
+  weights = wt_med,
+  adapt_delta = 0.9975
+)
+
+# forecasting for PfK13
+new_data <- df %>%
+  filter(nobs > numofobs, 
+         is.finite(df$lrsmed), 
+         Locus == "PfK13") %>% # this is for PfK13 model
+  group_by(District, Locus) %>% # we group by the District and Locus
+  complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
+  select(adj_year, year, District, Locus, min_year, max_year) %>%
+  mutate(min_year = replace(min_year, is.na(min_year), 0),
+         max_year = replace(max_year, is.na(max_year), 0)) 
+
+new_data <- new_data %>%
+    group_by(District, Locus) %>%
+    mutate(min_year = max(min_year),
+      adj_year = year - min_year) %>%
+    arrange(Locus, District, year) %>%
+    ungroup
+
+new_data$predict <- rstanarm::posterior_predict(PfK13_pred, type = "response", newdata = new_data) %>% colMeans
+conf_val <- rstanarm::posterior_predict(PfK13_pred, type = "response", newdata = new_data) %>% 
+  apply(2, quantile, prob = (c(0.025, 0.975)))
+new_data$conf.low <- conf_val[1,]
+new_data$conf.high <- conf_val[2,] 
+
+df_predict <- rbind(df_predict, new_data)
+
+df_predict_allyear <- df_predict %>% 
+  group_by(District, Locus) %>% 
+  mutate(min_year = replace_na(min_year, 0),
+         min_year = max(min_year),
+         max_year = replace_na(max_year, 0),
+         max_year = max(max_year))
 ```
 
 ## Convert to prevalence
@@ -209,6 +288,55 @@ df_predict_allyear <- df_predict_allyear %>% mutate(predict_prev = exp(predict)*
 
 ## Figure 6: Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
+################ PLOT FOR PfK13 ################
+df_true <- df_predict_allyear %>% 
+  filter(Locus == "PfK13", 
+         year <= max_year) %>%
+  mutate(label = "true")
+df_pred <- df_predict_allyear %>% 
+  filter(Locus == "PfK13",
+         year >= max_year) %>%
+  mutate(label = "predicted")
+ex_pt <- df_comb %>% 
+  mutate(Locus = "PfK13") %>%
+  filter(nobs > numofobs, 
+         District %in% unique(df_pred$District))
+  
+pred_PfK13 <- ggplot() +
+  geom_line(data = df_true, 
+            aes(year, predict_prev, color = label)) +
+  geom_line(data = df_pred, 
+            aes(year, predict_prev, color = label)) +
+  geom_ribbon(data = df_pred, 
+              aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = label, fill = label), 
+              linetype = "dashed", 
+              alpha = 0.2,  
+              show.legend = FALSE) +
+  geom_point(data = ex_pt, 
+             aes(x = year, y = med * 100, color = "true")) +
+  theme_bw() +
+  facet_wrap(~District) +
+  ylab("PfK13 Prevalence") +
+  xlab("Year") +
+  scale_color_manual(
+    values = c("#CC79A7", "grey"),
+    labels = c("Forecasting",  "True")
+  ) +
+  scale_fill_manual(
+    values = c("#CC79A7", "grey"),
+    labels = c("Forecasting",  "True")
+  ) +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "none",
+    panel.spacing = unit(0.2, "lines")) 
+
 ################ PLOT FOR A675V ################
 df_true <- df_predict_allyear %>% 
   filter(Locus == "A675V", 
@@ -219,7 +347,8 @@ df_pred <- df_predict_allyear %>%
          year >= max_year) %>%
   mutate(label = "predicted")
 ex_pt <- df %>% 
-  filter(nobs > numofobs, Locus == "A675V", District %in% unique(df_pred$District))
+  filter(nobs > numofobs, Locus == "A675V", 
+         District %in% unique(df_pred$District))
   
 pred_a675v <- ggplot() +
   geom_line(data = df_true, 
@@ -396,7 +525,7 @@ pred_p441l <- ggplot() +
     panel.spacing = unit(0.2, "lines")) 
 ```
 
-## Saving plots
+### Saving plots
 ```{r}
 fig6_width = 6
 fig6_height = 4
@@ -408,21 +537,6 @@ ggsave(
   dpi = 700
 )
 ggsave(
-  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469Y.png",
-  pred_c469y,
-  width = fig6_width,
-  height = fig6_height,
-  dpi = 700
-)
-ggsave(
-  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469F.png",
-  pred_c469f,
-  width = fig6_width,
-  height = 2.7,
-  dpi = 700
-)
-
-ggsave(
   "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_A675V.pdf",
   pred_a675v,
   width = fig6_width,
@@ -430,31 +544,149 @@ ggsave(
   dpi = 700
 )
 ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469Y.png",
+  pred_c469y,
+  width = fig6_width,
+  height = 2.9,
+  dpi = 700
+)
+ggsave(
   "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469Y.pdf",
   pred_c469y,
   width = fig6_width,
-  height = fig6_height,
+  height = 2.9,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469F.png",
+  pred_c469f,
+  width = fig6_width,
+  height = 2.3,
   dpi = 700
 )
 ggsave(
   "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_C469F.pdf",
   pred_c469f,
   width = fig6_width,
-  height = 2.7,
+  height = 2.3,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_P441L.png",
+  pred_p441l,
+  width = fig6_width,
+  height = 2.3,
   dpi = 700
 )
 ggsave(
   "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_P441L.pdf",
   pred_p441l,
+  width = fig6_width,
+  height = 2.3,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_PfK13.png",
+  pred_PfK13,
   width = fig6_width,
   height = fig6_height,
   dpi = 700
 )
 ggsave(
-  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_P441L.pdf",
-  pred_p441l,
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting_PfK13.pdf",
+  pred_PfK13,
   width = fig6_width,
-  height = 2.7,
+  height = fig6_height,
   dpi = 700
 )
 ```
+
+## Figure 6: Uganda combined Ploting forecasting of predictions for the first 2, 3, and 4 years
+```{r}
+################ PLOT Combined ################
+df_true <- df_predict_allyear %>% 
+  filter(year <= max_year) %>%
+  group_by(adj_year, Locus) %>%
+  mutate(label = "true",
+         avg_predict_prev = mean(predict_prev),
+         avg_conf.low = mean(conf.low),
+         avg_conf.high = mean(conf.high)) %>%
+  ungroup
+
+df_pred <- df_predict_allyear %>% 
+  filter(year >= max_year) %>%
+  group_by(adj_year, Locus) %>%
+  mutate(label = "predicted",
+         avg_predict_prev = mean(predict_prev),
+         avg_conf.low = mean(conf.low_prev),
+         avg_conf.high = mean(conf.high_prev)) %>%
+  ungroup
+
+ex_pt <- df %>% 
+  filter(nobs > numofobs, 
+         District %in% unique(df_pred$District)) %>%
+  group_by(adj_year, Locus) %>%
+  mutate(avg_prev = mean(med*100))
+  
+pred_uganda <- ggplot() +
+  geom_line(data = df_true, 
+            aes(adj_year, avg_predict_prev, group = Locus, color = Locus)) +
+  geom_line(data = df_pred, 
+            aes(adj_year, avg_predict_prev, group = Locus, color = Locus)) +
+  geom_ribbon(data = df_pred, 
+              aes(ymin = avg_conf.low, ymax = avg_conf.high, x = adj_year, group = Locus, color = Locus, fill = Locus), 
+              linetype = "dashed", 
+              alpha = 0.2,  
+              show.legend = FALSE) +
+  geom_point(data = ex_pt, 
+             aes(x = adj_year, y = avg_prev, group = Locus, color = Locus)) +
+  theme_bw() +
+  facet_wrap(~District) +
+  ylab("Prevalence") +
+  xlab("Year") +
+  scale_color_manual(
+    values = c("#D55E00", "#0072B2", "#009E73", "#59386c", "grey40"),
+    name = "Mutations",
+    labels = c("675V", "469F", "469Y", "441L", "PfK13")
+  ) +
+  scale_fill_manual(
+    values = c("#D55E00", "#0072B2", "#009E73", "#59386c", "grey40"),
+    name = "Mutations",
+    labels = c("675V", "469F", "469Y", "441L", "PfK13")
+  ) +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.position = "right",
+    panel.spacing = unit(0.2, "lines")) 
+
+
+```
+
+### Saving plots
+```{r}
+fig6_width = 6
+fig6_height = 6
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting.png",
+  pred_uganda,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+
+ggsave(
+  "figures/Figure6-Forecasting/Uganda/Uganda_forecasting.pdf",
+  pred_uganda,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+
+```
+
