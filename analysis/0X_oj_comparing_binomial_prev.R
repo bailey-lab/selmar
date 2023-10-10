@@ -73,7 +73,8 @@ new_data <- new_data %>%
          conf.high = conf_val[2,]/n)
 
 df_predictbin <- new_data
-ggplot(df_predictbin,aes(year, predict)) + geom_point() + facet_wrap(~District)
+ggplot(df_predictbin, aes(year, predict, ymin = conf.low, ymax = conf.high)) +
+  geom_point() + geom_ribbon(alpha = 0.2) + facet_wrap(~District)
 
 
 # and compare against other approach
@@ -118,6 +119,13 @@ new_data <- new_data %>%
          conf.high = conf_val[2,])
 
 df_predict <- new_data
+
+df_predict %>% mutate(predict = exp(predict) / (1 + exp(predict))) %>%
+mutate(conf.low = exp(conf.low) / (1 + exp(conf.low))) %>%
+         mutate(conf.high = exp(conf.high) / (1 + exp(conf.high))) %>%
+
+ggplot(aes(year, predict, ymin = conf.low, ymax = conf.high)) +
+  geom_point() + geom_ribbon(alpha = 0.2) + facet_wrap(~District)
 
 ## compare fully
 
