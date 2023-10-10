@@ -3,7 +3,7 @@ numofobs <- 2
 #load data
 pfk7_data <- read.table("analysis/data/data-derived/pfk7_data.txt") %>% filter(Locus != "other_PfK13")
 
-pred_year <- 4
+pred_year <- i <-  4
 
 #------ Model prediction for C580Y ------
 data_c580y <- pfk7_data %>%
