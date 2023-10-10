@@ -126,7 +126,8 @@ for (i in pred_year) {
     filter(
       Locus == "C580Y",
       nobs > numofobs,
-      District == c("Pailin", "Preah Vihear", "Ratanakiri", "Tak")) 
+      # This was not filtering to all occurrences  as you were doing == 
+      District %in% c("Pailin", "Preah Vihear", "Ratanakiri", "Tak")) 
   
   selected_district <- data_c580y %>% 
     group_by(Locus, country, District) %>%
@@ -250,7 +251,7 @@ for (i in pred_year) {
     filter(
       Locus == "PfK13",
       nobs > numofobs,
-      District == c("Mandalay", "Preah Vihear", "Ratanakiri", "Tak")) 
+      District %in% c("Mandalay", "Preah Vihear", "Ratanakiri", "Tak")) 
 
   selected_district <- data_all_kelch %>% 
     group_by(Locus, country, District) %>%
