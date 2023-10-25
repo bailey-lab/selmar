@@ -1,0 +1,210 @@
+---
+title: "06_SelectionCoefficientPlot"
+output: html_document
+date: "2023-10-11"
+---
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+# Load data
+```{r cars}
+#load data
+df_raw <- read.table("data/data-derived/Ugandan_data.txt")
+df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+df <-  df_raw %>% select(-x_org, -value) %>%
+  rbind(df_comb %>% mutate(Locus = "PfK13") %>% rename(x = comb))
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures/"
+```
+
+# Bayesian GMM with slopes and intercepts
+```{r}
+# Bayesian stan model with slopes and intercepts
+# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+
+## C469Y
+c469y_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "C469Y" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+)
+vals <- summary(c469y_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c469y_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c469y_stanmod$mutation <- rep("C469Y", dim(ranef_c469y_stanmod)[1])
+
+## A675V
+a675v_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = df %>% filter(Locus == "A675V" & nobs > numofobs),
+  weights = wt_med, adapt_delta = 0.9975
+  )
+vals <- summary(a675v_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_a675v_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_a675v_stanmod$mutation <- rep("A675V", dim(ranef_a675v_stanmod)[1])
+
+ranef_stanmod <- rbind(ranef_c469y_stanmod, ranef_a675v_stanmod)
+ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
+ranef_stanmod$site <- str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
+``` 
+
+
+## Posterior of the model
+```{r}
+df$predict_stan <- NA
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <-  rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% colMeans
+df$predict_stan[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <-  rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% colMeans
+
+```
+
+## Confidence interval
+```{r}
+#Selection coefficient for individual mutations
+df$conf.low <- NA
+df$conf.high <- NA
+c469y_conf <- rstanarm::posterior_predict(c469y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+a675v_conf <- rstanarm::posterior_predict(a675v_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+
+# here just add predictions  for the c469Y rows
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[1,]
+df$conf.low[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[1,]
+
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "C469Y" & df$nobs > numofobs] <- c469y_conf[2,]
+df$conf.high[is.finite(df$lrsmed) & df$Locus == "A675V" & df$nobs > numofobs] <- a675v_conf[2,]
+```
+
+## Prevalence scale
+```{r}
+# Plot the predictions in each site with only Bayesian
+#convert to prevalence scale
+df$predict_stan_prev <- NA
+df$conf.high_prev <- NA
+df$conf.low_prev <- NA
+
+df$predict_stan_prev <- exp(df$predict_stan)*100/(1+exp(df$predict_stan))
+df$conf.high_prev <- exp(df$conf.high)*100/(1+exp(df$conf.high))
+df$conf.low_prev <- exp(df$conf.low)*100/(1+exp(df$conf.low))
+```
+
+# Figure 2: Plot prevalence for all mutations with numobs>2
+```{r}
+prev <- df %>%
+  filter(is.finite(lrsmed),
+         nobs > numofobs,
+         District == "Lamwo",
+         Locus %in% c("C469Y", "A675V")) %>%
+  ggplot(aes(year, med*100, group = Locus, color = Locus)) +
+  geom_point(aes(size = n)) + 
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  geom_line(aes(year, predict_stan_prev, color = Locus, group = Locus), size = 2) + 
+  scale_size_binned(name = "Sample Size",range = c(1,5)) +
+  ylab("Prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual(
+    values = c("#D55E00", "#009E73"),
+    name = "Mutations",
+    labels = c("675V", "469Y")
+  ) +
+  scale_fill_manual(values = c("#D55E00", "#009E73")) +
+  theme(axis.line = element_line(), 
+        axis.text = element_text(size = 14), 
+        axis.title=element_text(size=16), 
+        legend.text=element_text(size=16), 
+        strip.text.x = element_text(size = 16), 
+        legend.title = element_text(size=16), 
+        legend.position = "right", 
+        legend.box = "vertical")
+
+prev_select_coef <- df %>%
+  filter(is.finite(lrsmed),
+         nobs > numofobs,
+         District == "Lamwo",
+         Locus %in% c("C469Y", "A675V")) %>%
+  ggplot(aes(year, predict_stan, color = Locus, group = Locus)) +
+  geom_line(size = 2) + 
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  scale_size_binned(name = "Sample Size",range = c(1,5)) +
+  ylab("Log odds of prevalence") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual(
+    values = c("#D55E00", "#009E73"),
+    name = "Mutations",
+    labels = c("675V", "469Y")
+  ) +
+  scale_fill_manual(values = c("#D55E00", "#009E73")) +
+  theme(axis.line = element_line(), 
+        axis.text = element_text(size = 14), 
+        axis.title=element_text(size=16), 
+        legend.text=element_text(size=16), 
+        strip.text.x = element_text(size = 16), 
+        legend.title = element_text(size=16), 
+        legend.position = "right", 
+        legend.box = "vertical")
+```
+
+### Saving plots
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/Selection-Coefficient-Explanation/Prevalence_Lamwo_plot.png"),
+  prev,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/Selection-Coefficient-Explanation/Prevalence_Lamwo_plot.pdf"),
+  prev,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/Selection-Coefficient-Explanation/Selection_Lamwo_plot.png"),
+  prev_select_coef,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/Selection-Coefficient-Explanation/Selection_Lamwo_plot.pdf"),
+  prev_select_coef,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+
+
+```

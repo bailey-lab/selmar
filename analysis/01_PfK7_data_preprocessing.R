@@ -41,9 +41,6 @@ pfk7_data <- cam %>%
   filter(is.finite(min_year)) %>%
   arrange(Locus, country, site, year)
 
-pfk7_data$x[pfk7_data$prev == 1] <- pfk7_data$x[pfk7_data$prev == 1] - 0.5
-pfk7_data$x[pfk7_data$prev == 0 & pfk7_data$adj_year == -1] <- pfk7_data$x[pfk7_data$prev == 0 & pfk7_data$adj_year == -1] + 0.5
-
 pfk7_data <- pfk7_data %>%
   group_by(country, site, Locus) %>%
   mutate(min_year = min(year[x>0])) %>%
