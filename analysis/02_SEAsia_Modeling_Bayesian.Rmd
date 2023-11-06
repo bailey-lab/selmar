@@ -31,12 +31,26 @@ library(gt)
 
 # Load data
 ```{r}
+fileLocManuscript_pfK7 <- "figures/"
+
 #load data
-pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% filter(Locus != "other_PfK13")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% 
+  filter(Locus != "other_PfK13") 
+
 #set the limit of number of observations
 numofobs <- 2
 
-fileLocManuscript_pfK7 <- "figures/"
+pfk7_data2 <- pfk7_data %>% 
+  filter(!(Locus == "PfK13" & District == "Binh Phuoc" & year == 2005)) %>%
+  group_by(Locus, District) %>%
+  mutate(min_year = min(year[x>0]))
+
+pfk7_data <- pfk7_data2 %>% 
+  group_by(Locus, District) %>%
+  filter(min_year <= 2010,
+         year >= min_year & year <= min_year + 4, #filter for the first five years,
+         nobs > numofobs) %>% #remove all distrcit where the first non-zero prevalence is larger than 50%
+  arrange(Locus, District, year)
 ```
 
 # Bayesian GMM with slopes and intercepts
@@ -75,7 +89,7 @@ ranef_r539t_stanmod$mutation <- rep("R539T", dim(ranef_r539t_stanmod)[1])
 # ---- Model for combined kelch -----
 all_kelch_stanmod <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(Locus == "K13", nobs > numofobs),
+  data = pfk7_data %>% filter(Locus == "PfK13", nobs > numofobs),
   weights = wt_med, 
   adapt_delta = 0.9975
 )
@@ -84,7 +98,7 @@ vals <- summary(all_kelch_stanmod$stanfit)$summary[,1]
 vals <- vals[grep("^b", names(vals))]
 ranef_all_kelch_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
            "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_all_kelch_stanmod$mutation <- rep("K13", dim(ranef_all_kelch_stanmod)[1])
+ranef_all_kelch_stanmod$mutation <- rep("PfK13", dim(ranef_all_kelch_stanmod)[1])
 
 ranef_stanmod <- rbind(ranef_c580y_stanmod, ranef_r539t_stanmod, ranef_all_kelch_stanmod)
 ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
@@ -100,7 +114,7 @@ pfk7_data$predict_stan <- NA
 
 pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
 pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "PfK13" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
 ```
 
 ## Confidence interval
@@ -116,11 +130,11 @@ all_kelch_conf <- rstanarm::posterior_predict(all_kelch_stanmod, type = "respons
 # here just add predictions  for the c469Y rows
 pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[1,]
 pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[1,]
-pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[1,]
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "PfK13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[1,]
 
 pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[2,]
 pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[2,]
-pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[2,]
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "PfK13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[2,]
 ```
 
 ## Prevalence scale
@@ -134,7 +148,7 @@ pfk7_data$conf.high_prev <- exp(pfk7_data$conf.high)*100/(1+exp(pfk7_data$conf.h
 pfk7_data$conf.low_prev <- exp(pfk7_data$conf.low)*100/(1+exp(pfk7_data$conf.low))
 ```
 
-# SFigure6: Plot prevalence for all mutations
+# SFigure5: Plot prevalence for all mutations
 ## Preprocessing
 ```{r}
 prev_df2 <- pfk7_data %>% filter(nobs > numofobs)
@@ -161,6 +175,9 @@ prev_plot <- prev_df2  %>%
   xlab("Year") +
   ylim(-1, 101)+
   ggpubr::theme_pubclean(base_size = 12)+
+  scale_x_continuous(limits = c(2002, 2014), 
+                     breaks = seq(2002, 2014, 4),
+                     minor_breaks = seq(2002, 2014, 2)) +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 8),
@@ -176,14 +193,14 @@ prev_plot <- prev_df2  %>%
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/Figure6-SEAsiaPrevalence/SEAsia_posterior_prevalence.png"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_prevalence.png"),
   prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/Figure6-SEAsiaPrevalence/SEAsia_posterior_prevalence.pdf"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_prevalence.pdf"),
   prev_plot,
   width = 8,
   height = 8,
@@ -275,7 +292,7 @@ selec_coef$conf.high[selec_coef$mutation == "R539T"] <- selec_coef$conf.high[sel
 selec_coef$conf.high[selec_coef$mutation == "K13"] <- selec_coef$conf.high[selec_coef$mutation == "K13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "K13"]
 
 effect_size_bay$s <- 18
-effect_size_bay$sizes <- 1
+effect_size_bay$sizes <- 1.1
 selec_coef$s <- 19
 selec_coef$sizes <- 0.5
 
@@ -286,13 +303,11 @@ rownames(stan_eff_bay_overall) <- NULL
 
 # selec_coef_bay <- selec_coef %>% mutate(method = "Baysian") %>% relocate(District, conf.low, estimate, conf.high, method, mutation, s, sizes)
 
-effect_size_bay <- rbind(effect_size_bay, selec_coef)
-effect_size_bay <- effect_size_bay %>% 
-  group_by(mutation) %>% 
-  arrange(District)
+effect_size_bay <- rbind(selec_coef, effect_size_bay)
 
 effect_size_bay <- effect_size_bay %>% 
-  mutate(mutation = replace(mutation, mutation == "C580Y", "580Y"), mutation = replace(mutation, mutation == "R539T", "539T")) 
+  mutate(mutation = replace(mutation, mutation == "C580Y", "580Y"), 
+         mutation = replace(mutation, mutation == "R539T", "539T")) 
 ```
 
 ## Figure3: Plot
@@ -301,21 +316,15 @@ selection_coef_bay <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_pointrange(data = effect_size_bay, 
                   aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
-                  position=position_dodge(width = 0.6), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
+                  position=position_dodge(width = 0.5), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
   scale_y_discrete(labels = c("539T", "580Y", "K13")) +
   ylab("Mutation") +
   xlab("Selection Coefficient") +
   xlim(-2.5,4) +
-    scale_color_manual(values=c("#4477AA",
+  scale_color_manual(values=c("#4477AA",
                               "#66CCEE",
                               "#228833",
                               "#CCBB44",
-                              "#EE6677",
-                              "#AA3377",
-                              "#DDAA33",
-                              "#004488",
-                              "#CC3311",
-                              "#44AA99",
                               "black",
                               "#EE7733")) +
   theme_bw() +
@@ -341,14 +350,14 @@ ggsave(
   paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.png"),
   selection_coef_bay,
   width = 8,
-  height = 5,
+  height = 5.5,
   dpi = 700
 )
 ggsave(
   paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.pdf"),
   selection_coef_bay,
   width = 8,
-  height = 5,
+  height = 5.5,
   dpi = 700
 )
 write.csv(
@@ -395,4 +404,3 @@ write.csv(
   quote = F
 )
 ```
-

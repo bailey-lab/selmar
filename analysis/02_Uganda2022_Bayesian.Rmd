@@ -373,7 +373,7 @@ selec_coef$conf.high[selec_coef$mutation == "P441L"] <- selec_coef$conf.high[sel
 selec_coef$conf.high[selec_coef$mutation == "K13"] <- selec_coef$conf.high[selec_coef$mutation == "K13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "K13"]
 
 effect_size_bay$s <- 18
-effect_size_bay$sizes <- 1
+effect_size_bay$sizes <- 1.1
 selec_coef$s <- 19
 selec_coef$sizes <- 0.5
 
@@ -442,14 +442,14 @@ ggsave(
   paste0(fileLocManuscript, "/Figure3-SelectionCeof/Figure3_Uganda_Effectsize.png"),
   selection_coef_bay,
   width = 8,
-  height = 8,
+  height = 9,
   dpi = 700
 )
 ggsave(
   paste0(fileLocManuscript, "/Figure3-SelectionCeof/Figure3_Uganda_Effectsize.pdf"),
   selection_coef_bay,
   width = 8,
-  height = 8,
+  height = 9,
   dpi = 700
 )
 write.csv(

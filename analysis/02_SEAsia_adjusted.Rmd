@@ -31,12 +31,26 @@ library(gt)
 
 # Load data
 ```{r}
+fileLocManuscript_pfK7 <- "figures/"
+
 #load data
-pfk7_data <- read.table("data/data-derived/pfk7_data_adj.txt") %>% filter(Locus != "other_PfK13")
+pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% 
+  filter(Locus != "other_PfK13") 
+
 #set the limit of number of observations
 numofobs <- 2
 
-fileLocManuscript_pfK7 <- "figures/"
+pfk7_data2 <- pfk7_data %>% 
+  filter(!(Locus == "PfK13" & District == "Binh Phuoc" & year == 2005)) %>%
+  group_by(Locus, District) %>%
+  mutate(min_year = min(year[x>0]))
+
+pfk7_data <- pfk7_data2 %>% 
+  group_by(Locus, District) %>%
+  filter(min_year <= 2010,
+         year >= min_year & year <= min_year + 4, #filter for the first five years,
+         nobs > numofobs) %>% #remove all distrcit where the first non-zero prevalence is larger than 50%
+  arrange(Locus, District, year)
 ```
 
 # Bayesian GMM with slopes and intercepts
@@ -154,13 +168,16 @@ prev_plot <- prev_df2  %>%
   scale_color_manual(
     values = c("#56B4E9", "#E69F00", "#009E73"),
     name = "Mutations",
-    labels = c("580Y", "PfK13", "539T")
+    labels = c("580Y", "K13", "539T")
   ) +
   scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) + 
   ylab("Prevalence") +
   xlab("Year") +
   ylim(-1, 101)+
   ggpubr::theme_pubclean(base_size = 12)+
+  scale_x_continuous(limits = c(2002, 2014), 
+                     breaks = seq(2002, 2014, 4),
+                     minor_breaks = seq(2002, 2014, 2)) +
   theme(
     axis.line = element_line(),
     axis.text = element_text(size = 8),
@@ -176,14 +193,14 @@ prev_plot <- prev_df2  %>%
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/Figure6-SEAsiaPrevalence/ADJUSTED_SEAsia_posterior_prevalence.png"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure6-SEAsiaPrevalence/SEAsia_posterior_prevalence.png"),
   prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/supplement/Figure6-SEAsiaPrevalence/ADJUSTED_SEAsia_posterior_prevalence.pdf"),
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure6-SEAsiaPrevalence/SEAsia_posterior_prevalence.pdf"),
   prev_plot,
   width = 8,
   height = 8,
@@ -211,7 +228,7 @@ stan_eff <- as.data.frame(t(data.frame(all_kelch_stanmod$stan_summary[2, c("2.5%
 mutate(method = "Bayesian (Intercept + Slope)") %>%
 setNames(c("conf.low", "estimate", "conf.high", "method"))
 
-effect_size <- rbind(effect_size, stan_eff %>% mutate(mutation = "PfK13"))
+effect_size <- rbind(effect_size, stan_eff %>% mutate(mutation = "K13"))
 
 #confidence interval per site and mutation
 stan_eff_c580y <- as.data.frame(c580y_stanmod$stan_summary[grep("year District", rownames(c580y_stanmod$stan_summary)),]) %>%
@@ -247,7 +264,7 @@ coef_r539t <- ranef(r539t_stanmod)$District %>%
 
 coef_all_kelch <- ranef(all_kelch_stanmod)$District %>% 
   mutate(District = rownames(ranef(all_kelch_stanmod)$District), 
-         mutation = "PfK13", 
+         mutation = "K13", 
          estimate = ranef(all_kelch_stanmod)$District$adj_year, 
          conf.low = stan_eff_all_kelch$conf.low, 
          conf.high = stan_eff_all_kelch$conf.high) %>% 
@@ -264,18 +281,18 @@ effect_size_bay <- effect_size %>%
 
 selec_coef$estimate[selec_coef$mutation == "C580Y"] <- selec_coef$estimate[selec_coef$mutation == "C580Y"] + effect_size_bay$estimate[effect_size_bay$mutation == "C580Y"]
 selec_coef$estimate[selec_coef$mutation == "R539T"] <- selec_coef$estimate[selec_coef$mutation == "R539T"] + effect_size_bay$estimate[effect_size_bay$mutation == "R539T"]
-selec_coef$estimate[selec_coef$mutation == "PfK13"] <- selec_coef$estimate[selec_coef$mutation == "PfK13"] + effect_size_bay$estimate[effect_size_bay$mutation == "PfK13"]
+selec_coef$estimate[selec_coef$mutation == "K13"] <- selec_coef$estimate[selec_coef$mutation == "K13"] + effect_size_bay$estimate[effect_size_bay$mutation == "K13"]
 
 selec_coef$conf.low[selec_coef$mutation == "C580Y"] <- selec_coef$conf.low[selec_coef$mutation == "C580Y"] + effect_size_bay$conf.low[effect_size_bay$mutation == "C580Y"]
 selec_coef$conf.low[selec_coef$mutation == "R539T"] <- selec_coef$conf.low[selec_coef$mutation == "R539T"] + effect_size_bay$conf.low[effect_size_bay$mutation == "R539T"]
-selec_coef$conf.low[selec_coef$mutation == "PfK13"] <- selec_coef$conf.low[selec_coef$mutation == "PfK13"] + effect_size_bay$conf.low[effect_size_bay$mutation == "PfK13"]
+selec_coef$conf.low[selec_coef$mutation == "K13"] <- selec_coef$conf.low[selec_coef$mutation == "K13"] + effect_size_bay$conf.low[effect_size_bay$mutation == "K13"]
 
 selec_coef$conf.high[selec_coef$mutation == "C580Y"] <- selec_coef$conf.high[selec_coef$mutation == "C580Y"] + effect_size_bay$conf.high[effect_size_bay$mutation == "C580Y"]
 selec_coef$conf.high[selec_coef$mutation == "R539T"] <- selec_coef$conf.high[selec_coef$mutation == "R539T"] + effect_size_bay$conf.high[effect_size_bay$mutation == "R539T"]
-selec_coef$conf.high[selec_coef$mutation == "PfK13"] <- selec_coef$conf.high[selec_coef$mutation == "PfK13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "PfK13"]
+selec_coef$conf.high[selec_coef$mutation == "K13"] <- selec_coef$conf.high[selec_coef$mutation == "K13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "K13"]
 
 effect_size_bay$s <- 18
-effect_size_bay$sizes <- 1
+effect_size_bay$sizes <- 1.1
 selec_coef$s <- 19
 selec_coef$sizes <- 0.5
 
@@ -286,13 +303,11 @@ rownames(stan_eff_bay_overall) <- NULL
 
 # selec_coef_bay <- selec_coef %>% mutate(method = "Baysian") %>% relocate(District, conf.low, estimate, conf.high, method, mutation, s, sizes)
 
-effect_size_bay <- rbind(effect_size_bay, selec_coef)
-effect_size_bay <- effect_size_bay %>% 
-  group_by(mutation) %>% 
-  arrange(District)
+effect_size_bay <- rbind(selec_coef, effect_size_bay)
 
 effect_size_bay <- effect_size_bay %>% 
-  mutate(mutation = replace(mutation, mutation == "C580Y", "580Y"), mutation = replace(mutation, mutation == "R539T", "539T")) 
+  mutate(mutation = replace(mutation, mutation == "C580Y", "580Y"), 
+         mutation = replace(mutation, mutation == "R539T", "539T")) 
 ```
 
 ## Figure3: Plot
@@ -301,24 +316,17 @@ selection_coef_bay <- ggplot() +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_pointrange(data = effect_size_bay, 
                   aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
-                  position=position_dodge(width = 0.6), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
-  scale_y_discrete(labels = c("539T", "580Y", "PfK13")) +
+                  position=position_dodge(width = 0.5), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
+  scale_y_discrete(labels = c("539T", "580Y", "K13")) +
   ylab("Mutation") +
   xlab("Selection Coefficient") +
   xlim(-2.5,4) +
-    scale_color_manual(values=c("#4477AA",
+  scale_color_manual(values=c("#4477AA",
                               "#66CCEE",
                               "#228833",
                               "#CCBB44",
-                              "#EE6677",
-                              "#AA3377",
-                              "#DDAA33",
-                              "#004488",
-                              "#CC3311",
-                              "#44AA99",
-                              "#EE99AA",
-                              "#EE7733",
-                              "black")) +
+                              "black",
+                              "#EE7733")) +
   theme_bw() +
   theme(
     legend.title = element_blank(),
@@ -339,22 +347,22 @@ effect_size_bay2 <- effect_size_bay %>%
 ### Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/ADJUSTED_Figure3_SEAsia_Effectsize.png"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.png"),
   selection_coef_bay,
   width = 8,
-  height = 5,
+  height = 5.5,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/ADJUSTED_Figure3_SEAsia_Effectsize.pdf"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize.pdf"),
   selection_coef_bay,
   width = 8,
-  height = 5,
+  height = 5.5,
   dpi = 700
 )
 write.csv(
   effect_size_bay2,
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/ADJUSTED_SEAsia_selectioncoefficients.csv"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients.csv"),
   row.names = F,
   quote = F
 )
@@ -380,9 +388,9 @@ selec_ceof_stats[2, ] <- cbind("539T",
                                round(max_539T, 3), 
                                effect_size_bay[which(effect_size_bay$estimate == max_539T),][5])
 
-min_PfK13 <- min(effect_size_bay %>% filter(mutation == "PfK13" & District != "Southeast Asia") %>% pull(estimate))
-max_PfK13 <- max(effect_size_bay %>% filter(mutation == "PfK13" & District != "Southeast Asia") %>% pull(estimate))
-selec_ceof_stats[3, ] <- cbind("PfK13", 
+min_PfK13 <- min(effect_size_bay %>% filter(mutation == "K13" & District != "Southeast Asia") %>% pull(estimate))
+max_PfK13 <- max(effect_size_bay %>% filter(mutation == "K13" & District != "Southeast Asia") %>% pull(estimate))
+selec_ceof_stats[3, ] <- cbind("K13", 
                                round(min_PfK13, 3), 
                                effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][5], 
                                round(max_PfK13, 3), 
@@ -391,9 +399,8 @@ selec_ceof_stats[3, ] <- cbind("PfK13",
 colnames(selec_ceof_stats) <- c("Mutation", "Min", "District", "Max", "District")
 write.csv(
   selec_ceof_stats,
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/ADJUSTED_SEAsia_selectioncoefficients_stats.csv"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients_stats.csv"),
   row.names = F,
   quote = F
 )
 ```
-

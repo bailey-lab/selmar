@@ -9,6 +9,7 @@ library(lme4)
 library(nlme)
 library(dplyr)
 library(ggplot2)
+library(ggpattern)
 library(ggpubr)
 library(scales)
 library(tidyverse)
@@ -48,7 +49,6 @@ fileLocManuscript <- "figures"
 ```{r}
 plot_overview_uganda <- df_uganda %>%
   arrange(desc(Locus)) %>%
-  filter(nobs <= numofobs) %>% 
   ggplot(aes(year, med * 100, group = Locus, color = Locus)) +
   geom_point(aes(size = n)) +
   scale_size_binned(name = "Sample Size",
@@ -218,13 +218,13 @@ write.csv(pie_data, file = paste0(fileLocManuscript,"/supplement/Figure2-UgandaM
 ## Plotting
 ```{r}
 # make plot with wild_type
-pie_chart_size <- c(8, 8, 6.5, 4.5, 3, 4, 3)
+pie_chart_size <- c(1, 4, 3, 2.5, 2, 2, 1.5)
 count <- 0
 for (y in 2016:2022){
   count <- count + 1
   pie_chart_df <- pie_data2 %>% filter(year == y)
-  val <- pie_chart_size[count]
-  map <- ggplot() +
+  val <- 1
+  map_uganda <- ggplot() +
   geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
   geom_sf(data=uganda, fill = "moccasin") +
   geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
@@ -254,9 +254,12 @@ for (y in 2016:2022){
   geom_scatterpie(data = pie_chart_df, 
                   aes(x=long, y=lat, group=District, r = radius_adj), 
                   cols=c("A675V", "C469F", "C469Y", "R561H", "P441L")) +
-  geom_scatterpie_legend(pie_chart_df$radius*val, 
-                         x=28.7, y=2.0, 
-                         labeller = function(x) round(x * 100/val)) +
+  geom_scatterpie_legend(pie_chart_df$radius_adj*val,
+                         x=28.7, y=2.0,
+                         labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100)) +
+    # geom_scatterpie_legend(pie_chart_df$radius_adj*val, 
+    #                    x=28.7, y=2.0, 
+    #                    labeller = function(x) round(x*100)) +
     scale_fill_manual(values = c("#D55E00",
                                "#0072B2",
                                "#009E73",
@@ -272,12 +275,12 @@ for (y in 2016:2022){
         axis.text = element_text(size = 10), 
         legend.position = c(0.085,0.89))
   
-    ggsave(
+  ggsave(
   paste0(
     fileLocManuscript,
     paste0("/supplement/Figure2-UgandaMap/Figure2_MapUganda", y,".pdf")
   ),
-  map,
+  map_uganda,
   width = 6,
   height = 5.5,
   dpi = 700
@@ -287,7 +290,7 @@ for (y in 2016:2022){
       fileLocManuscript,
       paste0("/supplement/Figure2-UgandaMap/Figure2_MapUganda", y,".png")
     ),
-    map,
+    map_uganda,
     width = 6,
     height = 5.5,
     dpi = 700
@@ -460,25 +463,34 @@ SE_asia <- SE_asia  %>%
 
 #adjust districts that contain non 
 r539t_district <- df_pfk7 %>% 
-  filter(Locus == "R539T", is.finite(lrsmed), nobs > numofobs) %>% 
+  filter(Locus == "R539T") %>% 
   distinct(District)
 r539t_district <- array(t(r539t_district))
 
 c580y_district <- df_pfk7 %>% 
-  filter(Locus == "C580Y", is.finite(lrsmed), nobs > numofobs) %>% 
+  filter(Locus == "C580Y") %>% 
   distinct(District)
 c580y_district <- array(t(c580y_district))
 
+c580y_r539t_district <- c580y_district[c580y_district %in% r539t_district]
+c580y_district <- c580y_district[!c580y_district %in% c580y_r539T_district]
+r539t_district <- r539t_district[!r539t_district %in% c580y_r539T_district]
+
 allkelch_district <- df_pfk7 %>% 
-  filter(Locus == "other_PfK13", is.finite(lrsmed), nobs > numofobs) %>% 
+  filter(Locus == "other_PfK13") %>% 
   distinct(District)
 allkelch_district <- array(t(allkelch_district))
+allkelch_district <- allkelch_district[!allkelch_district %in% c580y_r539T_district]
 
 #label colors for map
 SE_asia$color <- "not_enough_samples"
-SE_asia$color[SE_asia$name %in% r539t_district] <- "r539t" #combined
+SE_asia$color[SE_asia$name %in% c580y_r539t_district] <- "r539t_c580y" #combined
 SE_asia$color[SE_asia$name %in% c580y_district] <- "c580y" #combined
 SE_asia$color[SE_asia$name %in% allkelch_district] <- "other PfK13" #only other kelch mutants
+
+SE_asia_c580y <- SE_asia %>% filter(color == "c580y")
+SE_asia_other <- SE_asia %>% filter(color == "other PfK13")
+SE_asia_r539t_c580y <- SE_asia %>% filter(color == "r539t_c580y")
 
 #sum prevalence per Locus and District
 pie_data <- df_pfk7 %>% 
@@ -558,8 +570,12 @@ map_SEAsia <- ggplot() +
           color = 'black',
           size = 0.3,
           fill = ifelse(sov110$ADMIN %in% c("Laos", "Thailand", "Cambodia", "Vietnam", "Myanmar"), 'grey98', 'grey90')) +
-  geom_sf(data = SE_asia, 
-          fill = "moccasin") +
+  geom_sf(data = SE_asia_c580y, 
+          fill = "#56B4E9") +
+  geom_sf(data = SE_asia_other, 
+          fill = "#009E73") +
+  geom_sf(data = SE_asia_r539t_c580y, 
+          fill = "#E69F00") +
   geom_sf(data = lakes8,
           color = "grey40",
           fill = "aliceblue",
@@ -588,35 +604,35 @@ map_SEAsia <- ggplot() +
            y = 20,
            label = "Laos",
            color = "black",
-           size = 3 ,
+           size = 4,
            fontface = "bold") +
   annotate("text",
            x = 101.5,
            y = 16,
            label = "Thailand",
            color = "black",
-           size = 3,
+           size = 4,
            fontface = "bold") +
   annotate("text",
            x = 105.9,
            y = 12.8,
            label = "Cambodia",
            color = "black",
-           size = 3 ,
+           size = 4,
            fontface = "bold") +
   annotate("text",
            x = 104.9,
            y = 21.5,
            label = "Vietnam",
            color = "black",
-           size = 3,
+           size = 4,
            fontface = "bold") +
   annotate("text",
            x = 95.2,
            y = 16.9,
            label = "Myanmar",
            color = "black",
-           size = 3,
+           size = 4,
            fontface = "bold") +
   annotate("text",
            x = 102,
@@ -628,19 +644,6 @@ map_SEAsia <- ggplot() +
   theme_minimal() +
   xlab("") +
   ylab("") +
-  geom_scatterpie(data = pie_data,
-    aes(x = long, y = lat, group = District, r = radius_adj),
-    cols = c("c580y", "r539t", "other_PfK13")) +
-  geom_scatterpie_legend(pie_data$radius_adj*2,
-                         x = 108,
-                         y = 24, labeller = function(x) round(100*x/2)) +
-  scale_fill_manual(values = c("#56B4E9", 
-                               "#009E73", 
-                               "#E69F00"), 
-                    labels = c("580Y", 
-                               "539T", 
-                               "other PfK13"), 
-                    name = "")  +
   theme(legend.text = element_text(size = 10),
     axis.text = element_text(size = 10),
     legend.position = c(0.86, 0.95)
@@ -673,10 +676,31 @@ ggsave(
 
 # Figure 4: Overview of data plot SE Asia (PfK7 data) - included in analysis
 ```{r}
-plot_overview_seAsia_included <- df_pfk7 %>% 
-  filter(Locus != "other_PfK13", is.finite(lrsmed), nobs > numofobs) %>% 
-  ggplot(aes(year, prev*100, group = Locus, color = Locus)) +
-  geom_point(aes(size = n)) + 
+#load data
+pfk7_data_analysis <- df_pfk7 %>% 
+  filter(Locus != "other_PfK13") %>%
+  filter(!(Locus == "PfK13" & District == "Binh Phuoc" & year == 2005)) %>%
+  group_by(Locus, District) %>%
+  mutate(min_year = min(year[x>0]))
+
+pfk7_data_analysis <- pfk7_data_analysis %>% 
+  group_by(Locus, District) %>%
+  filter(min_year <= 2010,
+         year >= min_year & year <= min_year + 4, #filter for the first five years,
+         nobs > numofobs) %>% #remove all distrcit where the first non-zero prevalence is larger than 50%
+  arrange(Locus, District, year) %>%
+  mutate(point_format = 19)
+
+pfk7_data_notanalysis <- df_pfk7 %>% 
+  filter(Locus != "other_PfK13", 
+         nobs > numofobs,
+         is.finite(lrsmed)) %>%
+  mutate(point_format = 1)
+
+plot_overview_seAsia <- 
+  ggplot() +
+  geom_point(data = pfk7_data_analysis, aes(year, prev*100, group = Locus, color = Locus, size = n), shape = 19) + 
+  geom_point(data = pfk7_data_notanalysis, aes(year, prev*100, group = Locus, color = Locus, size = n), shape = 1) + 
   scale_size_binned(name = "Sample Size", range = c(0.2,3)) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
@@ -703,64 +727,18 @@ plot_overview_seAsia_included <- df_pfk7 %>%
 ```{r}
 ggsave(
   paste0(fileLocManuscript, "/supplement/Figure4-SEAsia-DataOverview-Ananlysis/SEAsia_dataoverview.pdf"),
-  plot_overview_seAsia_included,
-  width = 8,
-  height = 5,
+  plot_overview_seAsia,
+  width = 6,
+  height = 6,
   dpi = 700
 )
 ggsave(
   paste0(fileLocManuscript, "/supplement/Figure4-SEAsia-DataOverview-Ananlysis/SEAsia_dataoverview.png"),
-  plot_overview_seAsia_included,
-  width = 8,
-  height = 5,
+  plot_overview_seAsia,
+  width = 6,
+  height = 6,
   dpi = 700
 )
 ```
 
-# Figure 5: Overview of data plot SE Asia (PfK7 data)
-```{r}
-plot_overview_seAsia_notincluded <- df_pfk7 %>% 
-  filter(Locus != "other_PfK13", nobs <= numofobs) %>% 
-  ggplot(aes(year, prev*100, group = Locus, color = Locus)) +
-  geom_point(aes(size = n)) + 
-  scale_size_binned(name = "Sample Size",range = c(0.2,3)) +
-  labs(shape="Mutations", size = "Sample Size") +
-  theme_bw() +
-  facet_wrap(~country+District) +
-  ylab("Prevalence") +
-  xlab("Year") +
-  ggpubr::theme_pubclean(base_size = 12) +
-  scale_color_manual("Mutations",
-    values = c("#56B4E9", "#E69F00", "#009E73"),
-    labels = c("580Y", "PfK13", "539T")
-  ) +
-  theme(
-    axis.line = element_line(),
-    legend.title = element_text(size = 12),
-    axis.text = element_text(size = 10),
-    axis.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    strip.text.x = element_text(size = 10),
-    legend.position = "right",
-    legend.box = "vertical"
-  )
-```
-
-### Saving plot
-```{r}
-ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure5-SEAsia-DataOverview-NotAnanlysis/SEAsia_dataoverview.pdf"),
-  plot_overview_seAsia_notincluded,
-  width = 8,
-  height = 8.5,
-  dpi = 700
-)
-ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure5-SEAsia-DataOverview-NotAnanlysis/SEAsia_dataoverview.png"),
-  plot_overview_seAsia_notincluded,
-  width = 8,
-  height = 8.5,
-  dpi = 700
-)
-```
 
