@@ -36,7 +36,7 @@ library(gt)
 df_raw <- read.table("data/data-derived/Ugandan_data.txt")
 df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
 df <-  df_raw %>% select(-x_org, -value) %>%
-  rbind(df_comb %>% mutate(Locus = "K13") %>% rename(x = comb))
+  rbind(df_comb %>% mutate(Locus = "PfK13") %>% rename(x = comb))
 
 #set the limit of number of observations
 numofobs <- 2
@@ -56,14 +56,14 @@ fileLocManuscript <- "figures/"
 PfK13_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
-    filter(Locus == "K13" & nobs > numofobs),
+    filter(Locus == "PfK13" & nobs > numofobs),
   weights = wt_med, adapt_delta = 0.9975
 )
 
 new_data <- df %>%
   filter(nobs > numofobs, 
          is.finite(df$lrsmed), 
-         Locus == "K13") %>% # this is for c469Y model
+         Locus == "PfK13") %>% # this is for c469Y model
   group_by(District, Locus) %>% # we group by the District and Locus
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
   select(adj_year, year, District, Locus, min_year, max_year) %>%
@@ -240,7 +240,7 @@ df_predict_allyear <- df_predict %>%
 PfK13_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
-    filter(Locus == "K13" & nobs > numofobs),
+    filter(Locus == "PfK13" & nobs > numofobs),
   weights = wt_med,
   adapt_delta = 0.9975
 )
@@ -249,7 +249,7 @@ PfK13_pred <- rstanarm::stan_glmer(
 new_data <- df %>%
   filter(nobs > numofobs, 
          is.finite(df$lrsmed), 
-         Locus == "K13") %>% # this is for PfK13 model
+         Locus == "PfK13") %>% # this is for PfK13 model
   group_by(District, Locus) %>% # we group by the District and Locus
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
   select(adj_year, year, District, Locus, min_year, max_year) %>%
@@ -286,19 +286,19 @@ df_predict_allyear <- df_predict_allyear %>% mutate(predict_prev = exp(predict)*
                                                     conf.high_prev = exp(conf.high)*100/(1+exp(conf.high)))
 ```
 
-## Figure 6: Ploting forecasting of predictions for the first 2, 3, and 4 years
+## Figure 5: Ploting forecasting of predictions for the first 2, 3, and 4 years
 ```{r}
 ################ PLOT FOR PfK13 ################
 df_true <- df_predict_allyear %>% 
-  filter(Locus == "K13", 
+  filter(Locus == "PfK13", 
          year <= max_year) %>%
   mutate(label = "true")
 df_pred <- df_predict_allyear %>% 
-  filter(Locus == "K13",
+  filter(Locus == "PfK13",
          year >= max_year) %>%
   mutate(label = "predicted")
 ex_pt <- df_comb %>% 
-  mutate(Locus = "K13") %>%
+  mutate(Locus = "PfK13") %>%
   filter(nobs > numofobs, 
          District %in% unique(df_pred$District))
   

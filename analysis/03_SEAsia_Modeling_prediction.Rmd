@@ -418,6 +418,8 @@ corr_df_cutoff <- corr_df_cutoff %>%
   select(country, District, year, Locus, p_pred_prev, t_pred_prev, mae, bias, corr, nobs, adj_year, val , label) %>%
   arrange(Locus, label)
 
+corr_df_cutoff$Locus[corr_df_cutoff$Locus == "C580Y"] <- "580Y"
+corr_df_cutoff$Locus[corr_df_cutoff$Locus == "PfK13"] <- "K13"
 ```                                            
 
 ## Supplement Figure 9: Plotting per district
@@ -428,7 +430,7 @@ for (mu in unique(corr_df_cutoff$Locus)){
     ggplot(aes(x = t_pred_prev, y = p_pred_prev, color = label, group = label)) +
     geom_point() +
     geom_abline(slope = 1, intercept = 0, color = "grey", linetype = "dashed") +
-    facet_wrap(~ District) +
+    facet_wrap(~ District, ncol = 2) +
     theme_bw() +
     xlab("True") +
     ylab(paste(mu, "Prediction", sep=" ")) +
@@ -450,7 +452,7 @@ for (mu in unique(corr_df_cutoff$Locus)){
     ) +  labs(color = NULL)
   
   #Assigning df_predict to variables
-  var_name <- paste0(mu, "_correlation_raw_plot_cutoff")
+  var_name <- paste0("correlation_raw_plot_cutoff_", mu)
   assign(var_name, correlation_raw_plot_cutoff)
 }
 ```
@@ -459,7 +461,7 @@ for (mu in unique(corr_df_cutoff$Locus)){
 ```{r}
 correlation_table <- corr_df_cutoff %>% distinct(Locus, label, mae, bias, corr)
 write.csv(correlation_table, 
-            paste0("figures/supplement/Figure9-ForecastingCorrelation/correlation/SEAsia_correlation_table.csv"))
+            paste0("figures/supplement/Figure8-ForecastingCorrelation/correlation/SEAsia_correlation_table.csv"))
 ```
 
 ### Saving plots
@@ -467,22 +469,22 @@ write.csv(correlation_table,
 ################# C580Y #################
 ggsave(
   paste0(
-    "figures/supplement/Figure9-ForecastingCorrelation/correlation/SEAsia_cutoff_",
+    "figures/supplement/Figure8-ForecastingCorrelation/correlation/SEAsia_cutoff_",
     prev_cutoff_perc,
     "prev_C580Y_correlation.png"
   ),
-  C580Y_correlation_raw_plot_cutoff,
+  correlation_raw_plot_cutoff_580Y,
   width = 6,
   height = 4,
   dpi = 700
 )
 ggsave(
   paste0(
-    "figures/supplement/Figure9-ForecastingCorrelation/correlation/SEAsia_cutoff_",
+    "figures/supplement/Figure8-ForecastingCorrelation/correlation/SEAsia_cutoff_",
     prev_cutoff_perc,
     "prev_C580Y_correlation.pdf"
   ),
-  C580Y_correlation_raw_plot_cutoff,
+  correlation_raw_plot_cutoff_580Y,
   width = 6,
   height = 4,
   dpi = 700
@@ -492,22 +494,22 @@ ggsave(
 ################# PfK13 #################
 ggsave(
   paste0(
-    "figures/supplement/Figure9-ForecastingCorrelation/correlation/SEAsia_cutoff_",
+    "figures/supplement/Figure8-ForecastingCorrelation/correlation/SEAsia_cutoff_",
     prev_cutoff_perc,
     "prev_PfK13_correlation.png"
   ),
-  PfK13_correlation_raw_plot_cutoff,
+  correlation_raw_plot_cutoff_K13,
   width = 6,
   height = 4,
   dpi = 700
 )
 ggsave(
   paste0(
-    "figures/supplement/Figure9-ForecastingCorrelation/correlation/SEAsia_cutoff_",
+    "figures/supplement/Figure8-ForecastingCorrelation/correlation/SEAsia_cutoff_",
     prev_cutoff_perc,
     "prev_PfK13_correlation.pdf"
   ),
-  PfK13_correlation_raw_plot_cutoff,
+  correlation_raw_plot_cutoff_K13,
   width = 6,
   height = 4,
   dpi = 700
@@ -609,7 +611,7 @@ write.csv(
 )
 ```
 
-## Figure S7: Pailin - Model Overview 
+## Figure S7: Ratanakiri - Model Overview 
 ### Preprocessing
 ```{r}
 df_Ratanakiri_pred <- df_predict_cutoff_allyear %>%
@@ -666,7 +668,7 @@ prev_cutoff_pfk13_Ratanakiri_plot <-
 ```{r}
 ggsave(
   paste0(
-    "figures/supplement/Figure8-Forecasting/Figure7_PfK13_Ratanakiri_",
+    "figures/supplement/Figure7-Forecasting/Figure7_PfK13_Ratanakiri_",
     prev_cutoff_perc,
     "prev_forecasting.png"
   ),
@@ -678,7 +680,7 @@ ggsave(
 
 ggsave(
   paste0(
-    "figures/supplement/Figure8-Forecasting/Figure7_PfK13_Ratanakiri_",
+    "figures/supplement/Figure7-Forecasting/Figure7_PfK13_Ratanakiri_",
     prev_cutoff_perc,
     "prev_forecasting.pdf"
   ),
@@ -692,7 +694,7 @@ write.csv(
   df_predict_cutoff_allyear %>%
     filter(District == "Ratanakiri", Locus == "PfK13") %>%
     mutate(predict_prev = round(predict_prev, 2)),
-  "figures/supplement/Figure8-Forecasting/Figure7-Pailin-forecasting.csv"
+  "figures/supplement/Figure7-Forecasting/Figure7-Ratanakiri-forecasting.csv"
 )
 ```
 

@@ -272,7 +272,7 @@ pie_data2 <- pie_data2 %>%
 minr<-min(pie_data2$radius)  # min in the data original scale
 maxr<-max(pie_data2$radius)  # max in the data original scale
 min_scale<-0.1  ## min in the new scale
-max_scale<-0.35 ## max in the new scale
+max_scale<-0.45 ## max in the new scale
 pie_data2$radius_adj <- min_scale + (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
 ```
 
@@ -280,7 +280,6 @@ pie_data2$radius_adj <- min_scale + (max_scale-min_scale)*pie_data2$radius/(maxr
 ```{r}
 # make plot with wild_type
 pie_chart_df <- pie_data2 %>% filter(year == 2022)
-val <- 1.2
 map_uganda <- ggplot() +
   geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
   geom_sf(data=uganda, fill = "moccasin") +
@@ -311,24 +310,27 @@ map_uganda <- ggplot() +
   geom_scatterpie(data = pie_chart_df, 
                   aes(x=long, y=lat, group=District, r = radius_adj), 
                   cols=c("A675V", "C469F", "C469Y", "R561H", "P441L")) +
-  geom_scatterpie_legend(pie_chart_df$radius_adj*val, 
-                         x=28.7, 
-                         y=2.1, 
-                         labeller = function(x) round(((0.639899*(x-0.1))/0.25)*100))+
+  geom_scatterpie_legend(pie_chart_df$radius_adj,
+                         x=28.7,
+                         y=2,
+                         labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100), #convert adjusted radius size back to the mutant/genotyped
+                         n=4)+
     theme(legend.text=element_text(size=10), 
         axis.text = element_text(size = 10), 
         legend.position = c(0.085,0.89)) +
     scale_fill_manual(values = c("#D55E00",
-                               "#0072B2",
-                               "#009E73",
-                               "#F0E442",
-                               "#59386c"),
+                                 "#0072B2",
+                                 "#009E73",
+                                 "#F0E442",
+                                 "#59386c"),
                       labels = c("675V",
-                                "469F",
-                                "469Y",
-                                "561H",
-                                "441L"),
+                                 "469F",
+                                 "469Y",
+                                 "561H",
+                                 "441L"),
                       name = "")
+
+
 ```
 
 ## Saving Plots

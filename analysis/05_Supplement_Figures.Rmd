@@ -256,7 +256,7 @@ for (y in 2016:2022){
                   cols=c("A675V", "C469F", "C469Y", "R561H", "P441L")) +
   geom_scatterpie_legend(pie_chart_df$radius_adj*val,
                          x=28.7, y=2.0,
-                         labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100)) +
+                         labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100)) + #convert adjusted radius size back to the mutant/genotyped
     # geom_scatterpie_legend(pie_chart_df$radius_adj*val, 
     #                    x=28.7, y=2.0, 
     #                    labeller = function(x) round(x*100)) +

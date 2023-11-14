@@ -168,7 +168,7 @@ prev_plot <- prev_df2  %>%
   scale_color_manual(
     values = c("#56B4E9", "#E69F00", "#009E73"),
     name = "Mutations",
-    labels = c("580Y", "K13", "539T")
+    labels = c("580Y", "PfK13", "539T")
   ) +
   scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) + 
   ylab("Prevalence") +
@@ -228,7 +228,7 @@ stan_eff <- as.data.frame(t(data.frame(all_kelch_stanmod$stan_summary[2, c("2.5%
 mutate(method = "Bayesian (Intercept + Slope)") %>%
 setNames(c("conf.low", "estimate", "conf.high", "method"))
 
-effect_size <- rbind(effect_size, stan_eff %>% mutate(mutation = "K13"))
+effect_size <- rbind(effect_size, stan_eff %>% mutate(mutation = "PfK13"))
 
 #confidence interval per site and mutation
 stan_eff_c580y <- as.data.frame(c580y_stanmod$stan_summary[grep("year District", rownames(c580y_stanmod$stan_summary)),]) %>%
@@ -264,7 +264,7 @@ coef_r539t <- ranef(r539t_stanmod)$District %>%
 
 coef_all_kelch <- ranef(all_kelch_stanmod)$District %>% 
   mutate(District = rownames(ranef(all_kelch_stanmod)$District), 
-         mutation = "K13", 
+         mutation = "PfK13", 
          estimate = ranef(all_kelch_stanmod)$District$adj_year, 
          conf.low = stan_eff_all_kelch$conf.low, 
          conf.high = stan_eff_all_kelch$conf.high) %>% 
@@ -281,15 +281,15 @@ effect_size_bay <- effect_size %>%
 
 selec_coef$estimate[selec_coef$mutation == "C580Y"] <- selec_coef$estimate[selec_coef$mutation == "C580Y"] + effect_size_bay$estimate[effect_size_bay$mutation == "C580Y"]
 selec_coef$estimate[selec_coef$mutation == "R539T"] <- selec_coef$estimate[selec_coef$mutation == "R539T"] + effect_size_bay$estimate[effect_size_bay$mutation == "R539T"]
-selec_coef$estimate[selec_coef$mutation == "K13"] <- selec_coef$estimate[selec_coef$mutation == "K13"] + effect_size_bay$estimate[effect_size_bay$mutation == "K13"]
+selec_coef$estimate[selec_coef$mutation == "PfK13"] <- selec_coef$estimate[selec_coef$mutation == "PfK13"] + effect_size_bay$estimate[effect_size_bay$mutation == "PfK13"]
 
 selec_coef$conf.low[selec_coef$mutation == "C580Y"] <- selec_coef$conf.low[selec_coef$mutation == "C580Y"] + effect_size_bay$conf.low[effect_size_bay$mutation == "C580Y"]
 selec_coef$conf.low[selec_coef$mutation == "R539T"] <- selec_coef$conf.low[selec_coef$mutation == "R539T"] + effect_size_bay$conf.low[effect_size_bay$mutation == "R539T"]
-selec_coef$conf.low[selec_coef$mutation == "K13"] <- selec_coef$conf.low[selec_coef$mutation == "K13"] + effect_size_bay$conf.low[effect_size_bay$mutation == "K13"]
+selec_coef$conf.low[selec_coef$mutation == "PfK13"] <- selec_coef$conf.low[selec_coef$mutation == "PfK13"] + effect_size_bay$conf.low[effect_size_bay$mutation == "PfK13"]
 
 selec_coef$conf.high[selec_coef$mutation == "C580Y"] <- selec_coef$conf.high[selec_coef$mutation == "C580Y"] + effect_size_bay$conf.high[effect_size_bay$mutation == "C580Y"]
 selec_coef$conf.high[selec_coef$mutation == "R539T"] <- selec_coef$conf.high[selec_coef$mutation == "R539T"] + effect_size_bay$conf.high[effect_size_bay$mutation == "R539T"]
-selec_coef$conf.high[selec_coef$mutation == "K13"] <- selec_coef$conf.high[selec_coef$mutation == "K13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "K13"]
+selec_coef$conf.high[selec_coef$mutation == "PfK13"] <- selec_coef$conf.high[selec_coef$mutation == "PfK13"] + effect_size_bay$conf.high[effect_size_bay$mutation == "PfK13"]
 
 effect_size_bay$s <- 18
 effect_size_bay$sizes <- 1.1
@@ -317,7 +317,7 @@ selection_coef_bay <- ggplot() +
   geom_pointrange(data = effect_size_bay, 
                   aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
                   position=position_dodge(width = 0.5), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
-  scale_y_discrete(labels = c("539T", "580Y", "K13")) +
+  scale_y_discrete(labels = c("539T", "580Y", "PfK13")) +
   ylab("Mutation") +
   xlab("Selection Coefficient") +
   xlim(-2.5,4) +
@@ -388,9 +388,9 @@ selec_ceof_stats[2, ] <- cbind("539T",
                                round(max_539T, 3), 
                                effect_size_bay[which(effect_size_bay$estimate == max_539T),][5])
 
-min_PfK13 <- min(effect_size_bay %>% filter(mutation == "K13" & District != "Southeast Asia") %>% pull(estimate))
-max_PfK13 <- max(effect_size_bay %>% filter(mutation == "K13" & District != "Southeast Asia") %>% pull(estimate))
-selec_ceof_stats[3, ] <- cbind("K13", 
+min_PfK13 <- min(effect_size_bay %>% filter(mutation == "PfK13" & District != "Southeast Asia") %>% pull(estimate))
+max_PfK13 <- max(effect_size_bay %>% filter(mutation == "PfK13" & District != "Southeast Asia") %>% pull(estimate))
+selec_ceof_stats[3, ] <- cbind("PfK13", 
                                round(min_PfK13, 3), 
                                effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][5], 
                                round(max_PfK13, 3), 
