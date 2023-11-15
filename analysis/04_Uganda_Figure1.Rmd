@@ -71,7 +71,7 @@ prev <- df %>% select(-x_org, -value) %>%
                                "469F",
                                "469Y",
                                "441L",
-                               "PfK13",
+                               "K13 combined",
                                "561H")) +
   scale_color_manual(values = c("#D55E00",
                                "#0072B2",
@@ -83,7 +83,7 @@ prev <- df %>% select(-x_org, -value) %>%
                                "469F",
                                "469Y",
                                "441L",
-                               "PfK13",
+                               "K13 combined",
                                "561H")) +
   xlab("Year") +
   ylab("Prevalence") +
@@ -97,7 +97,7 @@ prev <- df %>% select(-x_org, -value) %>%
         axis.title=element_text(size=12), 
         legend.text=element_text(size=10), 
         strip.text.x = element_text(size = 10), 
-        legend.position = c(.25 , .99), 
+        legend.position = c(.4 , .99), 
         legend.justification = c("right", "top"), 
         legend.box.just = "right", 
         legend.margin = margin(1, 1, 1, 1))
