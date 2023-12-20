@@ -329,8 +329,8 @@ prev <- df_pfk7 %>%
                "#BBBBBB",
                "#E69F00"),
     labels = c("580Y",
-               "other PfK13",
-               "PfK13",
+               "other K13",
+               "K13",
                "539T")) +
   scale_fill_manual("Mutations",
     values = c("#56B4E9",
@@ -338,8 +338,8 @@ prev <- df_pfk7 %>%
                "#BBBBBB",
                "#E69F00"),
     labels = c("580Y",
-               "other PfK13",
-               "PfK13",
+               "other K13",
+               "K13",
                "539T")) +
   xlab("Year") +
   ylab("Prevalence") +
@@ -351,7 +351,7 @@ prev <- df_pfk7 %>%
         axis.title=element_text(size=12), 
         legend.text=element_text(size=10), 
         strip.text.x = element_text(size = 10), 
-        legend.position = c(.25 , .99), 
+        legend.position = c(.2 , .99), 
         legend.justification = c("right", "top"), 
         legend.box.just = "right", 
         legend.margin = margin(1, 1, 1, 1))
@@ -710,7 +710,7 @@ plot_overview_seAsia <-
   ggpubr::theme_pubclean(base_size = 12) +
   scale_color_manual("Mutations",
     values = c("#56B4E9", "#E69F00", "#009E73"),
-    labels = c("580Y", "PfK13", "539T")) +
+    labels = c("580Y", "K13", "539T")) +
   theme(
     axis.line = element_line(),
     legend.title = element_text(size = 12),

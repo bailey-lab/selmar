@@ -61,6 +61,12 @@ prev <- df %>% select(-x_org, -value) %>%
   ggplot(aes(x = year, y = prev_all, fill=Locus, color = Locus)) +
   geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
   theme_bw() +
+  ylab("Prevalence") +
+  scale_y_continuous(limits = c(0,0.3), 
+                     labels = scales::percent) +
+  scale_x_continuous("Year", 
+                     labels = as.character(df$year), 
+                     breaks = df$year) +
   scale_fill_manual(values = c("#D55E00",
                                "#0072B2",
                                "#009E73",
@@ -72,7 +78,8 @@ prev <- df %>% select(-x_org, -value) %>%
                                "469Y",
                                "441L",
                                "K13 combined",
-                               "561H")) +
+                               "561H"),
+                    name = "Mutations") +
   scale_color_manual(values = c("#D55E00",
                                "#0072B2",
                                "#009E73",
@@ -84,16 +91,11 @@ prev <- df %>% select(-x_org, -value) %>%
                                "469Y",
                                "441L",
                                "K13 combined",
-                               "561H")) +
-  xlab("Year") +
-  ylab("Prevalence") +
-  scale_y_continuous(limits = c(0,0.3), 
-                     labels = scales::percent) +
-  scale_x_continuous("Year", 
-                     labels = as.character(df$year), 
-                     breaks = df$year) +
-  theme(legend.title=element_blank(), 
-        axis.text = element_text(size = 10), 
+                               "561H"),
+                    name = "Mutations") +
+  labs(fill='Mutations') +
+  labs(fill='color') +
+  theme(axis.text = element_text(size = 10), 
         axis.title=element_text(size=12), 
         legend.text=element_text(size=10), 
         strip.text.x = element_text(size = 10), 
@@ -293,9 +295,9 @@ map_uganda <- ggplot() +
   coord_sf(xlim = c(28.5, 35), ylim = c(4 ,-2), expand = TRUE) +
   annotate("text", x = 34.8, y = 0.5, label = "Kenya",
            color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 29.4, y = 1.2, label = "Democratic Republic \n of the Congo",
+  annotate("text", x = 29.4, y = 2, label = "Democratic Republic \n of the Congo",
            color="grey50", size=4 , fontface="italic") +
-  annotate("text", x = 30.2, y = -1.7, label = "Rwanda",
+  annotate("text", x = 30.2, y = -1.9, label = "Rwanda",
            color="grey50", size=4 , fontface="italic") +
   annotate("text", x = 31.4, y = 3.956, label = "South Sudan",
            color="grey50", size=4 , fontface="italic") +
@@ -312,12 +314,12 @@ map_uganda <- ggplot() +
                   cols=c("A675V", "C469F", "C469Y", "R561H", "P441L")) +
   geom_scatterpie_legend(pie_chart_df$radius_adj,
                          x=28.7,
-                         y=2,
+                         y=0.7,
                          labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100), #convert adjusted radius size back to the mutant/genotyped
                          n=4)+
     theme(legend.text=element_text(size=10), 
         axis.text = element_text(size = 10), 
-        legend.position = c(0.085,0.89)) +
+        legend.position = c(0.085,0.84)) +
     scale_fill_manual(values = c("#D55E00",
                                  "#0072B2",
                                  "#009E73",
@@ -328,7 +330,7 @@ map_uganda <- ggplot() +
                                  "469Y",
                                  "561H",
                                  "441L"),
-                      name = "")
+                      name = "Mutations")
 
 
 ```

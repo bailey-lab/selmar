@@ -57,7 +57,8 @@ PfK13_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
     filter(Locus == "PfK13" & nobs > numofobs),
-  weights = wt_med, adapt_delta = 0.9975
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 new_data <- df %>%
@@ -104,7 +105,7 @@ new_data <- df %>%
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
   select(adj_year, year, District, Locus, min_year, max_year) %>%
   mutate(min_year = replace(min_year, is.na(min_year), 0),
-         max_year = replace(max_year, is.na(max_year), 0)) 
+         max_year = replace(max_year, is.na(max_year), 0))
 
 new_data <- new_data %>%
     group_by(District, Locus) %>%
@@ -133,7 +134,7 @@ a675v_pred <- rstanarm::stan_glmer(
 # forecasting for A467V
 new_data <- df %>%
   filter(nobs > numofobs, 
-         is.finite(df$lrsmed), 
+         is.finite(lrsmed), 
          Locus == "A675V") %>% # this is for c469Y model
   group_by(District, Locus) %>% # we group by the District and Locus
   complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
@@ -148,8 +149,8 @@ new_data <- new_data %>%
     arrange(Locus, District, year) %>%
     ungroup
 
-new_data$predict <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
-conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% 
+new_data$predict <- rstanarm::posterior_predict(a675v_pred, type = "response", newdata = new_data) %>% colMeans
+conf_val <- rstanarm::posterior_predict(a675v_pred, type = "response", newdata = new_data) %>% 
   apply(2, quantile, prob = (c(0.025, 0.975)))
 new_data$conf.low <- conf_val[1,]
 new_data$conf.high <- conf_val[2,] 
@@ -182,8 +183,8 @@ new_data <- new_data %>%
     arrange(Locus, District, year) %>%
     ungroup
 
-new_data$predict <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% colMeans
-conf_val <- rstanarm::posterior_predict(c469y_pred, type = "response", newdata = new_data) %>% 
+new_data$predict <- rstanarm::posterior_predict(c469f_pred, type = "response", newdata = new_data) %>% colMeans
+conf_val <- rstanarm::posterior_predict(c469f_pred, type = "response", newdata = new_data) %>% 
   apply(2, quantile, prob = (c(0.025, 0.975)))
 new_data$conf.low <- conf_val[1,]
 new_data$conf.high <- conf_val[2,] 
@@ -202,7 +203,8 @@ p441l_pred <- rstanarm::stan_glmer(
   lrsmed ~ adj_year + (1 + adj_year | District),
   data = df %>% 
     filter(Locus == "P441L" & nobs > numofobs),
-  weights = wt_med, adapt_delta = 0.9975
+  weights = wt_med, 
+  adapt_delta = 0.9975
 )
 
 # forecasting for P441L
@@ -223,48 +225,6 @@ new_data <- new_data %>%
 
 new_data$predict <- rstanarm::posterior_predict(p441l_pred, type = "response", newdata = new_data) %>% colMeans
 conf_val <- rstanarm::posterior_predict(p441l_pred, type = "response", newdata = new_data) %>% 
-  apply(2, quantile, prob = (c(0.025, 0.975)))
-new_data$conf.low <- conf_val[1,]
-new_data$conf.high <- conf_val[2,] 
-
-df_predict <- rbind(df_predict, new_data)
-
-df_predict_allyear <- df_predict %>% 
-  group_by(District, Locus) %>% 
-  mutate(min_year = replace_na(min_year, 0),
-         min_year = max(min_year),
-         max_year = replace_na(max_year, 0),
-         max_year = max(max_year))
-
-#------ Model prediction for PfK13 ------
-PfK13_pred <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = df %>% 
-    filter(Locus == "PfK13" & nobs > numofobs),
-  weights = wt_med,
-  adapt_delta = 0.9975
-)
-
-# forecasting for PfK13
-new_data <- df %>%
-  filter(nobs > numofobs, 
-         is.finite(df$lrsmed), 
-         Locus == "PfK13") %>% # this is for PfK13 model
-  group_by(District, Locus) %>% # we group by the District and Locus
-  complete(year = seq(max(year), 2033, 1)) %>% # this creates all the year values up to 2023
-  select(adj_year, year, District, Locus, min_year, max_year) %>%
-  mutate(min_year = replace(min_year, is.na(min_year), 0),
-         max_year = replace(max_year, is.na(max_year), 0)) 
-
-new_data <- new_data %>%
-    group_by(District, Locus) %>%
-    mutate(min_year = max(min_year),
-      adj_year = year - min_year) %>%
-    arrange(Locus, District, year) %>%
-    ungroup
-
-new_data$predict <- rstanarm::posterior_predict(PfK13_pred, type = "response", newdata = new_data) %>% colMeans
-conf_val <- rstanarm::posterior_predict(PfK13_pred, type = "response", newdata = new_data) %>% 
   apply(2, quantile, prob = (c(0.025, 0.975)))
 new_data$conf.low <- conf_val[1,]
 new_data$conf.high <- conf_val[2,] 
@@ -303,10 +263,11 @@ ex_pt <- df_comb %>%
          District %in% unique(df_pred$District))
   
 pred_PfK13 <- ggplot() +
-  geom_line(data = df_true, aes(year, predict_prev, color = "#CC79A7")) +
-  geom_line(data = df_pred, aes(year, predict_prev, color = "#CC79A7")) +
-  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "#CC79A7", fill = "#CC79A7"), linetype = "dashed", alpha = 0.2, show.legend = FALSE) +
-  geom_point(data = ex_pt, aes(x = year, y = med * 100, color = "#CC79A7")) +
+  geom_line(data = df_true, aes(year, predict_prev), color = "#CC79A7", show.legend = FALSE) +
+  geom_line(data = df_pred, aes(year, predict_prev), color = "#CC79A7", show.legend = FALSE) +
+  geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year), color = "#CC79A7", fill = "#CC79A7", linetype = "dashed", alpha = 0.2, show.legend = FALSE) +
+  geom_point(data = ex_pt, aes(x = year, y = med * 100, size = n), color = "#CC79A7") +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("K13 Prevalence") +
@@ -327,7 +288,7 @@ pred_PfK13 <- ggplot() +
     strip.text.x = element_text(size = 10),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
-    legend.position = "none",
+    legend.position = "right",
     panel.spacing = unit(0.2, "lines")) 
 
 ################ PLOT FOR A675V ################
@@ -345,16 +306,17 @@ ex_pt <- df %>%
   
 pred_a675v <- ggplot() +
   geom_line(data = df_true, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev), color = "#CC79A7", show.legend = FALSE) +
   geom_line(data = df_pred, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev), color = "#CC79A7", show.legend = FALSE) +
   geom_ribbon(data = df_pred, 
-              aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "#CC79A7", fill = "#CC79A7"), 
+              aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year), color = "#CC79A7", fill = "#CC79A7", 
               linetype = "dashed", 
               alpha = 0.2,  
               show.legend = FALSE) +
   geom_point(data = ex_pt, 
-             aes(x = year, y = med * 100, color = "#CC79A7")) +
+             aes(x = year, y = med * 100, size = n), color = "#CC79A7") +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("675V Prevalence") +
@@ -375,7 +337,7 @@ pred_a675v <- ggplot() +
     strip.text.x = element_text(size = 10),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
-    legend.position = "none",
+    legend.position = "right",
     panel.spacing = unit(0.2, "lines")) 
 
 ################ PLOT FOR C469Y ################
@@ -392,16 +354,17 @@ ex_pt <-df %>%
 
 pred_c469y <- ggplot() +
   geom_line(data = df_true, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev, color = "#CC79A7"), show.legend = FALSE) +
   geom_line(data = df_pred, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev, color = "#CC79A7"), show.legend = FALSE) +
   geom_ribbon(data = df_pred, 
               aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "#CC79A7", fill = "#CC79A7"), 
               linetype = "dashed", 
               alpha = 0.2,  
               show.legend = FALSE) +
   geom_point(data = ex_pt, 
-             aes(x = year, y = med * 100, color = "#CC79A7")) +
+             aes(x = year, y = med * 100, size=n), color = "#CC79A7") +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("469Y Prevalence") +
@@ -439,15 +402,16 @@ ex_pt <-df %>%
 
 pred_c469f <- ggplot() +
   geom_line(data = df_true, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev, color = "#CC79A7"), show.legend = FALSE) +
   geom_line(data = df_pred, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev, color = "#CC79A7"), show.legend = FALSE) +
   geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "#CC79A7", fill = "#CC79A7"), 
               linetype = "dashed", 
               alpha = 0.2,  
               show.legend = FALSE) +
   geom_point(data = ex_pt, 
-             aes(x = year, y = med * 100, color = "#CC79A7")) +
+             aes(x = year, y = med * 100, size = n), color = "#CC79A7") +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("469F Prevalence") +
@@ -468,7 +432,7 @@ pred_c469f <- ggplot() +
     strip.text.x = element_text(size = 10),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
-    legend.position = "none",
+    legend.position = "right",
     panel.spacing = unit(0.2, "lines")) 
 
 ################ PLOT FOR P441L ################
@@ -485,15 +449,16 @@ ex_pt <-df %>%
 
 pred_p441l <- ggplot() +
   geom_line(data = df_true, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev, color = "#CC79A7"), show.legend = FALSE) +
   geom_line(data = df_pred, 
-            aes(year, predict_prev, color = "#CC79A7")) +
+            aes(year, predict_prev, color = "#CC79A7"), show.legend = FALSE) +
   geom_ribbon(data = df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = "#CC79A7", fill = "#CC79A7"), 
               linetype = "dashed", 
               alpha = 0.2,  
               show.legend = FALSE) +
   geom_point(data = ex_pt, 
-             aes(x = year, y = med * 100, color = "#CC79A7")) +
+             aes(x = year, y = med * 100, size = n), color = "#CC79A7") +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("441L Prevalence") +
@@ -514,7 +479,7 @@ pred_p441l <- ggplot() +
     strip.text.x = element_text(size = 10),
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 8),
-    legend.position = "none",
+    legend.position = "right",
     panel.spacing = unit(0.2, "lines")) 
 ```
 
@@ -592,4 +557,31 @@ ggsave(
   height = fig6_height,
   dpi = 700
 )
+```
+
+## Fixation
+```{r}
+write_csv(df_predict_allyear, "figures/Figure5-Forecasting/Uganda/forecasting_data.csv")
+
+fix = df_predict_allyear  %>% filter(predict_prev >= 95)
+
+fix <- fix %>%
+  group_by(District, Locus) %>%
+  filter(year == min(year)) %>%
+  ungroup %>%
+  mutate(fixation =year - min_year) %>%
+  group_by(Locus) %>%
+  mutate(med = median(fixation),
+         med_year = median(year),
+         min_fixyear = min(year),
+         max_fixyear = max(year))
+
+write_csv(fix, "figures/Figure5-Forecasting/Uganda/fixation_95.csv")
+
+data_469Y_675V <- df_predict_allyear  %>% filter(Locus == "C469Y" | Locus == "A675V", year == 2033) %>%
+  ungroup %>%
+  group_by(Locus) %>%
+  mutate(avg_prev = mean(predict_prev))
+write_csv(data_469Y_675V, "figures/Figure5-Forecasting/Uganda/data_469Y_675V.csv")
+
 ```

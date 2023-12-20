@@ -38,7 +38,7 @@ pfk7_data <- read.table("data/data-derived/pfk7_data.txt") %>% filter(Locus != "
 
 pfk7_data2 <- pfk7_data %>% 
   group_by(Locus, District) %>%
-  filter(nobs > numofobs) %>% #remove all distrcit where the first non-zero prevalence is larger than 50%
+  filter(nobs > numofobs) %>%
   arrange(Locus, District, year)
 
 #----- C580Y -----
@@ -724,11 +724,11 @@ C580Y_ex_pt <- pfk7_data %>%
 
 fig6_prev_cutoff_plot_C580Y <- 
   ggplot() +
-  geom_point(data = C580Y_ex_pt, aes(x=year, y=prev*100, color = point_col, group = Locus)) +
-  scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
-  geom_line(data = C580Y_df_true, aes(year, predict_prev, color = point_col, group = Locus)) + 
-  geom_line(data = C580Y_df_pred, aes(year, predict_prev, color = point_col, group = Locus)) +
-  geom_ribbon(data = C580Y_df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = point_col, group = Locus, fill = point_col), linetype = "dashed", alpha = 0.2) +
+  geom_point(data = C580Y_ex_pt, aes(x=year, y=prev*100, group = Locus, size = n), color = C580Y_ex_pt$point_col) +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
+  geom_line(data = C580Y_df_true, aes(year, predict_prev, color = point_col, group = Locus), show_guide=FALSE) + 
+  geom_line(data = C580Y_df_pred, aes(year, predict_prev, color = point_col, group = Locus), show_guide=FALSE) +
+  geom_ribbon(data = C580Y_df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = point_col, group = Locus, fill = point_col), linetype = "dashed", alpha = 0.2, show_guide=FALSE) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("580Y Prevalence") +
@@ -747,7 +747,7 @@ fig6_prev_cutoff_plot_C580Y <-
       strip.text.x = element_text(size = 10),
       legend.title = element_text(size = 10),
       legend.text = element_text(size = 8),
-      legend.position = "none",
+      legend.position = "right",
       panel.spacing = unit(0.2, "lines")
     )
 
@@ -775,11 +775,11 @@ PfK13_ex_pt <- pfk7_data %>%
 
 fig6_prev_cutoff_plot_PfK13 <- 
   ggplot() +
-  geom_point(data = PfK13_ex_pt, aes(x=year, y=prev*100, color = point_col, group = Locus)) +
-  scale_size_binned(name = "Sample Size", range = c(0.2,2)) +
-  geom_line(data = PfK13_df_true, aes(year, predict_prev, color = point_col, group = Locus)) + 
-  geom_line(data = PfK13_df_pred, aes(year, predict_prev, color = point_col, group = Locus)) +
-  geom_ribbon(data = PfK13_df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = point_col, group = Locus, fill = point_col), linetype = "dashed", alpha = 0.2) +
+  geom_point(data = PfK13_ex_pt, aes(x=year, y=prev*100, group = Locus, size = n), color = PfK13_ex_pt$point_col) +
+  scale_size_binned(name = "Sample \n Size", range = c(0.2,3)) +
+  geom_line(data = PfK13_df_true, aes(year, predict_prev, color = point_col, group = Locus), show_guide=FALSE) + 
+  geom_line(data = PfK13_df_pred, aes(year, predict_prev, color = point_col, group = Locus), show_guide=FALSE) +
+  geom_ribbon(data = PfK13_df_pred, aes(ymin = conf.low_prev, ymax = conf.high_prev, x = year, color = point_col, group = Locus, fill = point_col), linetype = "dashed", alpha = 0.2, show_guide=FALSE) +
   theme_bw() +
   facet_wrap(~District) +
   ylab("K13 Prevalence") +
@@ -798,7 +798,7 @@ fig6_prev_cutoff_plot_PfK13 <-
       strip.text.x = element_text(size = 10),
       legend.title = element_text(size = 10),
       legend.text = element_text(size = 8),
-      legend.position = "none",
+      legend.position = "right",
       panel.spacing = unit(0.2, "lines")
     )
 ```
@@ -906,4 +906,75 @@ write.csv(
   pred_data_filter,
   "figures/Figure5-Forecasting/SE_Asia/Datapoint%_95Crl.csv"
 )
+```
+## Fixation values
+```{r}
+fix = df_predict_cutoff_allyear  %>% filter(predict_prev >= 95)
+write_csv(fix, "figures/Figure5-Forecasting/SE_Asia/fixation_95.csv")
+fix_K13 = df_predict_cutoff_allyear  %>% filter(predict_prev >= 90, Locus == "PfK13")
+
+fix <- fix %>%
+  group_by(District, Locus) %>%
+  filter(year == min(year)) %>%
+  ungroup %>%
+  mutate(fixation =year - min_year) %>%
+  group_by(Locus) %>%
+  mutate(med = median(fixation),
+         med_year = median(year),
+         min_fixyear = min(year),
+         max_fixyear = max(year))
+
+fix_K13 <- fix_K13 %>%
+  group_by(District, Locus) %>%
+  filter(year == min(year)) %>%
+  ungroup %>%
+  mutate(fixation =year - min_year) %>%
+  group_by(Locus) %>%
+  mutate(med = median(fixation),
+         med_year = median(year),
+         min_fixyear = min(year),
+         max_fixyear = max(year))
+
+
+```
+
+## Underprediction analysis
+```{r}
+predicted_df <- df_predict_cutoff_allyear %>%
+  select(adj_year, year, District, country, Locus, min_year, label, predict_prev) %>%
+  filter(label == "4year") %>%
+  arrange(country, District, Locus, year)
+
+observed_df <- pfk7_data %>%
+  select(adj_year, year, District, country, Locus, min_year, prev, n) %>%
+  arrange(country, District, Locus, year)
+
+predicted_df <- predicted_df %>% mutate(label_year = paste0(country, District, year, Locus))
+observed_df <- observed_df %>% mutate(label_year = paste0(country, District, year, Locus))
+
+obs_df <-  observed_df[observed_df$label_year %in% predicted_df$label_year,]
+pred_df <-  predicted_df[predicted_df$label_year %in% observed_df$label_year,] 
+
+# pred_df <- pred_df %>% 
+#   ungroup %>%
+#   select(label_year, label, predict_prev) %>% 
+#   rename(label_year_pred = label_year, label_pred = label)
+
+pred_df <- pred_df %>% 
+  ungroup %>%
+  select(label, predict_prev) %>%
+  rename(label_pred = label)
+
+compare_df <- cbind(obs_df, pred_df) %>%
+  mutate(prev = prev*100,
+         error = prev-predict_prev) %>%
+  group_by(Locus) %>%
+  mutate(weighted_mean_error = weighted.mean(error, n),
+         median_error = median(error)) %>%
+  ungroup %>%
+  mutate(weighted_mean_error_overall = weighted.mean(error, n),
+         median_error_overall = median(error))
+  
+write_csv(compare_df, "figures/Figure5-Forecasting/SE_Asia/low_prev.csv")
+
 ```

@@ -391,7 +391,8 @@ effect_size_bay <- effect_size_bay %>%
   mutate(mutation = replace(mutation, mutation == "A675V", "675V")) %>% 
   mutate(mutation = replace(mutation, mutation == "C469Y", "469Y")) %>% 
   mutate(mutation = replace(mutation, mutation == "C469F", "469F")) %>%
-  mutate(mutation = replace(mutation, mutation == "P441L", "441L"))
+  mutate(mutation = replace(mutation, mutation == "P441L", "441L")) %>%
+  mutate(mutation = replace(mutation, mutation == "PfK13", "K13")) 
 
 effect_size_bay <- effect_size_bay %>% 
   relocate(District, mutation) %>% 
@@ -496,12 +497,12 @@ max_441L <- max(effect_size_bay %>%
 selec_ceof_stats[4, ] <- cbind("441L", min_441L, effect_size_bay[which(effect_size_bay$estimate == min_441L),][1], max_441L, effect_size_bay[which(effect_size_bay$estimate == max_441L),][1])
 
 min_PfK13 <- min(effect_size_bay %>% 
-                  filter(mutation == "PfK13" & District != "Uganda") %>% 
+                  filter(mutation == "K13" & District != "Uganda") %>% 
                   pull(estimate))
 max_PfK13 <- max(effect_size_bay %>% 
-                  filter(mutation == "PfK13" & District != "Uganda") %>% 
+                  filter(mutation == "K13" & District != "Uganda") %>% 
                   pull(estimate))
-selec_ceof_stats[5, ] <- cbind("PfK13", min_PfK13, effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][1], max_PfK13, effect_size_bay[which(effect_size_bay$estimate == max_PfK13),][1])
+selec_ceof_stats[5, ] <- cbind("K13", min_PfK13, effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][1], max_PfK13, effect_size_bay[which(effect_size_bay$estimate == max_PfK13),][1])
 
 colnames(selec_ceof_stats) <- c("Mutation", "Min Select Ceof", "District", "Max Select Ceof", "District")
 ```

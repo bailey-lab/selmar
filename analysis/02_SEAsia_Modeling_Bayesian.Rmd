@@ -49,7 +49,7 @@ pfk7_data <- pfk7_data2 %>%
   group_by(Locus, District) %>%
   filter(min_year <= 2010,
          year >= min_year & year <= min_year + 4, #filter for the first five years,
-         nobs > numofobs) %>% #remove all distrcit where the first non-zero prevalence is larger than 50%
+         nobs > numofobs) %>%
   arrange(Locus, District, year)
 ```
 
@@ -168,7 +168,7 @@ prev_plot <- prev_df2  %>%
   scale_color_manual(
     values = c("#56B4E9", "#E69F00", "#009E73"),
     name = "Mutations",
-    labels = c("580Y", "PfK13", "539T")
+    labels = c("580Y", "K13", "539T")
   ) +
   scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) + 
   ylab("Prevalence") +
@@ -317,7 +317,7 @@ selection_coef_bay <- ggplot() +
   geom_pointrange(data = effect_size_bay, 
                   aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
                   position=position_dodge(width = 0.5), shape = effect_size_bay$s, size = effect_size_bay$sizes) +
-  scale_y_discrete(labels = c("539T", "580Y", "PfK13")) +
+  scale_y_discrete(labels = c("539T", "580Y", "K13")) +
   ylab("Mutation") +
   xlab("Selection Coefficient") +
   xlim(-2.5,4) +
@@ -341,7 +341,8 @@ selection_coef_bay <- ggplot() +
 effect_size_bay2 <- effect_size_bay %>% 
   relocate(District, mutation) %>% 
   select(!(s:sizes)) %>% 
-  mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3))
+  mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3)) %>%
+  mutate(mutation = replace(mutation, mutation == "PfK13", "K13")) 
 ```
 
 ### Saving plots

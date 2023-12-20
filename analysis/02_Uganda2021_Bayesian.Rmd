@@ -163,7 +163,7 @@ df$conf.high_prev <- exp(df$conf.high)*100/(1+exp(df$conf.high))
 df$conf.low_prev <- exp(df$conf.low)*100/(1+exp(df$conf.low))
 ```
 
-# Figure Supplement 7: Plot for selection coefficient 
+# Figure S7: Plot for selection coefficient 
 ## Preprocessing
 ```{r}
 # Plot the effect sizes
@@ -297,7 +297,8 @@ effect_size_bay <- effect_size_bay %>%
   mutate(mutation = replace(mutation, mutation == "A675V", "675V")) %>% 
   mutate(mutation = replace(mutation, mutation == "C469Y", "469Y")) %>% 
   mutate(mutation = replace(mutation, mutation == "C469F", "469F")) %>%
-  mutate(mutation = replace(mutation, mutation == "P441L", "441L"))
+  mutate(mutation = replace(mutation, mutation == "P441L", "441L")) %>%
+  mutate(mutation = replace(mutation, mutation == "PfK13", "K13"))
 
 effect_size_bay <- effect_size_bay %>% 
   relocate(District, mutation) %>% 
@@ -337,7 +338,7 @@ selection_coef_bay <- ggplot() +
         axis.line = element_line(), 
         legend.position = "right", 
         plot.title = element_text(hjust = 0.5, size = 20), 
-        axis.text = element_text(size = 14), 
+        axis.text = element_text(size = 12), 
         axis.title=element_text(size=16), 
         legend.text=element_text(size=16))
 ```
@@ -345,14 +346,14 @@ selection_coef_bay <- ggplot() +
 ## Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript, "/supplement/Figure7-Uganda2021/Uganda2021_Effectsize.png"),
+  paste0(fileLocManuscript, "/supplement/Figure6-Uganda2021/Uganda2021_Effectsize.png"),
   selection_coef_bay,
   width = 8,
   height = 5,
   dpi = 700
 )
 ggsave(
-  paste0(fileLocManuscript, "supplement/Figure7-Uganda2021/Uganda2021_Effectsize.pdf"),
+  paste0(fileLocManuscript, "supplement/Figure6-Uganda2021/Uganda2021_Effectsize.pdf"),
   selection_coef_bay,
   width = 8,
   height = 5,
@@ -360,7 +361,7 @@ ggsave(
 )
 write.csv(
   effect_size_bay %>% select(!c(s, sizes)),
-  paste0(fileLocManuscript, "/supplement/Figure7-Uganda2021/2021Uganda_selectioncoefficients.csv"),
+  paste0(fileLocManuscript, "/supplement/Figure6-Uganda2021/2021Uganda_selectioncoefficients.csv"),
   row.names = F,
   quote = F
 )
@@ -402,12 +403,12 @@ max_441L <- max(effect_size_bay %>%
 selec_ceof_stats[4, ] <- cbind("441L", min_441L, effect_size_bay[which(effect_size_bay$estimate == min_441L),][1], max_441L, effect_size_bay[which(effect_size_bay$estimate == max_441L),][1])
 
 min_PfK13 <- min(effect_size_bay %>% 
-                  filter(mutation == "PfK13" & District != "Uganda") %>% 
+                  filter(mutation == "K13" & District != "Uganda") %>% 
                   pull(estimate))
 max_PfK13 <- max(effect_size_bay %>% 
-                  filter(mutation == "PfK13" & District != "Uganda") %>% 
+                  filter(mutation == "K13" & District != "Uganda") %>% 
                   pull(estimate))
-selec_ceof_stats[5, ] <- cbind("PfK13", min_PfK13, effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][1], max_PfK13, effect_size_bay[which(effect_size_bay$estimate == max_PfK13),][1])
+selec_ceof_stats[5, ] <- cbind("K13", min_PfK13, effect_size_bay[which(effect_size_bay$estimate == min_PfK13),][1], max_PfK13, effect_size_bay[which(effect_size_bay$estimate == max_PfK13),][1])
 
 colnames(selec_ceof_stats) <- c("Mutation", "Min Select Ceof", "District", "Max Select Ceof", "District")
 ```
@@ -416,7 +417,7 @@ colnames(selec_ceof_stats) <- c("Mutation", "Min Select Ceof", "District", "Max 
 ```{r}
 write.csv(
   selec_ceof_stats,
-  paste0(fileLocManuscript, "/supplement/Figure7-Uganda2021/2021Uganda_selectioncoefficients_stats.csv"),
+  paste0(fileLocManuscript, "/supplement/Figure6-Uganda2021/2021Uganda_selectioncoefficients_stats.csv"),
   row.names = F,
   quote = F
 )
