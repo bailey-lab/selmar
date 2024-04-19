@@ -3,8 +3,8 @@ library(tidyr)
 library(ggplot2)
 
 #data files in data-raw obtained from MalariaGen PfK7 database
-x <- read.csv("analysis/data/data-raw/Pf7-samples.csv")
-g <- read.delim("analysis/data/data-raw/genotypes.txt")
+x <- read.csv("data/data-raw/Pf7-samples.csv")
+g <- read.delim("data/data-raw/genotypes.txt")
 names(g)[1] <- "sample_id"
 
 head(x)
@@ -20,24 +20,24 @@ cam <- cam %>%
          !(kelch13_349.726_ns_changes %in% c("!", "*", "-", "!*"))) %>%
   arrange(country, site, year) %>%
   group_by(country, site, year) %>%
-  summarise(C580Y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
-            R539T = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
+  summarise(n = n(),
             PfK13 = sum(grepl("446|458|469|476|493|539t|539T|543|553|561|574|580Y|580y|622|675", kelch13_349.726_ns_changes)),
+            C580Y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
+            R539T = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
             other_PfK13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
-            n = n()) %>%
+            WT = n - PfK13) %>%
   ungroup %>%
-  pivot_longer(cols = C580Y:other_PfK13) %>%
+  pivot_longer(cols = PfK13:other_PfK13) %>%
   rename(Locus = name, x = value) %>%
-  select(country, site, year, n, x, Locus)
+  select(country, site, year, n, x, Locus, WT)
 
 pfk7_data <- cam %>%
   group_by(country, site, Locus) %>%
-  filter(is.finite(x)) %>%
-  mutate(min_year = min(year[x>0])) %>%
-  mutate(nobs= sum(x > 0)) %>%
+  mutate(min_year = min(year[x>0]),
+         nobs= sum(x > 0),
+         prev = x/(x + WT)) %>%
   ungroup %>%
-  mutate(adj_year = year - min_year,
-         prev = x / n)
+  mutate(adj_year = year - min_year) %>%
   filter(is.finite(min_year)) %>%
   arrange(Locus, country, site, year)
 
@@ -64,4 +64,4 @@ pfk7_data <-
 pfk7_data$lrsmed[pfk7_data$lrsmed == Inf] <- NA
 pfk7_data$lrsmed[pfk7_data$lrsmed == -Inf] <- NA
 
-write.table(pfk7_data,"data/data-derived/pfk7_data.txt")
+write.table(pfk7_data,"data/data-derived/pfk7_data_WT.txt")

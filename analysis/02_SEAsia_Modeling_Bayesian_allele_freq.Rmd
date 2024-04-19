@@ -1,0 +1,213 @@
+---
+title: "Kelch PfK7 Selection Coefficient Modeling - MANUSCRIPT"
+output: html_document
+date: "2024-04-17"
+---
+
+# This file estimates the selection coefficient using a Bayesian GLM model using
+# the K13 allele frequency estimates in SEA
+
+```{r}
+library(Matrix)
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+# Load data
+```{r}
+fileLocManuscript_pfK7 <- "figures/"
+
+#load data
+pfk7_data <- read.table("data/data-derived/pfk7_data_freq.txt")
+
+#set the limit of number of observations
+numofobs <- 2
+
+pfk7_data2 <- pfk7_data %>% 
+  filter(!(Locus == "PfK13" & District == "Binh Phuoc" & year == 2005)) %>%
+  group_by(Locus, District) 
+
+pfk7_data <- pfk7_data2 %>% 
+  group_by(Locus, District) %>%
+  filter(min_year <= 2010,
+         year >= min_year & year <= min_year + 4, #filter for the first five years,
+         nobs > numofobs) %>%
+  arrange(Locus, District, year)
+```
+
+# Bayesian GMM with slopes and intercepts
+```{r}
+# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+
+# ---- Model for c580y -----
+c580y_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% 
+    filter(Locus == "C580Y", nobs > numofobs),
+  weights = wt_med, 
+  adapt_delta = 0.9975
+)
+
+vals <- summary(c580y_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_c580y_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_c580y_stanmod$mutation <- rep("C580Y", dim(ranef_c580y_stanmod)[1])
+
+# ---- Model for r539t -----
+r539t_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(Locus == "R539T", nobs > numofobs),
+  weights = wt_med, 
+  adapt_delta = 0.9975
+)
+
+vals <- summary(r539t_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_r539t_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_r539t_stanmod$mutation <- rep("R539T", dim(ranef_r539t_stanmod)[1])
+
+# ---- Model for combined kelch -----
+all_kelch_stanmod <- rstanarm::stan_glmer(
+  lrsmed ~ adj_year + (1 + adj_year | District),
+  data = pfk7_data %>% filter(Locus == "K13", nobs > numofobs),
+  weights = wt_med, 
+  adapt_delta = 0.9975
+)
+
+vals <- summary(all_kelch_stanmod$stanfit)$summary[,1]
+vals <- vals[grep("^b", names(vals))]
+ranef_all_kelch_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
+           "Slopes" = vals[seq(2, length(vals), 2)])
+ranef_all_kelch_stanmod$mutation <- rep("K13", dim(ranef_all_kelch_stanmod)[1])
+
+ranef_stanmod <- rbind(ranef_c580y_stanmod, ranef_r539t_stanmod, ranef_all_kelch_stanmod)
+ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
+ranef_stanmod$site <- str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
+ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
+``` 
+
+## Posterior of the model
+```{r}
+#  get model predictions for plotting
+pfk7_data$predict_stan <- NA
+
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
+pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% colMeans
+```
+
+## Confidence interval
+```{r}
+#  get model predictions for plotting
+pfk7_data$conf.low <- NA
+pfk7_data$conf.high <- NA
+
+c580y_conf <- rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+r539t_conf <- rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+all_kelch_conf <- rstanarm::posterior_predict(all_kelch_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
+
+# here just add predictions  for the c469Y rows
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[1,]
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[1,]
+pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[1,]
+
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[2,]
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[2,]
+pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <- all_kelch_conf[2,]
+```
+
+## Prevalence scale
+```{r}
+# Plot the predictions in each site with only Bayesian
+#convert to prevalence scale
+pfk7_data$predict_stan_prev <- NA
+
+pfk7_data$predict_stan_prev <- exp(pfk7_data$predict_stan)*100/(1+exp(pfk7_data$predict_stan))
+pfk7_data$conf.high_prev <- exp(pfk7_data$conf.high)*100/(1+exp(pfk7_data$conf.high))
+pfk7_data$conf.low_prev <- exp(pfk7_data$conf.low)*100/(1+exp(pfk7_data$conf.low))
+```
+
+# SFigure5: Plot prevalence for all mutations
+## Preprocessing
+```{r}
+prev_df2 <- pfk7_data %>% filter(nobs > numofobs)
+prev_df <- rbind(prev_df2, pfk7_data %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")) ## added these sites to show general prevalence across SE Asia
+```
+
+## Supplement Plot
+```{r}
+allele_plot <- prev_df2  %>%
+  ggplot(aes(year, freq, group = Locus, color = Locus)) +
+  geom_point(aes(size = n/2, group = Locus, color = Locus)) +
+  facet_wrap(~Country + District) +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  geom_line(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
+  geom_ribbon(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  scale_color_manual(
+    values = c("#56B4E9", "#E69F00", "#009E73"),
+    name = "Mutations",
+    labels = c("580Y", "K13", "539T")
+  ) +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
+  ylab("Allele Freq") +
+  xlab("Year") +
+  ylim(-0.01, 1.01)+
+  ggpubr::theme_pubclean(base_size = 12)+
+  scale_x_continuous(limits = c(2002, 2014), 
+                     breaks = seq(2002, 2014, 4),
+                     minor_breaks = seq(2002, 2014, 2)) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    strip.text.x = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.position = "right",
+    legend.box = "vertial"
+  )
+```
+
+## Saving plots
+```{r}
+ggsave(
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_allele_freq.png"),
+  prev_plot,
+  width = 8,
+  height = 8,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_allele_freq.pdf"),
+  prev_plot,
+  width = 8,
+  height = 8,
+  dpi = 700
+)
+```
+
+

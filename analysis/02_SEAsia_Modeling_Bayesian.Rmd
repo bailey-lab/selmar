@@ -4,6 +4,9 @@ output: html_document
 date: "2023-03-16"
 ---
 
+# This file estimates the selection coefficient using a Bayesian GLM model using
+# the K13 prevalence estimates in SEA
+
 ```{r setup, include=FALSE}
 library(lme4)
 library(nlme)
