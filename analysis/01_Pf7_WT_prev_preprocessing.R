@@ -3,8 +3,8 @@ library(tidyr)
 library(ggplot2)
 
 #data files in data-raw obtained from MalariaGen PfK7 database
-x <- read.csv("data/data-raw/Pf7-samples.csv")
-g <- read.delim("data/data-raw/genotypes.txt")
+x <- read.csv("analysis/data/data-raw/Pf7-samples.csv")
+g <- read.delim("analysis/data/data-raw/genotypes.txt")
 names(g)[1] <- "sample_id"
 
 head(x)
@@ -21,13 +21,13 @@ cam <- cam %>%
   arrange(country, site, year) %>%
   group_by(country, site, year) %>%
   summarise(n = n(),
-            PfK13 = sum(grepl("446|458|469|476|493|539t|539T|543|553|561|574|580Y|580y|622|675", kelch13_349.726_ns_changes)),
+            K13 = sum(grepl("446|458|469|476|493|539t|539T|543|553|561|574|580Y|580y|622|675", kelch13_349.726_ns_changes)),
             C580Y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
             R539T = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
-            other_PfK13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
-            WT = n - PfK13) %>%
+            other_K13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
+            WT = n - K13) %>%
   ungroup %>%
-  pivot_longer(cols = PfK13:other_PfK13) %>%
+  pivot_longer(cols = K13:other_K13) %>%
   rename(Locus = name, x = value) %>%
   select(country, site, year, n, x, Locus, WT)
 
@@ -64,4 +64,4 @@ pfk7_data <-
 pfk7_data$lrsmed[pfk7_data$lrsmed == Inf] <- NA
 pfk7_data$lrsmed[pfk7_data$lrsmed == -Inf] <- NA
 
-write.table(pfk7_data,"data/data-derived/pfk7_data_WT.txt")
+write.table(pfk7_data,"analysis/data/data-derived/pfk7_data_WT.txt")

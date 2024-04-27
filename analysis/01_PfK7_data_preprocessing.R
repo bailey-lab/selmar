@@ -22,11 +22,11 @@ cam <- cam %>%
   group_by(country, site, year) %>%
   summarise(C580Y = sum(grepl("580Y|580y", kelch13_349.726_ns_changes)),
             R539T = sum(grepl("539t|539T", kelch13_349.726_ns_changes)),
-            PfK13 = sum(grepl("446|458|469|476|493|539t|539T|543|553|561|574|580Y|580y|622|675", kelch13_349.726_ns_changes)),
-            other_PfK13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
+            K13 = sum(grepl("446|458|469|476|493|539t|539T|543|553|561|574|580Y|580y|622|675", kelch13_349.726_ns_changes)),
+            other_K13 = sum(grepl("446|458|469|476|493|543|553|561|574|622|675", kelch13_349.726_ns_changes)),
             n = n()) %>%
   ungroup %>%
-  pivot_longer(cols = C580Y:other_PfK13) %>%
+  pivot_longer(cols = C580Y:other_K13) %>%
   rename(Locus = name, x = value) %>%
   select(country, site, year, n, x, Locus)
 
@@ -37,9 +37,18 @@ pfk7_data <- cam %>%
   mutate(nobs= sum(x > 0)) %>%
   ungroup %>%
   mutate(adj_year = year - min_year,
-         prev = x / n)
+         prev = x / n) %>%
   filter(is.finite(min_year)) %>%
   arrange(Locus, country, site, year)
+
+pfk7_data <- pfk7_data %>%
+  group_by(country, site, Locus) %>%
+  mutate(min_year = min(year[x>0])) %>%
+  mutate(nobs= sum(x > 0)) %>%
+  ungroup %>%
+  mutate(adj_year = year - min_year,
+         prev = x / n) %>%
+  filter(is.finite(min_year))
 
 # log ratio function
 se_ln_ratio_noZeros <- function(x, N) {
@@ -64,4 +73,4 @@ pfk7_data <-
 pfk7_data$lrsmed[pfk7_data$lrsmed == Inf] <- NA
 pfk7_data$lrsmed[pfk7_data$lrsmed == -Inf] <- NA
 
-write.table(pfk7_data,"data/data-derived/pfk7_data.txt")
+write.table(pfk7_data,"analysis/data/data-derived/pfk7_data.txt")

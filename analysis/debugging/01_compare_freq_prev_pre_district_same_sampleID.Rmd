@@ -1,0 +1,214 @@
+---
+title: "Compare PfK7 data per district"
+output: html_document
+date: "2024-04-21"
+---
+
+```{r}
+kelch13 <- read.csv("data/data-raw/kelch.csv") %>%
+  dplyr::rename(sample_id = Sample)
+Pf7_samples <- read.csv("data/data-raw/Pf7-samples.csv")
+Pf7_samples_filtered <-
+  Pf7_samples %>% 
+  dplyr::filter(country %in% c("Cambodia", "Myanmar", "Laos", "Vietnam", "Thailand")) %>%
+  dplyr::select(sample_id, country, site, year)
+
+merged_kelch <- kelch13 %>% 
+  dplyr::left_join(Pf7_samples_filtered, by = "sample_id") %>%
+  drop_na(country, k13) 
+```
+
+
+```{r}
+x <- read.csv("data/data-raw/Pf7-samples.csv")
+g <- read.delim("data/data-raw/genotypes.txt")
+names(g)[1] <- "sample_id"
+
+head(x)
+table(x$ARTresistant)
+table(g$kelch13_349.726_ns_changes)
+
+cam <-
+  x %>% dplyr::filter(country %in% c("Cambodia", "Myanmar", "Laos", "Vietnam", "Thailand")) %>%
+  dplyr::left_join(g, by = "sample_id")
+
+cam <- cam %>%
+  filter(qc_pass,
+         !(kelch13_349.726_ns_changes %in% c("!", "*", "-", "!*"))) 
+```
+
+```{r}
+sample_ID_match <- intersect(merged_kelch$sample_id, cam$sample_id) 
+cam <- cam %>% filter(sample_id %in% sample_ID_match)
+merged_kelch <- merged_kelch %>% filter(sample_id %in% sample_ID_match)
+```
+
+```{r}
+merged_kelch <- merged_kelch %>%
+  drop_na(country, k13) %>%
+  group_by(country, site, year) %>%
+  summarise(n = n(),
+            WT = sum(1-k13, na.rm=TRUE),
+            other_K13 = sum(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V, na.rm=TRUE)/(sum(F446I + Y493H + I543T + P553L + R561H + P574L + A675V, na.rm=TRUE) + WT),
+            C580Y = sum(C580Y, na.rm=TRUE)/(sum(C580Y, na.rm=TRUE) + WT),
+            R539T = sum(R539T, na.rm=TRUE)/(sum(R539T, na.rm=TRUE) + WT))  %>%
+  ungroup %>%
+  select(-WT) %>%
+  mutate(K13 = other_K13 + C580Y + R539T) %>%
+  pivot_longer(cols = other_K13:K13) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  filter(is.finite(freq)) %>%
+  arrange(Locus, country, District, year) %>%
+  group_by(Locus, country, District) %>%
+  mutate(nobs = sum(freq > 0),
+         min_year = min(year[freq>0]),
+         adj_year = year - min_year) %>%
+  filter(is.finite(min_year),
+         year > 2000)
+allele_freq <- merged_kelch
+```
+
+```{r}
+prev <- read.table("data/data-derived/pfk7_data.txt")
+prev_WT <- read.table("data/data-derived/pfk7_data_WT.txt")
+```
+
+# Bar plot of prevalenc with respect to everything
+```{r}
+prev_barplot <- prev %>%
+  ggplot(aes(x = year, y = prev, fill=Locus, color = Locus)) +
+  facet_wrap(~country + District) +
+  geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+  theme_bw() +
+  scale_color_manual("Mutations",
+    values = c("#56B4E9",
+               "#009E73",
+               "#BBBBBB",
+               "#E69F00"),
+    labels = c("580Y",
+               "other K13",
+               "K13",
+               "539T")) +
+  scale_fill_manual("Mutations",
+    values = c("#56B4E9",
+               "#009E73",
+               "#BBBBBB",
+               "#E69F00"),
+    labels = c("580Y",
+               "other K13",
+               "K13",
+               "539T")) +
+  xlab("Year") +
+  ylab("Prevalence") +
+  ggtitle("Prevalence distribution of K13") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous("Year",
+                     breaks = seq(2000, 2020, 5)) +
+  theme(legend.title=element_blank(), 
+        axis.text = element_text(size = 12), 
+        axis.title=element_text(size=14), 
+        legend.text=element_text(size=12), 
+        strip.text.x = element_text(size = 12), 
+        legend.position = "right", 
+        legend.justification = c("right", "top"), 
+        legend.box.just = "right", 
+        legend.margin = margin(1, 1, 1, 1))
+
+ggsave("figures/REVISION/Prevalence_barplot_samesamples_predistrict.png",prev_barplot, dpi=400, width = 15, height=15)
+```
+
+# Bar plot of prevalence with respect to WT
+```{r}
+prev_WT_barplot <- prev_WT %>%
+  ggplot(aes(x = year, y = prev, fill=Locus, color = Locus)) +
+  facet_wrap(~country + District) +
+  geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+  theme_bw() +
+  scale_color_manual("Mutations",
+    values = c("#56B4E9",
+               "#009E73",
+               "#BBBBBB",
+               "#E69F00"),
+    labels = c("580Y",
+               "other K13",
+               "K13",
+               "539T")) +
+  scale_fill_manual("Mutations",
+    values = c("#56B4E9",
+               "#009E73",
+               "#BBBBBB",
+               "#E69F00"),
+    labels = c("580Y",
+               "other K13",
+               "K13",
+               "539T")) +
+  xlab("Year") +
+  ylab("Prevalence") +
+  ggtitle("Prevalence distribution of K13 with respect to WT") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous("Year",
+                     breaks = seq(2000, 2020, 5)) +
+  theme(legend.title=element_blank(), 
+        axis.text = element_text(size = 12), 
+        axis.title=element_text(size=14), 
+        legend.text=element_text(size=12), 
+        strip.text.x = element_text(size = 12), 
+        legend.position = "right", 
+        legend.justification = c("right", "top"), 
+        legend.box.just = "right", 
+        legend.margin = margin(1, 1, 1, 1))
+
+ggsave("figures/REVISION/Prevalence_barplot_WT_samesamples_predistrict.png",prev_WT_barplot, dpi=400, width = 15, height=15)
+```
+
+# Bar plot with respect to allele freq
+```{r}
+freq_barplot <- allele_freq %>%
+  ggplot(aes(x = year, y = freq, fill=Locus, color = Locus)) +
+  facet_wrap(~country + District) +
+  geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+  theme_bw() +
+  scale_color_manual("Mutations",
+    values = c("#56B4E9",
+               "#BBBBBB",
+               "#009E73",
+               "#E69F00"),
+    labels = c("580Y",
+               "K13",
+               "other K13",
+               "539T")) +
+  scale_fill_manual("Mutations",
+    values = c("#56B4E9",
+               "#BBBBBB",
+               "#009E73",
+               "#E69F00"),
+    labels = c("580Y",
+               "K13",
+               "other K13",
+               "539T")) +
+  xlab("Year") +
+  ylab("Allele frequency") +
+  ggtitle("Allele frequency distribution of K13 over WT") +
+  #scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous("Year",  
+                     breaks = seq(2001, 2018, 2)) +
+  theme(legend.title=element_blank(), 
+        axis.text = element_text(size = 10), 
+        axis.title=element_text(size=12), 
+        legend.text=element_text(size=10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = c(.2 , .99), 
+        legend.justification = c("right", "top"), 
+        legend.box.just = "right", 
+        legend.margin = margin(1, 1, 1, 1))
+
+
+ggsave("figures/REVISION/AlleleFreq_barplot_WT_samesamples_predistrict.png",prev_barplot, dpi=400, width = 15, height=15)
+```
+
+
+
+
+

@@ -1,0 +1,383 @@
+---
+title: "Kelch PfK7 Selection Coefficient Modeling - MANUSCRIPT"
+output: html_document
+date: "2024-04-20"
+---
+
+# Overview
+This code generates the allele frequency based on the UMI counts in Uganda
+
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+PRX2016_1 <- read.csv("data/data-raw/PRX-00.csv")
+PRX2016_2 <- read.csv("data/data-raw/PRX-01.csv")
+PRX2017 <- read.csv("data/data-raw/PRX-02.csv")
+PRX2018 <- read.csv("data/data-raw/PRX-03.csv")
+PRX2019 <- read.csv("data/data-raw/PRX-04.csv")
+PRX2020 <- read.csv("data/data-raw/PRX-05.csv")
+PRX2021 <- read.csv("data/data-raw/PRX-06.csv")
+PRX2022 <- read.csv("data/data-raw/PRX-07.csv")
+```
+
+## 2016
+```{r}
+#calculate WSAF for MIP sequenced samples (merge_coverage!=0)
+PRX2016_1_freq <- PRX2016_1 %>%
+  filter(merge_coverage > 0,
+         is.finite(genotype)) %>%
+  mutate(Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = C469Y+ R561H + C469F+ A675V,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(R561H, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2016)
+
+#calculate WSAF for MIP sequenced samples (merge_coverage!=0)
+PRX2016_2_freq <- PRX2016_2 %>%
+  filter(merge_coverage > 0,
+         is.finite(genotype)) %>%
+  mutate(Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = C469Y+ R561H + C469F+ A675V,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(R561H, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2016)
+```
+
+## 2017
+### MIP - WAF
+```{r}
+#calculate WSAF for MIP sequenced samples (merge_coverage!=0)
+PRX2017_freq <- PRX2017 %>%
+  filter(is.finite(genotype),
+         merge_coverage > 0) %>%
+  mutate(Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           #mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y+ A675V,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(R561H, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            #C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2017)
+```
+
+### Sanger - WAF
+```{r}
+PRX2017_MIP_WSAF <- PRX2017 %>%
+  filter(!is.finite(genotype),
+         merge_coverage > 0) %>%
+  mutate(Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           #mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(year, site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y+ A675V,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(across(c("K13", "C469Y", "R561H", "A675V"), ~mean(.[.>0])))
+
+PRX2018_sanger <- PRX2018 %>%
+  filter(!is.finite(genotype),
+         merge_coverage==0)
+
+```
+
+## 2018
+### MIP - WAF
+```{r}
+PRX2018_freq <- PRX2018 %>%
+  filter(is.finite(genotype),
+         merge_coverage!=0) %>%
+  mutate(year = 2018,
+         Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V",
+                           mutation_name == "k13-Pro441Leu" ~ "P441L")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(year, site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y+ A675V + P441L + C469F,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(K13, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            P441L = sum(P441L, na.rm=TRUE)/(sum(P441L, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2018)
+```
+
+### Sanger - WAF
+```{r}
+PRX2018_sanger <- PRX2018 %>%
+  filter(!is.finite(genotype),
+         merge_coverage!=0)
+
+```
+
+## 2019
+### MIP - WAF
+```{r}
+PRX2019_freq <- PRX2019 %>%
+  filter(is.finite(genotype),
+         merge_coverage!=0) %>%
+  mutate(year = 2019,
+         Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           #mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V",
+                           mutation_name == "k13-Pro441Leu" ~ "P441L")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(year, site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y + A675V + C469F,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(K13, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2019)
+```
+
+### Sanger - WAF
+```{r}
+PRX2019_sanger <- PRX2019 %>%
+  filter(!is.finite(genotype),
+         merge_coverage!=0)
+
+```
+
+## 2020
+### MIP - WAF
+```{r}
+PRX2020_freq <- PRX2020 %>%
+  filter(is.finite(genotype),
+         merge_coverage!=0) %>%
+  mutate(year = 2020,
+         Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V",
+                           mutation_name == "k13-Pro441Leu" ~ "P441L")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(year, site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y+ A675V + P441L + C469F,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(K13, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            P441L = sum(P441L, na.rm=TRUE)/(sum(P441L, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2020)
+```
+
+### Sanger - WAF
+```{r}
+PRX2020_sanger <- PRX2020 %>%
+  filter(!is.finite(genotype),
+         merge_coverage!=0)
+
+```
+
+## 2021
+### MIP - WAF
+```{r}
+PRX2021_freq <- PRX2021 %>%
+  filter(is.finite(genotype),
+         merge_coverage!=0) %>%
+  mutate(year = 2021,
+         Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V",
+                           mutation_name == "k13-Pro441Leu" ~ "P441L")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(year, site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y+ A675V + P441L + C469F,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(K13, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            P441L = sum(P441L, na.rm=TRUE)/(sum(P441L, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2021)
+```
+
+### Sanger - WAF
+```{r}
+PRX2021_sanger <- PRX2021 %>%
+  filter(!is.finite(genotype),
+         merge_coverage!=0)
+
+```
+
+## 2022
+### MIP - WAF
+```{r}
+PRX2022_freq <- PRX2022 %>%
+  filter(is.finite(genotype),
+         merge_coverage!=0) %>%
+  mutate(year = 2022,
+         Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V",
+                           mutation_name == "k13-Pro441Leu" ~ "P441L")) %>%
+  select(!mutation_name) %>%
+  group_by(site, Locus) %>%
+  mutate(freq = merge_alt_umi_count/(merge_ref_umi_count+merge_alt_umi_count)) %>%
+  select(year, site, id, freq, Locus) %>%
+  pivot_wider(names_from = Locus, values_from = freq) %>%
+  mutate(K13 = R561H + C469Y+ A675V + P441L + C469F,
+         WT = 1-K13) %>%
+  ungroup %>%
+  group_by(site) %>%
+  summarise(n = n(),
+            WT = sum(WT, na.rm=TRUE),
+            K13 = sum(K13, na.rm=TRUE)/(sum(K13, na.rm=TRUE) + WT),
+            C469Y = sum(C469Y, na.rm=TRUE)/(sum(C469Y, na.rm=TRUE) + WT),
+            R561H = sum(K13, na.rm=TRUE)/(sum(R561H, na.rm=TRUE) + WT),
+            P441L = sum(P441L, na.rm=TRUE)/(sum(P441L, na.rm=TRUE) + WT),
+            C469F = sum(C469F, na.rm=TRUE)/(sum(C469F, na.rm=TRUE) + WT),
+            A675V = sum(A675V, na.rm=TRUE)/(sum(A675V, na.rm=TRUE) + WT)) %>%
+  ungroup %>%
+  select(!WT) %>%
+  pivot_longer(cols = K13:A675V) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  mutate(year = 2022)
+```
+
+### Sanger - WAF
+```{r}
+PRX2022_sanger <- PRX2022 %>%
+  filter(!is.finite(genotype),
+         merge_coverage!=0)
+
+```
+

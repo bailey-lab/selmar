@@ -5,7 +5,7 @@ date: "2024-04-17"
 ---
 
 # This file estimates the selection coefficient using a Bayesian GLM model using
-# the K13 allele frequency estimates in SEA
+# the K13 prevalence relative to WT
 
 ```{r}
 library(Matrix)
@@ -32,13 +32,17 @@ library(rstan)
 library(gt)
 ## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 ```
+#Load function
+```{r}
+source("~/Dropbox (Brown)/Brown/PhD/JeffBaileyLab/Kelch_Uganda_Modeling/selmar/analysis/GLM_model_s_functions.R")
+```
 
 # Load data
 ```{r}
 fileLocManuscript_pfK7 <- "figures/"
 
 #load data
-pfk7_data <- read.table("data/data-derived/pfk7_data_freq.txt") %>% 
+pfk7_data <- read.table("data/data-derived/pfk7_data_WT.txt") %>% 
   filter(Locus != "other_K13") 
 
 #set the limit of number of observations
@@ -46,7 +50,8 @@ numofobs <- 2
 
 pfk7_data2 <- pfk7_data %>% 
   filter(!(Locus == "K13" & District == "Binh Phuoc" & year == 2005)) %>%
-  group_by(Locus, District) 
+  group_by(Locus, District) %>%
+  mutate(min_year = min(year[x>0]))
 
 pfk7_data <- pfk7_data2 %>% 
   group_by(Locus, District) %>%
@@ -58,123 +63,53 @@ pfk7_data <- pfk7_data2 %>%
 
 # Bayesian GMM with slopes and intercepts
 ```{r}
-# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+C580Y <- GLM_model_mutant(pfk7_data_prev_WT, "C580Y")
+c580y_stanmod <- C580Y$glmer
+ranef_c580y_stanmod <- C580Y$ranef
 
-# ---- Model for c580y -----
-c580y_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% 
-    filter(Locus == "C580Y", nobs > numofobs),
-  weights = wt_med, 
-  adapt_delta = 0.9975
-)
+R539T <- GLM_model_mutant(pfk7_data_prev_WT, "R539T")
+r539t_stanmod <- R539T$glmer
+ranef_r539t_stanmod <- R539T$ranef
 
-vals <- summary(c580y_stanmod$stanfit)$summary[,1]
-vals <- vals[grep("^b", names(vals))]
-ranef_c580y_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
-           "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_c580y_stanmod$mutation <- rep("C580Y", dim(ranef_c580y_stanmod)[1])
+K13 <- GLM_model_mutant(pfk7_data_prev_WT, "K13")
+K13_stanmod <- K13$glmer
+ranef_K13_stanmod <- K13$ranef
 
-# ---- Model for r539t -----
-r539t_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(Locus == "R539T", nobs > numofobs),
-  weights = wt_med, 
-  adapt_delta = 0.9975
-)
-
-vals <- summary(r539t_stanmod$stanfit)$summary[,1]
-vals <- vals[grep("^b", names(vals))]
-ranef_r539t_stanmod <- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
-           "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_r539t_stanmod$mutation <- rep("R539T", dim(ranef_r539t_stanmod)[1])
-
-# ---- Model for combined kelch -----
-K13_stanmod <- rstanarm::stan_glmer(
-  lrsmed ~ adj_year + (1 + adj_year | District),
-  data = pfk7_data %>% filter(Locus == "K13", nobs > numofobs),
-  weights = wt_med, 
-  adapt_delta = 0.9975
-)
-
-vals <- summary(K13_stanmod$stanfit)$summary[,1]
-vals <- vals[grep("^b", names(vals))]
-ranef_K13_stanmod<- data.frame("Intercepts" = vals[seq(1, length(vals), 2)],
-           "Slopes" = vals[seq(2, length(vals), 2)])
-ranef_K13_stanmod$mutation <- rep("K13", dim(ranef_K13_stanmod)[1])
-
-ranef_stanmod <- rbind(ranef_c580y_stanmod, ranef_r539t_stanmod, ranef_K13_stanmod)
-ranef_stanmod$site <- str_replace_all(rownames(ranef_stanmod), "\\[|\\]", "")
-ranef_stanmod$site <- str_replace_all(ranef_stanmod$site, "\\s*\\([^\\)]+\\)", "")
-ranef_stanmod$site <- str_remove(ranef_stanmod$site, "b District:")
-ranef_stanmod$site <- str_remove(ranef_stanmod$site, "1")
+ranef_stanmod_prev <- rbind(ranef_c580y_stanmod, ranef_r539t_stanmod, ranef_K13_stanmod)
+ranef_stanmod_prev$site <- str_replace_all(rownames(ranef_stanmod_prev), "\\[|\\]", "")
+ranef_stanmod_prev$site <- str_replace_all(ranef_stanmod_prev$site, "\\s*\\([^\\)]+\\)", "")
+ranef_stanmod_prev$site <- str_remove(ranef_stanmod_prev$site, "b District:")
+ranef_stanmod_prev$site <- str_remove(ranef_stanmod_prev$site, "1")
 ``` 
-
-## Posterior of the model
+#Calculate selection coefficient
 ```{r}
-#  get model predictions for plotting
-pfk7_data$predict_stan <- NA
-
-pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% colMeans
-pfk7_data$predict_stan[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <-  rstanarm::posterior_predict(K13_stanmod, type = "response") %>% colMeans
+pfk7_data <- selection_ceof_estimate(df, c580y_stanmod, r539t_stanmod, k13_stanmod)
 ```
 
-## Confidence interval
-```{r}
-#  get model predictions for plotting
-pfk7_data$conf.low <- NA
-pfk7_data$conf.high <- NA
-
-c580y_conf <- rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-r539t_conf <- rstanarm::posterior_predict(r539t_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-K13_conf <- rstanarm::posterior_predict(K13_stanmod, type = "response") %>% apply(2, quantile, prob = (c(0.025, 0.975)))
-
-# here just add predictions  for the c469Y rows
-pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[1,]
-pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[1,]
-pfk7_data$conf.low[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <- K13_conf[1,]
-
-pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "C580Y" & pfk7_data$nobs > numofobs] <- c580y_conf[2,]
-pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "R539T" & pfk7_data$nobs > numofobs] <- r539t_conf[2,]
-pfk7_data$conf.high[is.finite(pfk7_data$lrsmed) & pfk7_data$Locus == "K13" & pfk7_data$nobs > numofobs] <- K13_conf[2,]
-```
-
-## Frequency scale
-```{r}
-# Plot the predictions in each site with only Bayesian
-#convert to allele frequency scale
-pfk7_data$predict_stan_freq <- NA
-
-pfk7_data$predict_stan_freq <- exp(pfk7_data$predict_stan)/(1+exp(pfk7_data$predict_stan))
-pfk7_data$conf.high_freq <- exp(pfk7_data$conf.high)/(1+exp(pfk7_data$conf.high))
-pfk7_data$conf.low_freq <- exp(pfk7_data$conf.low)/(1+exp(pfk7_data$conf.low))
-```
-
-# SFigure5: Plot allele frequency for all mutations
+# SFigure5: Plot prevalence relative to WT for all mutations
 ## Preprocessing
 ```{r}
-freq_df2 <- pfk7_data %>% filter(nobs > numofobs)
-freq_df <- rbind(freq_df2, pfk7_data %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")) ## added these sites to show general allele frequency across SE Asia
+prev_df2 <- pfk7_data %>% filter(nobs > numofobs)
+prev_df <- rbind(prev_df2, pfk7_data %>% filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")) ## added these sites to show general prevalence relative to WT across SE Asia
 ```
 
 ## Supplement Plot
 ```{r}
-allele_plot <- freq_df2  %>%
-  ggplot(aes(year, freq, group = Locus, color = Locus)) +
+prev_plot <- prev_df  %>%
+  ggplot(aes(year, prev, group = Locus, color = Locus)) +
   geom_point(aes(size = n/2, group = Locus, color = Locus)) +
   facet_wrap(~country + District) +
   labs(shape="Mutations", size = "Sample Size") +
   theme_bw() +
-  geom_line(data = freq_df %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(year, predict_stan_freq, color = Locus, group = Locus), size = 1) +
-  geom_ribbon(data = freq_df %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(ymin = conf.low_freq, ymax = conf.high_freq, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  geom_line(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
+  geom_ribbon(data = prev_df %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
   scale_color_manual(
     values = c("#56B4E9", "#E69F00", "#009E73"),
     name = "Mutations",
     labels = c("580Y", "K13", "539T")
   ) +
   scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
-  ylab("Allele Freq") +
+  ylab("Allele prev") +
   xlab("Year") +
   #ylim(-0.01, 1.01)+
   ggpubr::theme_pubclean(base_size = 12)+
@@ -196,15 +131,15 @@ allele_plot <- freq_df2  %>%
 ## Saving plots
 ```{r}
 ggsave(
-  #paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_allele_freq.png"),
-  paste0(fileLocManuscript_pfK7, "REVISION/SEAsia_posterior_allele_freq.png"),
-  allele_plot,
+  #paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_prev_WR.png"),
+  paste0(fileLocManuscript_pfK7, "REVISION/SEAsia_posterior_prev_WT.png"),
+  prev_plot,
   width = 8,
   height = 8,
   dpi = 700
 )
 # ggsave(
-#   paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_allele_freq.pdf"),
+#   paste0(fileLocManuscript_pfK7, "/supplement/Figure5-SEAsiaPrevalence/SEAsia_posterior_prev_WR.pdf"),
 #   allele_plot,
 #   width = 8,
 #   height = 8,
@@ -351,7 +286,7 @@ effect_size_bay2 <- effect_size_bay %>%
 ### Saving plots
 ```{r}
 ggsave(
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize_allelefreq.png"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/Figure3_SEAsia_Effectsize_prev_WT.png"),
   selection_coef_bay,
   width = 8,
   height = 5.5,
@@ -366,7 +301,7 @@ ggsave(
 # )
 write.csv(
   effect_size_bay2,
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients_allelefreq.csv"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients_prev_WT.csv"),
   row.names = F,
   quote = F
 )
@@ -402,7 +337,7 @@ selec_ceof_stats[3, ] <- cbind("K13",
 colnames(selec_ceof_stats) <- c("Mutation", "Min", "District", "Max", "District")
 write.csv(
   selec_ceof_stats,
-  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients_stats_allelefreq.csv"),
+  paste0(fileLocManuscript_pfK7, "/Figure3-SelectionCeof/SEAsia_selectioncoefficients_stats_prev_WT.csv"),
   row.names = F,
   quote = F
 )

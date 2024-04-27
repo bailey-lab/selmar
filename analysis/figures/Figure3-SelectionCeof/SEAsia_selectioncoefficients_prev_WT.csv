@@ -1,0 +1,15 @@
+District,mutation,conf.low,estimate,conf.high
+Binh Phuoc,580Y,-0.607,0.557,1.908
+Pailin,580Y,-0.865,0.328,1.503
+Pursat,580Y,-0.583,0.573,1.763
+Ratanakiri,580Y,-0.941,0.29,1.431
+Pailin,539T,-1.326,0.125,1.579
+Pursat,539T,-0.919,0.517,1.978
+Binh Phuoc,K13,-0.171,0.272,0.69
+Pailin,K13,0.001,0.43,0.879
+Pursat,K13,-0.035,0.391,0.835
+Ratanakiri,K13,-0.12,0.307,0.777
+Tak,K13,-0.388,0.135,0.534
+Southeast Asia,580Y,-0.145,0.435,1.029
+Southeast Asia,539T,-0.371,0.321,1.075
+Southeast Asia,K13,0.084,0.309,0.506

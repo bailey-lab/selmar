@@ -28,14 +28,14 @@ merged_kelch <- kelch13 %>%
   drop_na(country, k13) %>%
   group_by(country, site, year) %>%
   summarise(n = n(),
-            WT = sum(1-k13),
-            K13 = sum(k13)/(sum(k13) + WT),
-            C580Y = sum(C580Y)/(sum(C580Y) + WT),
-            other_K13 = sum(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V)/(sum(F446I + Y493H + I543T + P553L + R561H + P574L + A675V) + WT),
-            R539T = sum(R539T)/(sum(R539T) + WT))  %>%
+            WT = sum(1-k13, na.rm=TRUE),
+            other_K13 = sum(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V, na.rm=TRUE)/(sum(F446I + Y493H + I543T + P553L + R561H + P574L + A675V, na.rm=TRUE) + WT),
+            C580Y = sum(C580Y, na.rm=TRUE)/(sum(C580Y, na.rm=TRUE) + WT),
+            R539T = sum(R539T, na.rm=TRUE)/(sum(R539T, na.rm=TRUE) + WT))  %>%
   ungroup %>%
   select(-WT) %>%
-  pivot_longer(cols = K13:R539T) %>%
+  mutate(K13 = other_K13 + C580Y + R539T) %>%
+  pivot_longer(cols = other_K13:K13) %>%
   rename(freq = value,
          Locus = name,
          District = site) %>%
@@ -88,13 +88,13 @@ merged_kelch_year <- merge(kelch13, Pf7_samples_filtered, by = "sample_id", all.
   group_by(year) %>%
   summarise(n = n(),
             WT = sum(1-k13, na.rm=TRUE),
-            K13 = sum(k13, na.rm=TRUE)/(sum(k13, na.rm=TRUE) + WT),
-            C580Y = sum(C580Y, na.rm=TRUE)/(sum(C580Y, na.rm=TRUE) + WT),
             other_K13 = sum(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V, na.rm=TRUE)/(sum(F446I + Y493H + I543T + P553L + R561H + P574L + A675V, na.rm=TRUE) + WT),
+            C580Y = sum(C580Y, na.rm=TRUE)/(sum(C580Y, na.rm=TRUE) + WT),
             R539T = sum(R539T, na.rm=TRUE)/(sum(R539T, na.rm=TRUE) + WT))  %>%
   ungroup %>%
   select(-WT) %>%
-  pivot_longer(cols = K13:R539T) %>%
+  mutate(K13 = other_K13 + C580Y + R539T) %>%
+  pivot_longer(cols = other_K13:K13) %>%
   rename(freq = value,
          Locus = name) %>%
   filter(is.finite(freq),
