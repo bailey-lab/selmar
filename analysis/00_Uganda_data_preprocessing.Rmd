@@ -1,0 +1,184 @@
+---
+title: "Uganda_ratio_sanger_MIP"
+output: html_document
+date: "2024-05-06"
+---
+
+# Overview
+This code generates an intermediate dataframe from the original UMI count data.
+The file outputted from this script will give the ratio of umi_alt_count/coverage for each mutation, as well as the original sanger and MIP genotype call (0=WT, 1=mixed, 2=mutant)
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+#Load processing functions
+source("Uganda_preprocessing_functions.R")
+```
+
+```{r}
+#Load data
+PRX2016 <- read.csv("data/data-raw/PRX-00.csv")
+PRX2017 <- read.csv("data/data-raw/PRX-02.csv")
+PRX2018 <- read.csv("data/data-raw/PRX-03.csv")
+PRX2019 <- read.csv("data/data-raw/PRX-04.csv")
+PRX2020 <- read.csv("data/data-raw/PRX-05.csv")
+PRX2021 <- read.csv("data/data-raw/PRX-06.csv")
+PRX2022 <- read.csv("data/data-raw/PRX-07.csv")
+
+PRX_list <- list(PRX2016, PRX2017, PRX2018, PRX2019, PRX2020, PRX2021, PRX2022)
+```
+
+```{r}
+PRX_df <- data.frame()
+year <- c(2016, 2017, 2018, 2019, 2020, 2021, 2022)
+for (i in 1:length(PRX_list)){
+  PRX_df <- rbind(PRX_df, PRX_list[[i]] %>% mutate(year = year[i]))
+}
+
+#total mumber of samples
+tot_samples <- dim(unique(PRX_df %>% 
+    filter(is.finite(merge_coverage),
+           merge_coverage != 0) %>% 
+      select(id)))[1]
+
+#number of sanger samples
+sanger_samples <- dim(unique(PRX_df %>% filter(!is.finite(genotype), #filter out any MIP samples
+                            is.finite(sanger_geno)) %>% 
+      select(id)))[1]
+
+#number of MIP samples
+MIP_samples <- dim(unique(PRX_df %>% filter(is.finite(genotype))%>% 
+      select(id)))[1]
+
+```
+
+```{r}
+count <- 1
+df_ratio <- data.frame()
+final_colnames_freq <- c("site", "id", "type", "A675V", "R561H", "C469Y", "C469F", "P441L", "K13", "WT", "remove")
+final_colnames_genotype <- c("site", "id", "A675V_genotype", "R561H_genotype", "C469Y_genotype", "C469F_genotype", "P441L_genotype")
+df_overall_MIP_freq_avg <- list()
+for (y in 2016:2022){
+  df <- PRX_list[[count]]
+  df <- df %>% mutate(Locus = case_when(mutation_name == "k13-Cys469Tyr" ~ "C469Y",
+                           mutation_name == "k13-Arg561His" ~ "R561H",
+                           mutation_name == "k13-Cys469Phe" ~ "C469F",
+                           mutation_name == "k13-Ala675Val" ~ "A675V",
+                           mutation_name == "k13-Pro441Leu" ~ "P441L")) %>%
+    select(!mutation_name)
+  df_coverage_finite <- df %>% 
+    filter(is.finite(merge_coverage))
+  
+  #=============================================================================
+  # Check if there are samples where one MIP failed 
+  #=============================================================================
+  #column remove: mutation for which the MIP failed
+  #Column genotype_updated: updated genotype of the failed
+  df_corrected <- obtain_samples_low_coverage(df_coverage_finite)
+  
+  if (y %in% c(2016, 2021, 2022)){
+    mutations <- unique(df$Locus)
+    #obtain overall K13 frequency using the MIPs which were not recorded due to too low coverage
+    df_ratio_y <- calculate_ratio(df_corrected, mutations) 
+    if (length(colnames(df_ratio_y)) != length(final_colnames_freq)){
+      missing_colnames <- final_colnames_freq[!final_colnames_freq %in% colnames(df_ratio_y)]
+      for (m_missing in missing_colnames){
+        df_ratio_y[, m_missing] <- NA
+      }
+      df_ratio_y <- df_ratio_y %>% 
+        mutate(type="MIP") %>%
+        select(site, id, type, A675V, R561H, C469Y, C469F, P441L, K13, WT, remove)
+    }
+    
+    #===========================================================================
+    # Check if any K13 mutation > 1 
+    #===========================================================================
+    df_ratio_y <- updated_kelch13_ratio_greater_than_1(df_ratio_y)
+    
+    #add MIP genotype to dataframe
+    df_ratio_y_geno <- add_MIP_genotype(df_corrected, df_ratio_y, final_colnames_genotype)
+  }
+  else if (y %in% c(2017, 2018, 2019, 2020)){
+    #===========================================================================
+    #                               MIP ratio
+    #===========================================================================
+    df_MIP_corrected <- df_corrected %>%  filter(is.finite(genotype_updated)) #filter out any MIP samples
+    MIP_mutations <- unique(df_MIP_corrected$Locus)
+    #obtain overall K13 frequency using the MIPs which were not recorded due to too low coverage
+    df_MIP_ratio <- calculate_ratio(df_MIP_corrected, MIP_mutations)
+    #add column (remove) which will indicate if a sample should be removed in the WSAF calculation per mutation
+    df_MIP_ratio <- add_samples_remove(df_MIP_ratio, df_MIP_corrected)
+    df_MIP_ratio <- df_MIP_ratio %>% mutate(type="MIP")
+    
+    #calculate avg of postive freq to estimate WSAF of sanger samples
+    ##obtain ratio of alt/coverage for mixed MIPs
+    df_corrected_mixed <- df_corrected %>% filter(genotype_updated == 1)
+    df_ratio_mixed <- calculate_ratio(df_corrected_mixed, unique(df_corrected_mixed$Locus))
+    df_ratio_mixed <- add_samples_remove(df_ratio_mixed, df_corrected_mixed)
+    
+    #average ratio for mixed mutants
+    df_MIP_mixed_freq_avg <- calc_avg_ratio_individual_mutations(df_ratio_mixed, df_corrected_mixed)
+    
+    #===========================================================================
+    #                             Sanger ratio
+    #===========================================================================
+    df_sanger <- df %>% filter(!is.finite(genotype), #filter out any MIP samples
+                            is.finite(sanger_geno)) #filter sanger samples
+    sanger_mutations <- unique(df_sanger$Locus)
+    #pivot dataframe
+    df_sanger <- df_sanger %>%
+      select(site, id, sanger_geno, Locus) %>%
+      pivot_wider(names_from = Locus, values_from = sanger_geno)
+    #add column (remove) which will indicate if a sample should be removed in the WSAF calculation per mutation
+    df_sanger <- add_samples_remove(df_sanger, df_corrected)
+    #remove samples which we already accounted for in MIPs using remove column
+    df_sanger <- remove_MIP_samples(df_sanger)
+    df_sanger_ratio <- sanger_calc_freq(df_sanger, df_MIP_mixed_freq_avg, sanger_mutations, MIP_mutations) 
+    #calculate WSAF for K13
+    df_sanger_ratio[, sanger_mutations] <- lapply(sanger_mutations, function(x) as.numeric(df_sanger_ratio[[x]]))
+    df_sanger_ratio$K13 <- rowSums(df_sanger_ratio[, sanger_mutations],na.rm = TRUE)
+    #calculate WT
+    df_sanger_ratio$WT <- 1-df_sanger_ratio$K13
+    df_sanger_ratio <- df_sanger_ratio %>% mutate(type="sanger")
+    
+    #===========================================================================
+    # Check if mutations were not observed that need to be added to dataframe 
+    # for proper merging of dataframes
+    #===========================================================================
+    if (length(colnames(df_MIP_ratio)) == length(final_colnames_freq)){
+      df_ratio_y_geno <- rbind(df_MIP_ratio, df_sanger_ratio)
+      df_ratio_y_geno <- df_ratio_y_geno%>% select(site, id, type, A675V, R561H, C469Y, C469F, P441L, K13, WT, remove)
+    }
+    else {
+      missing_colnames <- final_colnames_freq[!final_colnames_freq %in% colnames(df_MIP_ratio)]
+      for (m_missing in missing_colnames){
+        df_MIP_ratio[, m_missing] <- NA
+      }
+      df_MIP_ratio <- df_MIP_ratio %>% select(site, id, type, A675V, R561H, C469Y, C469F, P441L, K13, WT, remove)
+      df_sanger_ratio <- df_sanger_ratio %>% select(site, id, type, A675V, R561H, C469Y, C469F, P441L, K13, WT, remove)
+      df_ratio_y_geno <- rbind(df_MIP_ratio, df_sanger_ratio)
+    }
+    
+    #===========================================================================
+    # Check if any K13 mutation > 1 
+    #===========================================================================
+    df_ratio_y_geno <- updated_kelch13_ratio_greater_than_1(df_ratio_y_geno)
+    
+    #===========================================================================
+    # Add MIP and sanger genotype to ratio data
+    #===========================================================================
+    colnames_genotype <- c("id", "site" ,"A675V_genotype", "R561H_genotype", "C469Y_genotype", "C469F_genotype", "P441L_genotype")
+    df_ratio_y_geno <- add_sanger_MIP_genotype(df_corrected, df_ratio_y_geno, colnames_genotype)
+  }
+  #add year and reorder columns
+  df_ratio_y_geno <- df_ratio_y_geno %>% 
+    mutate(year = y) %>%
+    select(site, id, year, type, A675V, R561H, C469Y, C469F, P441L, K13, WT, remove, A675V_genotype, R561H_genotype, C469Y_genotype, C469F_genotype, P441L_genotype)
+  df_ratio <- rbind(df_ratio, df_ratio_y_geno)
+  count<- count+1
+}
+
+write.csv(df_ratio, "data/data-derived/Uganda_ratio_genotype_intermediate_file.csv", row.names=FALSE)
+```

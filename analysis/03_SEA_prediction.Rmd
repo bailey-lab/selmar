@@ -1,0 +1,504 @@
+---
+title: "Forecasting allele frequency SEA"
+output: html_document
+date: "2024-05-11"
+---
+
+```{r setup, include=FALSE}
+library(cowplot)
+library(dplyr)
+library (ggforce)
+library(ggplot2)
+library(ggmap)
+library(ggpubr)
+library(ggspatial)
+library(gt)
+library(lme4)
+library(Metrics)
+library(nlme)
+library(RColorBrewer)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rstan)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+library(scales)
+library(scatterpie)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(tabulizer)
+library(tidyverse)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+```
+
+#Load functions
+```{r}
+source("GLM_model_s_functions.R")
+source("SEA_prediction_model_functions.R")
+```
+# Load data
+```{r}
+#set the limit of number of observations
+numofobs <- 2
+#load data
+pfk7_data_unfiltered <- read.table("data/data-derived/pfk7_allele_frequency.txt") 
+
+pfk7_data_filtered <- pfk7_data_unfiltered %>%
+  filter(Locus != "other_K13") %>%
+  group_by(Locus, District) %>%
+  filter(nobs > numofobs) %>%
+  arrange(Locus, District, year)
+
+#----- C580Y -----
+pfk7_data_580Y <- pfk7_data_filtered %>%
+  filter(Locus == "C580Y",
+         District %in% c("Preah Vihear", "Ratanakiri", "Tak"))
+
+#----- K13 -----
+pfk7_data_K13 <- pfk7_data_filtered %>%
+  filter(Locus == "K13",
+         District %in% c("Mandalay", "Preah Vihear", "Ratanakiri", "Tak"))
+
+pfk7_C580Y_K13 <- rbind(pfk7_data_580Y, pfk7_data_K13)
+```
+
+# Bayesian GMM with slopes and intercepts
+```{r}
+# Have a read through rstanarm vignettes and guides on how it works in comparison to lme4
+# ---- Model for c580y -----
+C580Y <- GLM_model_mutant(pfk7_C580Y_K13, "C580Y", numofobs = 2)
+c580y_stanmod <- C580Y$glmer
+ranef_c580y_stanmod <- C580Y$ranef
+
+# ---- Model for combined kelch -----
+K13 <- GLM_model_mutant(pfk7_C580Y_K13, "K13", numofobs = 2)
+K13_stanmod <- K13$glmer
+ranef_K13_stanmod <- K13$ranef
+``` 
+## Posterior of the model
+```{r}
+#  get model predictions for plotting
+pfk7_C580Y_K13$predict_stan <- NA
+
+pfk7_C580Y_K13$predict_stan[is.finite(pfk7_C580Y_K13$lrsmed) & 
+                                  pfk7_C580Y_K13$Locus == "C580Y" & 
+                                  pfk7_C580Y_K13$nobs > numofobs] <- rstanarm::posterior_predict(c580y_stanmod, type = "response") %>% colMeans
+pfk7_C580Y_K13$predict_stan[is.finite(pfk7_C580Y_K13$lrsmed) & 
+                                  pfk7_C580Y_K13$Locus == "K13" & 
+                                  pfk7_C580Y_K13$nobs > numofobs] <- rstanarm::posterior_predict(K13_stanmod, type = "response") %>% colMeans
+```
+
+## Convert prediction to allele frequency scale
+```{r}
+#convert confidence of forecasting into pervalence
+pfk7_C580Y_K13 <- pfk7_C580Y_K13 %>%
+  mutate(predict_stan_freq = exp(predict_stan)/(1+exp(predict_stan)))
+```
+
+# Forecasting allele frequency
+## First year 50% cutoff based on the first 2, 3, and 4 years 
+```{r}
+pred_year <- c(2, 3, 4)
+freq_cutoff <- 0.5
+
+for (i in pred_year) {
+  #------ Model prediction for C580Y ------
+  forecast_data_C580Y <- prediction_model(pfk7_C580Y_K13, "C580Y", i, numofobs=2, freq_cutoff=0.5)
+
+  #------ Model prediction for combined K13 mutations ------
+  forecast_data_K13 <- prediction_model(pfk7_C580Y_K13, "K13", i, numofobs=2, freq_cutoff = 0.5)
+  
+  df_predict <- rbind(forecast_data_C580Y, forecast_data_K13)
+  
+  df_predict <- df_predict %>% 
+    group_by(District, Locus) %>% 
+    mutate(min_year = replace_na(min_year, 0), 
+           min_year = max(min_year),
+           label = paste0(i, "year"),  
+           pred_y = i)
+  
+  #Assigning df_predict to variables
+  var_name <- paste0("df_predict_cutoff_", i, "year")
+  assign(var_name, df_predict)
+}
+
+#combine forecasting predictions for all years
+df_predict_cutoff_allyear <- rbind(df_predict_cutoff_2year, df_predict_cutoff_3year, df_predict_cutoff_4year)
+```
+
+### Convert predictions to allele frequency scale
+```{r}
+df_predict_cutoff_allyear <- df_predict_cutoff_allyear %>%
+  mutate(
+    conf.high_freq = exp(conf.high)/(1+exp(conf.high)),
+    conf.low_freq = exp(conf.low)/(1+exp(conf.low)),
+    predict_freq = exp(predict)/(1+exp(predict)))
+```
+
+### SFigure 8: Plotting forecasting of predictions for the first 2, 3, and 4 years with allele frequency cut off
+```{r}
+################ PLOT FOR C580Y ################
+prev_cutoff_c580y_plot <- plot_prediction(df_predict_cutoff_allyear, pfk7_C580Y_K13, "C580Y")
+
+################ PLOT FOR ALL KELCH ################
+prev_cutoff_K13_plot <- plot_prediction(df_predict_cutoff_allyear, pfk7_C580Y_K13, "K13")
+```
+
+##### Saving plots
+```{r}
+################ PLOT FOR C580Y ################
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/forecasting/SEA_C580Y_prediction_cutoff",
+    freq_cutoff,
+    "freq.png"
+  ),
+  prev_cutoff_c580y_plot,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/forecasting/SEA_C580Y_prediction_cutoff",
+    freq_cutoff,
+    "freq.pdf"
+  ),
+  prev_cutoff_c580y_plot,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+
+################ PLOT FOR ALL KELCH ################
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/forecasting/SEA_K13_prediction_cutoff",
+    freq_cutoff,
+    "freq.png"
+  ),
+  prev_cutoff_K13_plot,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/forecasting/SEA_K13_prediction_cutoff",
+    freq_cutoff,
+    "freq.pdf"
+  ),
+  prev_cutoff_K13_plot,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+
+write.table(df_predict_cutoff_allyear, paste0(
+    "figures/supplement/Figure8_forecasting/forecasting/SEA_prediction_cutoff",
+    freq_cutoff,
+    "freq.txt"))
+```
+
+# Comparison to raw data
+## Data preprocessing
+```{r}
+correlation_prediction_true <- correlation(pfk7_C580Y_K13, df_predict_cutoff_allyear, numofobs=2)
+```                                            
+
+## Supplement Figure 9: Plotting per district
+```{r}
+## Correlation plot for 50% cutoff in first year
+correlation_plot_C580Y <- plot_correlation(correlation_prediction_true, "C580Y")
+correlation_plot_K13 <- plot_correlation(correlation_prediction_true, "K13")
+```
+
+## Correlation table
+```{r}
+correlation_table <- correlation_prediction_true %>% 
+  distinct(Locus, label, mae, bias, corr)
+write.csv(correlation_table, 
+            paste0("figures/supplement/Figure8_forecasting/correlation/SEA_correlation_table.csv"))
+```
+
+### Saving plots
+```{r}
+################# C580Y #################
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/correlation/SEA_C580Y_correlation_cutoff_",
+    freq_cutoff,
+    "freq.png"
+  ),
+  correlation_plot_C580Y,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/correlation/SEA_C580Y_correlation_cuttoff_",
+    freq_cutoff,
+    "freq.pdf"
+  ),
+  correlation_plot_C580Y,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+
+
+################# K13 #################
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/correlation/SEA_K13_correlation_cuttoff_",
+    freq_cutoff,
+    "freq.png"
+  ),
+  correlation_plot_K13,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/supplement/Figure8_forecasting/correlation/SEA_K13_correlation_cuttoff_",
+    freq_cutoff,
+    "freq.pdf"
+  ),
+  correlation_plot_K13,
+  width = 6,
+  height = 4,
+  dpi = 700
+)
+```
+
+# Manuscript figures 
+## Figure S7: Ratanakiri - Model Overview 
+### Preprocessing
+```{r}
+df_Ratanakiri_pred <- df_predict_cutoff_allyear %>%
+  filter(year <= min_year + pred_y,
+         Locus == "K13",
+         District == "Ratanakiri") %>%
+  mutate(predict_prev = exp(predict)/(1 + exp(predict)))
+df_Ratanakiri_forecasting <- df_predict_cutoff_allyear %>%
+  filter(year >= min_year + pred_y, 
+         District == "Ratanakiri", 
+         Locus == "K13") %>%
+  mutate(predicted_prev = exp(predict)/(1 + exp(predict)))
+ex_pt <- pfk7_C580Y_K13 %>%
+  filter(nobs > numofobs,
+         District == "Ratanakiri",
+         Locus == "K13") %>%
+  mutate(point_col = case_when(year >= min_year & year <= min_year + 2 ~ "#E69F00",
+                          year > min_year + 2 & year <= min_year + 3 ~ "#56B4E9",
+                          year > min_year + 3 & year <= min_year + 4 ~ "#0072B2",
+                          year > min_year + 4 ~ "black",
+                          year < min_year ~ "black")) 
+```
+
+### Plotting
+```{r}
+prev_cutoff_K13_Ratanakiri_plot <- 
+  ggplot() +
+  geom_line(data = df_Ratanakiri_pred, aes(year, predict_freq, group = label, color = label)) +
+  geom_line(data=df_Ratanakiri_forecasting, aes(year, exp(predict)/(1+exp(predict)), group = label, color = label), linetype = "dashed") +
+  geom_point(data = ex_pt, aes(x=year, y=freq, size = n), color = ex_pt$point_col) +
+  labs(shape="Mutations", size = "Sample Size") +
+  scale_x_continuous(breaks = seq(min(ex_pt$year), max(df_predict_cutoff_allyear$year), by = 2)) +
+  theme_bw() +
+  ylab("Allele frequency") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual(
+    values = c("#E69F00", "#56B4E9", "#0072B2", "grey"),
+    labels = c("2 years", "3 years", "4 years", "true")
+  ) + 
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 8),
+    strip.text.x = element_text(size = 8),
+    legend.position = "none",
+  ) +  labs(color = NULL)
+```
+
+### Saving
+```{r}
+ggsave(
+  paste0(
+    "figures/supplement/Figure7_forecasting_toy_example/Figure7_K13_Ratanakiri_",
+    freq_cutoff,
+    "freq_forecasting.png"
+  ),
+  prev_cutoff_K13_Ratanakiri_plot,
+  width = 3.5,
+  height = 3.5,
+  dpi = 700
+)
+
+ggsave(
+  paste0(
+    "figures/supplement/Figure7_forecasting_toy_example/Figure7_K13_Ratanakiri_",
+    freq_cutoff,
+    "freq_forecasting.pdf"
+  ),
+  prev_cutoff_K13_Ratanakiri_plot,
+  width = 3.25,
+  height = 4,
+  dpi = 700
+)
+
+write.csv(
+  df_predict_cutoff_allyear %>%
+    filter(District == "Ratanakiri", Locus == "K13") %>%
+    mutate(predict_freq = round(predict_freq, 3)),
+  "figures/supplement/Figure7_forecasting_toy_example/Figure7_Ratanakiri_forecasting.csv"
+)
+```
+
+## Figure 5: Plotting forecasting of predictions for the first 2, 3, and 4 years with confidence intervals
+```{r}
+freq_cutoff <- 0.5
+################ PLOT FOR C580Y ################
+figure6_C580Y <- plot_forecasting_confidence(df_predict_cutoff_allyear, pfk7_C580Y_K13, "C580Y")
+
+################ Plot K13 ################
+figure6_K13 <- plot_forecasting_confidence(df_predict_cutoff_allyear, pfk7_C580Y_K13, "K13")
+```
+
+##### Saving plots
+```{r}
+fig6_width = 6
+fig6_height = 4
+
+ggsave(
+  paste0(
+    "figures/Figure4_forecasting/SEA/SEA_cutoff_C580Y_",
+    freq_cutoff,
+    "_freq_4year_pred.png"
+  ),
+  figure6_C580Y,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/Figure4_forecasting/SEA/SEA_cutoff_C580Y_",
+    freq_cutoff,
+    "_freq_4year_pred.pdf"
+  ),
+  figure6_C580Y,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/Figure4_forecasting/SEA/SEA_cutoff_K13_",
+    freq_cutoff,
+    "_freq_4year_pred.png"
+  ),
+  figure6_K13,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    "figures/Figure4_forecasting/SEA/SEA_cutoff_K13_",
+    freq_cutoff,
+    "_freq_4year_pred.pdf"
+  ),
+  figure6_K13,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+```
+
+### Get x% of data points within the 95% CrI
+```{r}
+pred_within_95CrI <- points_within_95CrI(df_predict_cutoff_allyear, pfk7_C580Y_K13)
+  
+write.csv(
+  pred_within_95CrI,
+  "figures/Figure4_forecasting/SEA/datapoints_within_95Crl.csv"
+)
+```
+
+## Fixation values
+```{r}
+fix_0.95_allele_freq <- df_predict_cutoff_allyear %>% 
+  filter(predict_freq >= 0.95)
+
+fix_0.95_allele_freq_summary <- fix_0.95_allele_freq %>%
+  select(District, country, year, min_year, Locus) %>%
+  group_by(District, Locus) %>%
+  filter(year == min(year)) %>% #obtain first fixated year
+  ungroup %>%
+  mutate(fixation =year - min_year) %>%
+  group_by(Locus) %>%
+  mutate(med = median(fixation),
+         med_year = median(year),
+         min_fixyear = min(year),
+         max_fixyear = max(year))
+
+write_csv(fix_0.95_allele_freq, "figures/Figure4_forecasting/SEA/fixation_95_all_data.csv")
+write_csv(fix_0.95_allele_freq_summary, "figures/Figure4_forecasting/SEA/fixation_95_summary.csv")
+
+fix_K13_0.9_allele_freq <- df_predict_cutoff_allyear  %>% 
+  filter(predict_freq >= 0.9, Locus == "K13")
+
+fix_K13_0.9_allele_freq_summary <- fix_K13_0.9_allele_freq %>%
+  select(District, country, year, min_year, Locus) %>%
+  group_by(District, Locus) %>%
+  filter(year == min(year)) %>%
+  ungroup %>%
+  mutate(fixation =year - min_year) %>%
+  group_by(Locus) %>%
+  mutate(med = median(fixation),
+         med_year = median(year),
+         min_fixyear = min(year),
+         max_fixyear = max(year))
+
+write_csv(fix_0.95_allele_freq, "figures/Figure4_forecasting/SEA/K13_fixation_90_all_data.csv")
+write_csv(fix_0.95_allele_freq_summary, "figures/Figure4_forecasting/SEA/K13_fixation_90_summary.csv")
+```
+
+## Underprediction analysis
+```{r}
+#obtain data that was predicted based on the first 5 years
+predicted_4year <- df_predict_cutoff_allyear %>%
+  select(adj_year, year, District, country, Locus, min_year, label, predict_freq) %>%
+  filter(label == "4year") %>%
+  arrange(country, District, Locus, year) %>%
+  mutate(label = paste0(country, District, year, Locus))
+
+#obtain true data 
+observed_df_filtered <- pfk7_C580Y_K13 %>%
+  select(adj_year, year, District, country, Locus, min_year, freq, n) %>%
+  arrange(country, District, Locus, year) %>%
+  mutate(label = paste0(country, District, year, Locus)) %>%
+  filter(label %in% predicted_4year$label)
+
+predicted_4year_filtered <-  predicted_4year %>%
+  ungroup %>%
+  filter(label %in% predicted_4year$label) %>%
+  select(label, predict_freq)
+
+observed_df_filtered  <- as.data.frame(observed_df_filtered)
+predicted_4year_filtered <- as.data.frame(predicted_4year_filtered)
+
+compare_df <- merge(x=observed_df_filtered, y=predicted_4year_filtered, by="label") %>%
+  mutate(error = freq-predict_freq) %>%
+  group_by(Locus) %>%
+  mutate(weighted_mean_error = weighted.mean(error, n),
+         median_error = median(error)) %>%
+  ungroup %>%
+  mutate(weighted_mean_error_overall = weighted.mean(error, n),
+         median_error_overall = median(error))
+  
+write_csv(compare_df, "figures/Figure4_forecasting/SEA/underpredicted_allele_frequency_analysis.csv")
+
+```

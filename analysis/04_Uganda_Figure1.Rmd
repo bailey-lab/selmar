@@ -1,5 +1,5 @@
 ---
-title: "Figure 1 - Kelch Selection Coefficient Modeling - MANUSCRIPT"
+title: "Figure 1: Kelch Selection Coefficient Modeling"
 output: html_document
 date: "2023-03-24"
 ---
@@ -32,8 +32,9 @@ library(gt)
 #Load data
 ```{r}
 #load data
-df <- read.table("data/data-derived/Ugandan_data.txt")
-df_comb <- read.table("data/data-derived/Ugandan_comb_data.txt")
+df_freq <- read.table("data/data-derived/Uganda_allele_frequency.txt")
+df_freq_comb_year <- read.table("data/data-derived/Uganda_mean_allele_frequency_year.txt")
+df_freq_comb <- read.table("data/data-derived/Uganda_mean_allele_frequency.txt")
 #set the limit of number of observations
 numofobs <- 2
 
@@ -42,56 +43,41 @@ fileLocManuscript <- "figures"
 
 # Figure1A: Prevalence plot
 ```{r}
-prev <- df %>% select(-x_org, -value) %>%
-  rbind(df_comb %>% mutate(Locus = "PfK13 Mutation") %>% rename(x = comb)) %>%
-  group_by(year, Locus) %>%
-  mutate(all_genotyped = sum(n),
-         mut_sample = sum(x),
-         prev_sum = sum(med)) %>%
-  ungroup %>%
-  group_by(year) %>%
-  mutate(n = length(unique(District)),
-         all_genotyped = max(all_genotyped)) %>%
-  select(Locus, year, adj_year, n, all_genotyped, mut_sample, prev_sum) %>%
-  distinct(all_genotyped, mut_sample, prev_sum, .keep_all = TRUE) %>%
-  mutate(prev_all = mut_sample/all_genotyped,
-         prev_sum = prev_sum/n) %>%
-  ungroup() %>%
-  complete(year, Locus, fill = list(prev_all = 0)) %>%
-  ggplot(aes(x = year, y = prev_all, fill=Locus, color = Locus)) +
+freq_plot <- df_freq_comb_year %>%
+  mutate(Locus = ifelse(Locus == "K13", "z_K13", Locus)) %>%
+  ggplot(aes(x = year, y = freq, fill=Locus, color = Locus)) +
   geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
   theme_bw() +
-  ylab("Prevalence") +
-  scale_y_continuous(limits = c(0,0.3), 
-                     labels = scales::percent) +
+  ylab("Allele frequency") +
+  scale_y_continuous(limits = c(0,0.3)) +
   scale_x_continuous("Year", 
-                     labels = as.character(df$year), 
-                     breaks = df$year) +
+                     labels = as.character(df_freq_comb$year), 
+                     breaks = df_freq_comb$year) +
   scale_fill_manual(values = c("#D55E00",
                                "#0072B2",
                                "#009E73",
                                "#59386c",
-                               "#BBBBBB",
-                               "#F0E442"),
+                               "#F0E442",
+                               "#BBBBBB"),
                     labels = c("675V",
                                "469F",
                                "469Y",
                                "441L",
-                               "K13 combined",
-                               "561H"),
+                               "561H",
+                               "K13 combined"),
                     name = "Mutations") +
   scale_color_manual(values = c("#D55E00",
                                "#0072B2",
                                "#009E73",
                                "#59386c",
-                               "#BBBBBB",
-                               "#F0E442"),
+                               "#F0E442",
+                               "#BBBBBB"),
                     labels = c("675V",
                                "469F",
                                "469Y",
                                "441L",
-                               "K13 combined",
-                               "561H"),
+                               "561H",
+                               "K13 combined"),
                     name = "Mutations") +
   labs(fill='Mutations') +
   labs(fill='color') +
@@ -108,21 +94,15 @@ prev <- df %>% select(-x_org, -value) %>%
 ## Saving
 ```{r}
 ggsave(
-  paste0(
-    fileLocManuscript,
-    "/Figure1-UgandaPrevMap/Figure1A_Prevalence.pdf"
-  ),
-  prev,
+  "figures/Figure1_UgandaPrevMap/Figure1A_Prevalence.pdf",
+  freq_plot,
   width = 4,
   height = 5.5,
   dpi = 700
 )
 ggsave(
-  paste0(
-    fileLocManuscript,
-    "/Figure1-UgandaPrevMap/Figure1A_Prevalence.png"
-  ),
-  prev,
+  "figures/Figure1_UgandaPrevMap/Figure1A_Prevalence.png",
+  freq_plot,
   width = 4,
   height = 5.5,
   dpi = 700
@@ -132,44 +112,30 @@ ggsave(
 
 ## Calculation
 ```{r}
-prev_df <-  df %>% 
-  group_by(year, Locus) %>% 
-  mutate(min_n = sum(n), mut_sample = sum(x)) %>% 
-  distinct(min_n, mut_sample) %>% 
-  mutate(prop_sample = round((mut_sample/min_n)*100, 2))
-
-avg_20162017 <- prev_df %>% 
-  filter(year == 2016 || year == 2017) %>% 
+avg_20162017 <- df_freq_comb_year %>% 
+  filter(year <= 2017) %>% 
   ungroup %>% 
   group_by(Locus) %>% 
-  summarise(sum_prop_sample = mean(prop_sample))
+  summarise(mean_allele_freq = mean(freq))
 
-avg_20202021 <- prev_df %>% 
-  filter(year == 2020 || year == 2021) %>% 
+avg_20202021 <- df_freq_comb_year %>% 
+  filter(year >= 2020 & year <= 2021) %>% 
   ungroup %>% group_by(Locus) %>% 
-  summarise(sum_prop_sample = mean(prop_sample))
+  summarise(mean_allele_freq = mean(freq))
 
-avg_2022 <- prev_df %>% 
+avg_2022 <- df_freq_comb_year %>% 
   filter(year == 2022) %>% 
   ungroup %>% group_by(Locus) %>% 
-  summarise(sum_prop_sample = prop_sample)
+  summarise(mean_allele_freq = mean(freq))
 
-prev_comb_df <-  df_comb %>% 
-  group_by(year) %>% 
-  drop_na(comb) %>%
-  mutate(min_n = sum(n), 
-         mut_sample = sum(comb)) %>% 
-  distinct(min_n, mut_sample) %>% 
-  mutate(prop_sample = round((mut_sample/min_n)*100, 2))
-
-max_med <- df %>%
+max_freq <- df_freq %>%
   group_by(year) %>%
-  drop_na(med) %>%
-  mutate(med = med *100,
-         max_district = District[which.max(med)],
-         max_med = round(max(med, na.rm=TRUE),1)) %>%
+  drop_na(freq) %>%
+  mutate(med = freq *100,
+         max_district = District[which.max(freq)],
+         max_freq = round(max(freq, na.rm=TRUE),1)) %>%
   ungroup() %>%
-  distinct(year, max_district, max_med)
+  distinct(year, max_district, max_freq)
   
 ```
 
@@ -201,7 +167,7 @@ uganda <- ne_states(country="Uganda", returnclass = "sf") %>%
   arrange(name)
 uganda$name[uganda$name == "Kabale"] <- "Rukiga"
 uganda <- uganda %>% 
-  filter(name %in% unique(df$District)) %>% 
+  filter(name %in% unique(df_freq$District)) %>% 
   na.omit() %>% 
   arrange(name) %>%
   filter(!name == "Amolatar")
@@ -209,30 +175,7 @@ uganda <- uganda %>%
 
 ## Per year checking
 ```{r}
-#sum prevalence per Locus and District
-pie_data <- df %>% 
-  mutate(sum_district_locus = x) %>%
-  select(year, District, Locus, sum_district_locus) %>% 
-  distinct(District, Locus, year, .keep_all = TRUE) %>% 
-  ungroup() 
-
-#sum sample size for each District
-all_genotyped <- df %>% 
-  group_by(District, year) %>% 
-  mutate(sum_district_locus = max(n)) %>% 
-  select(year, District, sum_district_locus) %>% 
-  distinct(District, year, .keep_all = TRUE) %>% 
-  ungroup() 
-
-#add all genotyped data to dataframe as additional rows
-pie_data <- pie_data %>% 
-  add_row(year = all_genotyped$year, 
-          District = all_genotyped$District,
-          Locus = rep("AllGenotyped", length(all_genotyped$District)), 
-          sum_district_locus = all_genotyped$sum_district_locus) %>% 
-  arrange(District) %>% 
-  ungroup
-
+pie_data <- df_freq_comb %>% select(District, year, Locus, freq)
 #add long and lat to dataframe for plotting
 pie_data$lat <- NA
 pie_data$long <- NA
@@ -241,47 +184,24 @@ for (i in unique(uganda$name)){
   pie_data$long[pie_data$District == i] <- rep(uganda$longitude[uganda$name == i], sum((pie_data$District == i)))
 }
 
-#initialize rows for each mutation and all genotyped
-pie_data2 <- pie_data %>% select(year, District, lat, long) %>% distinct(year, District, .keep_all = TRUE)
-pie_data2$A675V <- NA
-pie_data2$C469Y <- NA
-pie_data2$C469F <- NA
-pie_data2$R561H <- NA
-pie_data2$P441L <- NA
-pie_data2$AllGenotyped <- NA
-
-#obtain districts that obtain each mutation
-C469Y_dist <- unique(df$District[df$Locus == "C469Y"])
-A675V_dist <- unique(df$District[df$Locus == "A675V"])
-C469F_dist <- unique(df$District[df$Locus == "C469F"])
-R561H_dist <- unique(df$District[df$Locus == "R561H"])
-P441L_dist <- unique(df$District[df$Locus == "P441L"])
-
-#add prevalence for each mutation to dataframe
-pie_data2$A675V[pie_data2$District %in% A675V_dist] <- pie_data$sum_district_locus[pie_data$Locus == "A675V"]
-pie_data2$C469Y[pie_data2$District %in% C469Y_dist] <- pie_data$sum_district_locus[pie_data$Locus == "C469Y"]
-pie_data2$C469F[pie_data2$District %in% C469F_dist] <- pie_data$sum_district_locus[pie_data$Locus == "C469F"]
-pie_data2$R561H[pie_data2$District %in% R561H_dist] <- pie_data$sum_district_locus[pie_data$Locus == "R561H"]
-pie_data2$P441L[pie_data2$District %in% P441L_dist] <- pie_data$sum_district_locus[pie_data$Locus == "P441L"]
-pie_data2$AllGenotyped <- pie_data$sum_district_locus[pie_data$Locus == "AllGenotyped"]
-pie_data2[is.na(pie_data2)] <- 0
-
-pie_data2 <- pie_data2 %>%
-  mutate(radius = (pie_data2$A675V + pie_data2$C469Y + pie_data2$C469F + pie_data2$R561H) / pie_data2$AllGenotyped) %>%
-  filter(radius >0)
+pie_data <- pie_data %>%
+  pivot_wider(values_from = freq, names_from = Locus) %>%
+  #mutate(WT = 1-PfK13) %>%
+  mutate(radius = K13) %>%
+  filter(radius > 0)
 
 #rescale radius
-minr<-min(pie_data2$radius)  # min in the data original scale
-maxr<-max(pie_data2$radius)  # max in the data original scale
+minr<-min(pie_data$radius)  # min in the data original scale
+maxr<-max(pie_data$radius)  # max in the data original scale
 min_scale<-0.1  ## min in the new scale
 max_scale<-0.45 ## max in the new scale
-pie_data2$radius_adj <- min_scale + (max_scale-min_scale)*pie_data2$radius/(maxr-minr)
+pie_data$radius_adj <- min_scale + (max_scale-min_scale)*pie_data$radius/(maxr-minr)
 ```
 
 ## Plotting for 2022
 ```{r}
 # make plot with wild_type
-pie_chart_df <- pie_data2 %>% filter(year == 2022)
+pie_chart_df <- pie_data %>% filter(year == 2022)
 map_uganda <- ggplot() +
   geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
   geom_sf(data=uganda, fill = "moccasin") +
@@ -315,7 +235,8 @@ map_uganda <- ggplot() +
   geom_scatterpie_legend(pie_chart_df$radius_adj,
                          x=28.7,
                          y=0.7,
-                         labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100), #convert adjusted radius size back to the mutant/genotyped
+                         labeller = function(x) round((x*0.5441068-0.1)/0.35 *100),
+                         #labeller = function(x) round(((0.639899*(x-0.1))/0.35)*100), #convert adjusted radius size back to the mutant/genotyped
                          n=4)+
     theme(legend.text=element_text(size=10), 
         axis.text = element_text(size = 10), 
@@ -338,24 +259,18 @@ map_uganda <- ggplot() +
 ## Saving Plots
 ```{r}
 ggsave(
-  paste0(
-    fileLocManuscript,
-    paste0("/Figure1-UgandaPrevMap/Figure1B_MapUganda_2021.pdf")
-  ),
+  "figures/Figure1_UgandaPrevMap/Figure1B_MapUganda_2022.pdf",
   map_uganda,
   width = 6,
   height = 5.5,
   dpi = 700
   )
-  ggsave(
-    paste0(
-      fileLocManuscript,
-      paste0("/Figure1-UgandaPrevMap/Figure1B_MapUganda_2021.png")
-    ),
-    map_uganda,
-    width = 6,
-    height = 5.5,
-    dpi = 700
-  )
+ggsave(
+  "figures/Figure1_UgandaPrevMap/Figure1B_MapUganda_2022.png",
+  map_uganda,
+  width = 6,
+  height = 5.5,
+  dpi = 700
+)
 
 ```

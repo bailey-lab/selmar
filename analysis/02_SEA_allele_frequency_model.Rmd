@@ -1,0 +1,222 @@
+---
+title: "SEA: Selection coefficients analysis based on allele freuquency of K13 mutations"
+output: html_document
+date: "2024-04-17"
+---
+
+# This file estimates the selection coefficient using a Bayesian GLM model using
+# the K13 allele frequency estimates in SEA
+
+```{r}
+library(Matrix)
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+#Load function
+```{r}
+source("GLM_model_s_functions.R")
+source("SEA_analysis_selection_coef.R")
+source("SEA_preprocessing_selection_coef.R")
+source("SEA_selection_coef_estimate.R")
+```
+
+# Load data
+```{r}
+fileLocManuscript_pfK7 <- "figures/"
+
+#load data
+pfk7_data_unfiltered <- read.table("data/data-derived/pfk7_allele_frequency.txt") %>% 
+  filter(Locus != "other_K13") 
+
+#set the limit of number of observations
+numofobs <- 2
+
+pfk7_data_filtered <- pfk7_data_unfiltered %>% 
+  filter(!(Locus == "K13" & District == "Binh Phuoc" & year == 2005)) %>%
+  group_by(Locus, District) %>%
+  filter(min_year <= 2010,
+         year >= min_year & year <= min_year + 4, #filter for the first five years,
+         nobs > numofobs) %>%
+  arrange(Locus, District, year)
+```
+
+# Bayesian GMM with slopes and intercepts
+```{r}
+C580Y <- GLM_model_mutant(pfk7_data_filtered, "C580Y", numofobs = 2)
+c580y_stanmod <- C580Y$glmer
+ranef_c580y_stanmod <- C580Y$ranef
+
+R539T <- GLM_model_mutant(pfk7_data_filtered, "R539T", numofobs = 2)
+r539t_stanmod <- R539T$glmer
+ranef_r539t_stanmod <- R539T$ranef
+
+K13 <- GLM_model_mutant(pfk7_data_filtered, "K13", numofobs = 2)
+K13_stanmod <- K13$glmer
+ranef_K13_stanmod <- K13$ranef
+``` 
+
+#Calculate selection coefficient
+```{r}
+pfk7_data_filtered <- selection_coef_estimate(pfk7_data_filtered, c580y_stanmod, r539t_stanmod, k13_stanmod)
+```
+
+# SFigure5: Plot allele frequency for all mutations
+## Preprocessing
+```{r}
+# add other SEAn sites to show general allele frequency across SE Asia
+other_districts <- pfk7_data_unfiltered %>% 
+  filter(District == "Bago" | District == "Bac Lieu" | District == "Mandalay" | District == "Ninh Thuan")
+  # filter(! District %in% unique(pfk7_data_filtered$District)) %>%
+  # filter(!District %in% c("Champasak", "Salavan", "Sekong", "Kayin", "Rakhine", "Dak Lak", "Dak Nong", "Gia Lai", "Stueng Traeng"))
+```
+
+## Supplement Plot
+```{r}
+allele_freq_model_fit <- pfk7_data_filtered %>%
+  ggplot(aes(year, freq, group = Locus, color = Locus)) +
+  geom_point(aes(size = n/2, group = Locus, color = Locus)) +
+  geom_line(data = pfk7_data_filtered %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) +
+  geom_ribbon(data = pfk7_data_filtered %>% filter(nobs > numofobs, is.finite(lrsmed)), aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  geom_point(data = other_districts, aes(size = n/2, x = year, y = freq, group = Locus, color = Locus)) + 
+  facet_wrap(~country + District) +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  scale_color_manual(
+    values = c("#56B4E9", "#E69F00", "#009E73"),
+    name = "Mutations",
+    labels = c("580Y", "K13", "539T")
+  ) +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00", "#009E73")) +
+  ylab("Allele Freq") +
+  xlab("Year") +
+  #ylim(-0.01, 1.01)+
+  ggpubr::theme_pubclean(base_size = 12)+
+  scale_x_continuous(limits = c(2002, 2014), 
+                     breaks = seq(2002, 2014, 4),
+                     minor_breaks = seq(2002, 2014, 2)) +
+  theme(
+    axis.line = element_line(),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    strip.text.x = element_text(size = 12),
+    legend.title = element_text(size = 12),
+    legend.position = "right",
+    legend.box = "vertial"
+  )
+```
+
+## Saving plots
+```{r}
+ggsave(
+  "figures/supplement/Figure5_SEA_Prevalence/SEA_posterior_allele_freq.png",
+  allele_freq_model_fit,
+  width = 8,
+  height = 8,
+  dpi = 700
+)
+ggsave(
+  "figures/supplement/Figure5_SEA_Prevalence/SEA_posterior_allele_freq.pdf",
+  allele_freq_model_fit,
+  width = 8,
+  height = 8,
+  dpi = 700
+)
+```
+
+# Plot selection coefficient 
+## Preprocessing
+```{r}
+selection_coef_result <- preprocessing_selection_coef(c580y_stanmod, r539t_stanmod, K13_stanmod)
+rownames(selection_coef_result) <- NULL
+```
+
+## Figure S6: Plot
+```{r}
+selection_coef_plot <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_pointrange(data = selection_coef_result, 
+                  aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
+                  position=position_dodge(width = 0.5), shape = selection_coef_result$s, size = selection_coef_result$sizes) +
+  scale_y_discrete(labels = c("539T", "580Y", "K13")) +
+  ylab("Mutation") +
+  xlab("Selection Coefficient") +
+  xlim(-2.5,3) +
+  scale_color_manual(values=c("#4477AA",
+                              "#66CCEE",
+                              "#228833",
+                              "#CCBB44",
+                              "black",
+                              "#EE7733")) +
+  theme_bw() +
+  theme(
+    legend.title = element_blank(),
+    axis.line = element_line(),
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5, size = 20),
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 10)
+  )
+
+selection_coef_summary <- selection_coef_result %>% 
+  relocate(District, mutation) %>% 
+  select(!(s:sizes)) %>% 
+  mutate(conf.low = round(conf.low, 3), conf.high = round(conf.high, 3), estimate = round(estimate, 3)) 
+```
+
+### Saving plots
+```{r}
+ggsave(
+  "figures/Figure3_selection_coefficient/SEA/Figure3_SEA_selecton_coef_allelefreq.png",
+  selection_coef_plot,
+  width = 8,
+  height = 5.5,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure3_selection_coefficient/SEA/Figure3_SEA_selecton_coef_allelefreq.pdf",
+  selection_coef_plot,
+  width = 8,
+  height = 5.5,
+  dpi = 700
+)
+write.csv(
+  selection_coef_summary,
+  "figures/Figure3_selection_coefficient/SEA/SEA_selection_coef_allelefreq_summary.csv",
+  row.names = F,
+  quote = F
+)
+```
+
+### Statistical analysis of selection coefficients
+```{r}
+selec_ceof_stats <- analysis_selection_coef(selection_coef_result)
+write.csv(
+  selec_ceof_stats,
+  "figures/Figure3_selection_coefficient/SEA/SEA_selection_coef_allelefreq_stats.csv",
+  row.names = F,
+  quote = F
+)
+```

@@ -1,0 +1,212 @@
+---
+title: "Allele frequency prediction"
+output: html_document
+date: "2024-05-10"
+---
+
+
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+
+```
+
+#Load functions
+```{r}
+source("Uganda_prediction_model_functions.R")
+```
+
+# Load data
+```{r}
+#load data
+df_freq <- read.table("data/data-derived/Uganda_allele_frequency.txt") %>%
+  group_by(District) %>%
+  mutate(max_year = max(year)) %>%
+  ungroup
+
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures/"
+```
+
+# Forecasting selection up until 2033
+```{r}
+pred_year <- 2033
+#------ Model prediction for PfK13 ------
+freq_predict_K13 <- prediction_model(df_freq, "K13", numofobs=2, pred_year)
+
+#------ Model prediction for C469Y ------
+freq_predict_C469Y <- prediction_model(df_freq, "C469Y", numofobs=2, pred_year)
+
+#------ Model prediction for A675V ------
+freq_predict_A675V <- prediction_model(df_freq, "A675V", numofobs=2, pred_year)
+
+#------ Model prediction for C469F ------
+freq_predict_C469F <- prediction_model(df_freq, "C469F", numofobs=2, pred_year)
+
+#------ Model prediction for P441L ------
+freq_predict_P441L <- prediction_model(df_freq, "P441L", numofobs=2, pred_year)
+
+df_predict <- rbind(freq_predict_K13, 
+                    freq_predict_C469Y,
+                    freq_predict_C469F,
+                    freq_predict_A675V,
+                    freq_predict_P441L)
+
+df_predict_allyear <- df_predict %>% 
+  group_by(District, Locus) %>% 
+  mutate(min_year = replace_na(min_year, 0),
+         min_year = max(min_year),
+         max_year = replace_na(max_year, 0),
+         max_year = max(max_year))
+```
+
+## Convert to allele freq
+```{r}
+df_predict_allyear <- df_predict_allyear %>% mutate(predict_freq = exp(predict)*100/(1+exp(predict)),
+                                                    conf.low_freq = exp(conf.low)*100/(1+exp(conf.low)),
+                                                    conf.high_freq = exp(conf.high)*100/(1+exp(conf.high)))
+```
+
+## Figure 5: Ploting forecasting of predictions for the first 2, 3, and 4 years
+```{r}
+################ PLOT FOR PfK13 ################
+plot_pred_K13 <- plot_prediction(df_predict_allyear, df_freq, "K13")
+  
+################ PLOT FOR A675V ################
+plot_pred_A675V <- plot_prediction(df_predict_allyear, df_freq, "A675V")
+
+################ PLOT FOR C469Y ################
+plot_pred_C469Y <- plot_prediction(df_predict_allyear, df_freq, "C469Y") 
+
+################ PLOT FOR C469F ################
+plot_pred_C469F <- plot_prediction(df_predict_allyear, df_freq, "C469F") 
+
+################ PLOT FOR P441L ################
+plot_pred_P441L <- plot_prediction(df_predict_allyear, df_freq, "P441L") 
+```
+
+### Saving plots
+```{r}
+fig6_width = 6
+fig6_height = 4
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_A675V.png",
+  plot_pred_A675V,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_A675V.pdf",
+  plot_pred_A675V,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_C469Y.png",
+  plot_pred_C469Y,
+  width = fig6_width,
+  height = 2.9,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_C469Y.pdf",
+  plot_pred_C469Y,
+  width = fig6_width,
+  height = 2.9,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_C469F.png",
+  plot_pred_C469F,
+  width = fig6_width,
+  height = 2.3,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_C469F.pdf",
+  plot_pred_C469F,
+  width = fig6_width,
+  height = 2.3,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_P441L.png",
+  plot_pred_P441L,
+  width = fig6_width,
+  height = 2.3,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_P441L.pdf",
+  plot_pred_P441L,
+  width = fig6_width,
+  height = 2.3,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_PfK13.png",
+  plot_pred_K13,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+ggsave(
+  "figures/Figure4_forecasting/Uganda/Uganda_forecasting_PfK13.pdf",
+  plot_pred_K13,
+  width = fig6_width,
+  height = fig6_height,
+  dpi = 700
+)
+
+write_csv(df_predict_allyear, "figures/Figure4_forecasting/Uganda/forecasting_data.csv")
+```
+
+## Fixation statistics
+```{r}
+fix <- df_predict_allyear  %>% filter(predict_freq >= 95)
+
+#calculated fixation for each mutations
+fix <- fix %>%
+  group_by(District, Locus) %>%
+  filter(year == min(year)) %>%
+  ungroup %>%
+  mutate(fixation =year - min_year) %>%
+  group_by(Locus) %>%
+  mutate(med = median(fixation),
+         med_year = median(year),
+         min_fixyear = min(year),
+         max_fixyear = max(year))
+write_csv(fix, "figures/Figure4_forecasting/Uganda/prediction_fixation_95.csv")
+
+#obtain predicted allele frequency in last year
+predicted_2033 <- df_predict_allyear  %>% filter(year == 2033) %>%
+  ungroup %>%
+  group_by(Locus) %>%
+  mutate(avg_prev = mean(predict_freq))
+write_csv(predicted_2033 , "figures/Figure4_forecasting/Uganda/prediction_2033.csv")
+
+```

@@ -1,0 +1,158 @@
+---
+title: "Uganda: generate within sample allele frequency"
+output: html_document
+date: "2024-05-07"
+---
+# Overview
+This code generates the allele frequency for Uganda.
+
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+source("Uganda_preprocessing_functions.R")
+ratio_file <- read.csv("data/data-derived/Uganda_ratio_genotype_intermediate_file.csv")
+```
+
+# WSAF for Uganda for each site, year and Locus
+## Read in Data
+```{r}
+#filter out districts and rename some districts
+ratio_file <- ratio_file %>% 
+  filter(site != "MAS" & site != "kS") %>%
+  mutate(site = replace(site, site == "TR", "TO"),
+         site = replace(site, site == "LAM", "LA")) %>%
+  rename(PfK13 = K13) %>%
+  select(site, id, year, type, A675V, R561H, C469Y, C469F, P441L, PfK13, WT, remove)
+K13_mutations <- c("A675V", "R561H", "C469Y", "C469F", "P441L")
+```
+
+## Calculate WSAF
+```{r}
+#calculate allele freqeuncy for each mutation removing the samples that have too low coverage
+freq_individual_mut <- calc_freq_individual_mutations(ratio_file, K13_mutations)
+freq_individual_mut <- freq_individual_mut %>%
+  mutate(id = paste0(site, "_", year))
+
+#calculate allele freqeuncy for K13
+freq_K13 <- calc_freq_K13(ratio_file)
+freq_K13 <- freq_K13 %>%
+  mutate(id = paste0(site, "_", year)) %>%
+  select(!c(site, year))
+
+freq_Uganda <- merge(freq_individual_mut, freq_K13, by="id")
+freq_Uganda <- freq_Uganda %>% 
+  select(site, year, n, A675V, R561H, C469Y, C469F, P441L, K13) %>%
+  pivot_longer(cols = A675V:K13, names_to = "Locus", values_to ="freq") %>%
+  mutate(District = case_when(site == "AG" ~ "Agago",
+                          site == "KS" ~ "Kasese",
+                          site == "KB" ~ "Rukiga",
+                          site == "KN" ~ "Kanungu",
+                          site == "HO" ~ "Hoima",
+                          site == "KBG" ~ "Kaabong",
+                          site == "KBK" ~ "Koboko",
+                          site == "KO" ~ "Kole",
+                          site == "KTK" ~ "Katakwi",
+                          site == "LA" ~ "Lamwo",
+                          site == "TO" ~ "Tororo",
+                          site == "AM" ~ "Amoleta",
+                          site == "MU" ~ "Mubende",
+                          site == "JI" ~ "Jinja",
+                          site == "AR" ~ "Arua",
+                          site == "KAP" ~ "Kapchorwa",
+                          site == "AR" ~ "Arua")) %>%
+  mutate(lrsmed = log(freq/(1-freq))) %>%
+  group_by(District, Locus) %>%
+  mutate(min_year = min(year[freq>0], na.rm = TRUE),
+         nobs= sum(freq > 0, na.rm = TRUE)) %>%
+  ungroup %>%
+  mutate(adj_year = year - min_year) %>%
+  select(District, year, Locus, n, min_year, adj_year, nobs, lrsmed, freq)
+
+# log ratio function
+se_ln_ratio_noZeros<-function(x,N) {
+  inds<-which(x==0)
+  x[inds]<-0.5
+  inds<-which(x==N)
+  x[inds]<-x[inds]-0.5
+  se<- sqrt(1/x + 1/(N-x))
+  return(se)
+}
+
+numofobs <- 2
+# remove the data that is Inf here due to 0s - this will obscure it from mdel fitting
+freq_Uganda$lrsmed[freq_Uganda$lrsmed == -Inf] <- NA
+
+freq_Uganda$wt_med <- NA
+freq_Uganda$wt_med[freq_Uganda$nobs > numofobs & is.finite(freq_Uganda$lrsmed)] <- 
+  1/(se_ln_ratio_noZeros(round(freq_Uganda$freq[freq_Uganda$nobs > numofobs & is.finite(freq_Uganda$lrsmed)]*freq_Uganda$n[freq_Uganda$nobs > numofobs & is.finite(freq_Uganda$lrsmed)]), 
+                         freq_Uganda$n[freq_Uganda$nobs > numofobs & is.finite(freq_Uganda$lrsmed)])^2)
+```
+## Save dataframe
+```{r}
+write.table(freq_Uganda, "data/data-derived/Uganda_allele_frequency.txt")
+write.csv(freq_Uganda, "data/data-derived/Uganda_allele_frequency.csv")
+```
+
+# Data for Map and bar plot: average WSAF across samples
+## WSAF across year and site for pie chart
+```{r}
+#calculate allele freqeuncy for each mutation removing the samples that have too low coverage
+ratio_file_filtered <- ratio_file %>%
+  mutate_at(vars(A675V, R561H, C469Y, C469F, P441L), ~replace_na(., 0))
+
+freq_individual_mut_mean <- calc_freq_individual_mutations_mean(ratio_file_filtered, K13_mutations)
+freq_individual_mut_mean <- freq_individual_mut_mean %>%
+  mutate(id = paste0(site, "_", year))
+
+#calculate allele freqeuncy for K13
+freq_K13_mean <- calc_freq_K13_mean(ratio_file_filtered)
+freq_K13_mean <- freq_K13_mean %>%
+  mutate(id = paste0(site, "_", year)) %>%
+  select(!c(site, year))
+
+freq_Uganda_mean <- merge(freq_individual_mut_mean, freq_K13_mean, by="id")
+freq_Uganda_mean <- freq_Uganda_mean %>% 
+  select(site, year, n, A675V, R561H, C469Y, C469F, P441L, K13) %>%
+  pivot_longer(cols = A675V:K13, names_to = "Locus", values_to ="freq") %>%
+  mutate(District = case_when(site == "AG" ~ "Agago",
+                          site == "KS" ~ "Kasese",
+                          site == "KB" ~ "Rukiga",
+                          site == "KN" ~ "Kanungu",
+                          site == "HO" ~ "Hoima",
+                          site == "KBG" ~ "Kaabong",
+                          site == "KBK" ~ "Koboko",
+                          site == "KO" ~ "Kole",
+                          site == "KTK" ~ "Katakwi",
+                          site == "LA" ~ "Lamwo",
+                          site == "TO" ~ "Tororo",
+                          site == "AM" ~ "Amoleta",
+                          site == "MU" ~ "Mubende",
+                          site == "JI" ~ "Jinja",
+                          site == "AR" ~ "Arua",
+                          site == "KAP" ~ "Kapchorwa",
+                          site == "AR" ~ "Arua")) %>%
+  select(District, year, Locus, n, freq)
+
+write.table(freq_Uganda_mean, "data/data-derived/Uganda_mean_allele_frequency.txt")
+```
+
+## WSAF across year for bar plot
+```{r}
+#calculate allele freqeuncy for each mutation removing the samples that have too low coverage
+freq_individual_mut_mean_year <- calc_freq_individual_mutations_mean_year(ratio_file_filtered, K13_mutations)
+
+#calculate allele freqeuncy for K13
+freq_K13_mean_year <- calc_freq_K13_mean_year(ratio_file_filtered)
+
+freq_Uganda_mean_year <- merge(freq_individual_mut_mean_year, freq_K13_mean_year, by="year")
+freq_Uganda_mean_year <- freq_Uganda_mean_year %>% 
+  select(year, n, A675V, R561H, C469Y, C469F, P441L, K13) %>%
+  pivot_longer(cols = A675V:K13, names_to = "Locus", values_to ="freq") %>%
+  select(year, Locus, n, freq)
+
+write.table(freq_Uganda_mean_year, "data/data-derived/Uganda_mean_allele_frequency_year.txt")
+```
+

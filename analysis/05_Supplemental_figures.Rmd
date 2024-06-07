@@ -1,0 +1,605 @@
+---
+title: "Supplemental figures"
+output: html_document
+date: "2024-05-13"
+---
+
+```{r setup, include=FALSE}
+library(lme4)
+library(nlme)
+library(dplyr)
+library(ggplot2)
+library(ggpattern)
+library(ggpubr)
+library(scales)
+library(tidyverse)
+library(cowplot)
+library(tabulizer)
+library(RColorBrewer)
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(sf) #see ubuntu issues here: https://rtask.thinkr.fr/installation-of-r-4-0-on-ubuntu-20-04-lts-and-tips-for-spatial-packages/
+library(ggspatial)
+library(scatterpie)
+library(scales)
+library (ggforce)
+library (ggmap)
+library(rstan)
+library(gt)
+library(ggbreak) 
+## install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+```
+
+# Load data
+```{r}
+#load data
+df_uganda <- read.table("data/data-derived/Uganda_allele_frequency.txt")
+df_comb_uganda <- read.table("data/data-derived/Uganda_mean_allele_frequency.txt")
+df_pfk7 <- read.table("data/data-derived/pfk7_allele_frequency.txt")
+df_pfk7_com <- read.table("data/data-derived/pfk7_allele_frequency_mean.txt")
+df_comb_pfk7 <- read.table("data/data-derived/pfk7_allele_frequency_year_mean.txt")
+
+#set the limit of number of observations
+numofobs <- 2
+
+fileLocManuscript <- "figures"
+```
+
+# Figure1: Overview of data plot Uganda with less than three observations --> data not included in analysis
+```{r}
+plot_overview_uganda <- df_uganda %>%
+  filter(Locus != "K13") %>%
+  arrange(desc(Locus)) %>%
+  ggplot(aes(year, freq, group = Locus, color = Locus)) +
+  geom_point(aes(size = n)) +
+  scale_size_binned(name = "Sample Size",
+                    range = c(0.2,2.5)) +
+  labs(shape = "Mutations", 
+       size = "Sample Size") +
+  theme_bw() +
+  facet_wrap( ~ District) +
+  ylab("Allele frequency") +
+  xlab("Year") +
+  scale_color_manual(values = c("#D55E00",
+                              "#0072B2",
+                              "#009E73",
+                              "#59386c",
+                              "#F0E442"),
+                   labels = c("675V",
+                              "469F",
+                              "469Y",
+                              "441L",
+                              "561H")) +
+  ggpubr::theme_pubclean(base_size = 12) +
+  theme(
+    axis.line = element_line(),
+    legend.title = element_text(size = 12),
+    axis.text = element_text(size = 6),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    strip.text.x = element_text(size = 10),
+    legend.position = "right", #c(0.94, 0.07)
+  )
+```
+
+### Saving plot
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure1-Uganda-DataOverview/Uganda_dataoverview.pdf"),
+  plot_overview_uganda,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure1-Uganda-DataOverview/Uganda_dataoverview.png"),
+  plot_overview_uganda,
+  width = 8,
+  height = 5,
+  dpi = 700
+)
+```
+
+# Figure 2: Uganda Map for 2016-2020
+## Download map components
+```{r}
+#load base map layers
+admin8 <- ne_download(scale="large", type = "admin_1_states_provinces_lines",
+                      category = "cultural", returnclass = "sf")
+rivers8 <- ne_download(scale = 10, type = 'rivers_lake_centerlines',
+                       category = 'physical', returnclass = "sf")
+lakes8 <- ne_download(scale = "large", type = 'lakes',
+                      category = 'physical', returnclass = "sf")
+sov110 <- ne_download(scale="medium", type = "sovereignty",
+                      category = "cultural", returnclass = "sf")
+admin110 <- ne_download(scale="large", type = "populated_places",
+                        category = "cultural", returnclass = "sf")
+kampala <- data.frame(name="Kampala", long=32.5833, lat=0.31666)
+
+pt.lim = data.frame(xlim = c(28.5, 35.5), ylim = c(4.25,-3))
+pt.bbox <- st_bbox(c(xmin=pt.lim$xlim[1],
+           xmax=pt.lim$xlim[2],
+           ymin=pt.lim$ylim[1],
+           ymax=pt.lim$ylim[2]))
+
+#get uganda specific information
+uganda <- ne_states(country="Uganda", returnclass = "sf") %>% 
+  st_crop(pt.bbox) %>% 
+  select(name, latitude, longitude) %>%
+  arrange(name)
+uganda$name[uganda$name == "Kabale"] <- "Rukiga"
+uganda <- uganda %>% 
+  filter(name %in% unique(df_comb_uganda$District)) %>% 
+  na.omit() %>% arrange(name)
+```
+
+## Data Preprocessing
+```{r}
+pie_data <- df_comb_uganda %>% select(District, year, Locus, freq)
+#add long and lat to dataframe for plotting
+pie_data$lat <- NA
+pie_data$long <- NA
+for (i in unique(uganda$name)){
+  pie_data$lat[pie_data$District == i] <- rep(uganda$latitude[uganda$name == i], sum((pie_data$District == i)))
+  pie_data$long[pie_data$District == i] <- rep(uganda$longitude[uganda$name == i], sum((pie_data$District == i)))
+}
+
+pie_data <- pie_data %>%
+  pivot_wider(values_from = freq, names_from = Locus) %>%
+  #mutate(WT = 1-PfK13) %>%
+  mutate(radius = K13) %>%
+  filter(radius >0)
+
+#rescale radius
+minr<-min(pie_data$radius)  # min in the data original scale
+maxr<-max(pie_data$radius)  # max in the data original scale
+min_scale<-0.1  ## min in the new scale
+max_scale<-0.45 ## max in the new scale
+pie_data$radius_adj <- min_scale + (max_scale-min_scale)*pie_data$radius/(maxr-minr)
+write.csv(pie_data, file = paste0(fileLocManuscript,"/supplement/Figure2_UgandaMap/Figure2_stas.csv"))
+```
+
+## Plotting
+```{r}
+# make plot with wild_type
+pie_chart_size <- c(1, 4, 3, 2.5, 2, 2, 1.5)
+count <- 0
+for (y in 2016:2022){
+  count <- count + 1
+  pie_chart_df <- pie_data %>% filter(year == y)
+  val <- 1
+  map_uganda <- ggplot() +
+  geom_sf(data=sov110, color='black', size=0.3, fill = ifelse(sov110$ADMIN == "Uganda", 'grey98', 'grey90')) +
+  geom_sf(data=uganda, fill = "moccasin") +
+  geom_sf(data=lakes8, color="grey40", fill ="aliceblue", size= 0.5) +
+  geom_sf(data=admin8, color="grey80", size= 0.6) +
+  geom_sf(data=admin110, color="grey80", size= 0.4) +
+  annotation_scale(location = "bl", width_hint = 0.3, height = unit(0.1, "cm")) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.25, "in"), pad_y = unit(0.15, "in"),
+                         style = north_arrow_fancy_orienteering, height = unit(1, "cm"), width = unit(1, "cm")) +
+  coord_sf(xlim = c(28.5, 35), ylim = c(4 ,-2), expand = TRUE) +
+  annotate("text", x = 34.8, y = 0.5, label = "Kenya",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 29.4, y = 1.2, label = "Democratic Republic \n of the Congo",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 30.2, y = -1.7, label = "Rwanda",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 31.4, y = 3.956, label = "South Sudan",
+           color="grey50", size=4 , fontface="italic") +
+  annotate("text", x = 34.5, y = -2, label = "Tanzania",
+           color="grey50", size=4 , fontface="italic") +
+  theme_minimal() + 
+  annotate(geom = "text", x = 31, y = -0.5, label = "Uganda", fontface = "bold", color = "black", size = 6) +
+  annotate(geom = "text", x = 33, y = -1, label = "Lake Victoria", 
+           fontface = "italic", color = "grey50", size = 5) +
+  xlab("") +
+  ylab("") +
+  geom_scatterpie(data = pie_chart_df, 
+                  aes(x=long, y=lat, group=District, r = radius_adj), 
+                  cols=c("A675V", "C469F", "C469Y", "R561H", "P441L")) +
+  geom_scatterpie_legend(pie_chart_df$radius_adj*val,
+                         x=28.7, y=2.0,
+                         labeller = function(x) round((x*0.5441068-0.1)/0.35 *100)) + #convert adjusted radius size back to the mutant/genotyped
+    # geom_scatterpie_legend(pie_chart_df$radius_adj*val, 
+    #                    x=28.7, y=2.0, 
+    #                    labeller = function(x) round(x*100)) +
+    scale_fill_manual(values = c("#D55E00",
+                               "#0072B2",
+                               "#009E73",
+                               "#F0E442",
+                               "#59386c"),
+                      labels = c("675V",
+                                "469F",
+                                "469Y",
+                                "561H",
+                                "441L"),
+                      name = "") +
+  theme(legend.text=element_text(size=10), 
+        axis.text = element_text(size = 10), 
+        legend.position = c(0.085,0.89))
+  
+  ggsave(
+  paste0(
+    fileLocManuscript,
+    paste0("/supplement/Figure2_UgandaMap/Figure2_MapUganda", y,".pdf")
+  ),
+  map_uganda,
+  width = 6,
+  height = 5.5,
+  dpi = 700
+  )
+  ggsave(
+    paste0(
+      fileLocManuscript,
+      paste0("/supplement/Figure2_UgandaMap/Figure2_MapUganda", y,".png")
+    ),
+    map_uganda,
+    width = 6,
+    height = 5.5,
+    dpi = 700
+  )
+}
+
+```
+
+
+# Figure 3
+## Figure 3A: SE Asia allele frequency
+### allele frequency plot overview
+```{r}
+SEA_freq_plot <- df_comb_pfk7 %>%
+  ggplot(aes(x = year, y = freq, fill=Locus, color = Locus)) +
+  geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) +
+  theme_bw() +
+  scale_color_manual("Mutations",
+    values = c("#56B4E9",
+               "#BBBBBB",
+               "#009E73",
+               "#E69F00"),
+    labels = c("580Y",
+               "K13",
+               "other K13",
+               "539T")) +
+  scale_fill_manual("Mutations",
+    values = c("#56B4E9",
+               "#BBBBBB",
+               "#009E73",
+               "#E69F00"),
+    labels = c("580Y",
+               "K13",
+               "other K13",
+               "539T")) +
+  xlab("Year") +
+  ylab("Allele frequency") +
+  scale_x_continuous("Year",  
+                     breaks = seq(2001, 2018, 2)) +
+  theme(legend.title=element_blank(), 
+        axis.text = element_text(size = 10), 
+        axis.title=element_text(size=12), 
+        legend.text=element_text(size=10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = c(.2 , .99), 
+        legend.justification = c("right", "top"), 
+        legend.box.just = "right", 
+        legend.margin = margin(1, 1, 1, 1))
+```
+
+### Saving plot
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure3_SEA_allele_frequency_map/SEAsia_prevalence.pdf"),
+  SEA_freq_plot,
+  width = 6,
+  height = 6.25,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure3_SEA_allele_frequency_map/SEAsia_prevalence.png"),
+  SEA_freq_plot,
+  width = 6,
+  height = 6.25,
+  dpi = 700
+)
+```
+
+## Figure 3B: SE Asia Map
+### Download maps
+```{r}
+#load base map layers
+admin8 <-
+  ne_download(
+    scale = "large",
+    type = "admin_1_states_provinces_lines",
+    category = "cultural",
+    returnclass = "sf"
+  )
+rivers8 <- ne_download(
+  scale = 10,
+  type = 'rivers_lake_centerlines',
+  category = 'physical',
+  returnclass = "sf"
+)
+lakes8 <- ne_download(
+  scale = "large",
+  type = 'lakes',
+  category = 'physical',
+  returnclass = "sf"
+)
+sov110 <- ne_download(
+  scale = "medium",
+  type = "sovereignty",
+  category = "cultural",
+  returnclass = "sf"
+)
+admin110 <- ne_download(
+  scale = "large",
+  type = "populated_places",
+  category = "cultural",
+  returnclass = "sf"
+)
+
+pt.lim = data.frame(xlim = c(28.5, 35.5), ylim = c(4.25, -3))
+pt.bbox <- st_bbox(c(
+  xmin = pt.lim$xlim[1],
+  xmax = pt.lim$xlim[2],
+  ymin = pt.lim$ylim[1],
+  ymax = pt.lim$ylim[2]
+))
+```
+
+### Preprocessing - getting SE Asia specific boarder, country and water information
+```{r}
+#adjust names of Districts
+SEA_map <- ne_states(country = unique(df_pfk7$country),
+            returnclass = "sf") %>%
+  #st_crop(pt.bbox) %>%
+  select(name, admin, latitude, longitude) %>%
+  arrange(name) %>% arrange(admin) %>%
+  mutate(
+    name = str_replace(name, "Batdâmbâng", "Battambang"),
+    name = str_replace(name, "Kaôh Kong", "Koh Kong"),
+    name = str_replace(name, "Krong Pailin", "Pailin"),
+    name = str_replace(name, "Preah Vihéar", "Preah Vihear"),
+    name = str_replace(name, "Pouthisat", "Pursat"),
+    name = str_replace(name, "Si Sa Ket", "Sisakhet"),
+    name = str_replace(name, "Rôtânôkiri", "Ratanakiri"),
+    name = str_replace(name, "Attapu", "Attapeu"),
+    name = str_replace(name, "Saravan", "Salavan"),
+    name = str_replace(name, "Savannakhét", "Savannakhet"),
+    name = str_replace(name, "Xékong", "Sekong"),
+    name = str_replace(name, "Khánh Hòa", "Khanh Hoa"),
+    name = str_replace(name, "Quàng Nam", "Quang Nam")
+  )
+
+#add Latitude for Districts that are not in the database
+SEA_map$name[SEA_map$latitude == 9.33941] <- "Bac Lieu"
+SEA_map$name[SEA_map$latitude == 11.6805] <- "Binh Phuoc"
+SEA_map$name[SEA_map$latitude == 11.1284] <- "Binh Thuan"
+SEA_map$name[SEA_map$latitude == 12.7691] <- "Dak Lak"
+SEA_map$name[SEA_map$latitude == 12.1425] <- "Dak Nong"
+SEA_map$name[SEA_map$latitude == 11.6242] <- "Ninh Thuan"
+SEA_map$name[SEA_map$latitude == 16.7204] <- "Quang Tri"
+SEA_map$name[SEA_map$latitude == 13.6662] <- "Stueng Traeng"
+
+#filter districts that are in SE Asia
+SEA_map <- SEA_map  %>% 
+  filter(name %in% unique(df_pfk7$District)) %>% 
+  na.omit() %>% 
+  arrange(name)
+
+#adjust districts that contain non 
+r539t_district <- df_pfk7 %>% 
+  filter(Locus == "R539T") %>% 
+  distinct(District)
+
+c580y_district <- df_pfk7 %>% 
+  filter(Locus == "C580Y") %>% 
+  distinct(District)
+
+c580y_r539t_district <- r539t_district %>%
+  filter(District %in% c580y_district$District)
+c580y_district <- c580y_district %>%
+  filter(!District %in% c580y_r539t_district$District)
+
+c580y_r539t_district <- c580y_r539t_district$District
+c580y_district <- c580y_district$District
+
+allkelch_district <- df_pfk7 %>% 
+  filter(Locus == "other_K13") %>% 
+  distinct(District)
+allkelch_district <- array(t(allkelch_district))
+allkelch_district <- allkelch_district[!allkelch_district %in% c580y_r539t_district]
+
+#label colors for map
+SEA_map$color <- "not_enough_samples"
+SEA_map$color[SEA_map$name %in% c580y_r539t_district] <- "r539t_c580y" #combined
+SEA_map$color[SEA_map$name %in% c580y_district] <- "c580y" #combined
+SEA_map$color[SEA_map$name %in% allkelch_district] <- "other K13" #only other kelch mutants
+
+SEA_map_c580y <- SEA_map %>% filter(color == "c580y")
+SEA_map_other <- SEA_map %>% filter(color == "other K13")
+SEA_map_r539t_c580y <- SEA_map %>% filter(color == "r539t_c580y")
+```
+
+### Plotting
+```{r}
+# make plot with wild_type
+map_SEAsia <- ggplot() +
+  geom_sf(data = sov110,
+          color = 'black',
+          size = 0.3,
+          fill = ifelse(sov110$ADMIN %in% c("Laos", "Thailand", "Cambodia", "Vietnam", "Myanmar"), 'grey98', 'grey90')) +
+  geom_sf(data = SEA_map_c580y, 
+          fill = "#56B4E9") +
+  geom_sf(data = SEA_map_other, 
+          fill = "#009E73") +
+  geom_sf(data = SEA_map_r539t_c580y, 
+          fill = "#E69F00") +
+  geom_sf(data = lakes8,
+          color = "grey40",
+          fill = "aliceblue",
+          size = 0.5) +
+  geom_sf(data = admin8,
+          color = "grey80", 
+          size = 0.6) +
+  geom_sf(data = admin110, 
+          color = "grey80", 
+          size = 0.4) +
+  annotation_scale(location = "bl",
+                   width_hint = 0.3,
+                   height = unit(0.1, "cm")) +
+  annotation_north_arrow(location = "bl",
+                         which_north = "true",
+                         pad_x = unit(0.25, "in"),
+                         pad_y = unit(0.15, "in"),
+                         style = north_arrow_fancy_orienteering,
+                         height = unit(1, "cm"),
+                         width = unit(1, "cm")) +
+  coord_sf(xlim = c(111, 92.5),
+           ylim = c(6.5, 28),
+           expand = TRUE) +
+  annotate("text", 
+           x = 102.5, 
+           y = 20,
+           label = "Laos",
+           color = "black",
+           size = 4,
+           fontface = "bold") +
+  annotate("text",
+           x = 101.5,
+           y = 16,
+           label = "Thailand",
+           color = "black",
+           size = 4,
+           fontface = "bold") +
+  annotate("text",
+           x = 105.9,
+           y = 12.8,
+           label = "Cambodia",
+           color = "black",
+           size = 4,
+           fontface = "bold") +
+  annotate("text",
+           x = 104.9,
+           y = 21.5,
+           label = "Vietnam",
+           color = "black",
+           size = 4,
+           fontface = "bold") +
+  annotate("text",
+           x = 95.2,
+           y = 16.9,
+           label = "Myanmar",
+           color = "black",
+           size = 4,
+           fontface = "bold") +
+  annotate("text",
+           x = 102,
+           y = 24,
+           label = "China",
+           color = "grey50",
+           size = 4,
+           fontface = "italic") +
+  theme_minimal() +
+  xlab("") +
+  ylab("") +
+  theme(legend.text = element_text(size = 10),
+    axis.text = element_text(size = 10),
+    legend.position = c(0.86, 0.95)
+  )
+```
+
+### Saving plot
+```{r}
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/supplement/Figure3_SEA_allele_frequency_map/SEAsia_map.pdf"
+  ),
+  map_SEAsia,
+  width = 5.625,
+  height = 6.25,
+  dpi = 700
+)
+ggsave(
+  paste0(
+    fileLocManuscript,
+    "/supplement/Figure3_SEA_allele_frequency_map/SEAsia_map.png"
+  ),
+  map_SEAsia,
+  width = 5.625,
+  height = 6.25,
+  dpi = 700
+)
+```
+
+# Figure 4: Overview of data plot SE Asia (PfK7 data) - included in analysis
+```{r}
+#load data
+pfk7_data_analysis <- df_pfk7 %>% 
+  filter(Locus != "other_K13") %>%
+  filter(!(Locus == "K13" & District == "Binh Phuoc" & year == 2005)) %>%
+  group_by(Locus, District) %>%
+  mutate(min_year = min(year[freq>0]))
+
+pfk7_data_analysis <- pfk7_data_analysis %>% 
+  group_by(Locus, District) %>%
+  filter(min_year <= 2010,
+         year >= min_year & year <= min_year + 4, #filter for the first five years,
+         nobs > numofobs) %>% #remove all distrcit where the first non-zero prevalence is larger than 50%
+  arrange(Locus, District, year) %>%
+  mutate(point_format = 19)
+
+pfk7_data_notanalysis <- df_pfk7 %>% 
+  filter(Locus != "other_K13", 
+         nobs > numofobs,
+         is.finite(lrsmed)) %>%
+  mutate(point_format = 1)
+
+plot_overview_seAsia <- 
+  ggplot() +
+  geom_point(data = pfk7_data_analysis, aes(year, freq, group = Locus, color = Locus, size = n), shape = 19) + 
+  geom_point(data = pfk7_data_notanalysis, aes(year, freq, group = Locus, color = Locus, size = n), shape = 1) + 
+  scale_size_binned(name = "Sample Size", range = c(0.2,3)) +
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  facet_wrap(~country+District) +
+  ylab("Allele frequency") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual("Mutations",
+    values = c("#56B4E9", "#E69F00", "#009E73"),
+    labels = c("580Y", "K13", "539T")) +
+  theme(
+    axis.line = element_line(),
+    legend.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 8),
+    strip.text.x = element_text(size = 8),
+    legend.position = "right",
+    legend.box = "vertical"
+  )
+```
+
+### Saving plot
+```{r}
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure4_SEA_data_overview/SEA_dataoverview.pdf"),
+  plot_overview_seAsia,
+  width = 7,
+  height = 6,
+  dpi = 700
+)
+ggsave(
+  paste0(fileLocManuscript, "/supplement/Figure4_SEA_data_overview/SEA_dataoverview.png"),
+  plot_overview_seAsia,
+  width = 7,
+  height = 6,
+  dpi = 700
+)
+```
+
+

@@ -1,0 +1,145 @@
+---
+title: "Preprocessing Pf7 allele freq data"
+output: html_document
+date: "2024-04-16"
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+#load function
+```{r}
+source("~/Dropbox (Brown)/Brown/PhD/JeffBaileyLab/Kelch_Uganda_Modeling/selmar/analysis/SEA_preprocessing_allele_freqeuncy_function.R")
+```
+
+#Load data
+```{r}
+kelch13 <- read.csv("data/data-raw/kelch.csv") %>%
+  dplyr::rename(sample_id = Sample)
+Pf7_samples <- read.csv("data/data-raw/Pf7-samples.csv")
+```
+
+#preprocessing
+```{r}
+Pf7_samples_filtered <-
+  Pf7_samples %>% 
+  dplyr::filter(country %in% c("Cambodia", "Myanmar", "Laos", "Vietnam", "Thailand")) %>%
+  dplyr::select(sample_id, country, site, year)
+
+pfk7_preprocessing <- kelch13 %>% 
+  dplyr::left_join(Pf7_samples_filtered, by = "sample_id") %>%
+  drop_na(country, k13) %>%
+  group_by(country, site, year) %>%
+  select(sample_id, site, country, year, F446I, Y493H, R539T, I543T, P553L, R561H, P574L, C580Y, A675V) %>%
+  ungroup
+
+pfk7_preprocessing$k13 <- rowSums(pfk7_preprocessing[,c("F446I", "Y493H", "R539T", "I543T", "P553L", "R561H", "P574L", "C580Y", "A675V")])
+pfk7_preprocessing$WT <- 1-pfk7_preprocessing$k13
+
+#adjust K13>1
+pfk7_preprocessing <- updated_kelch13_ratio_greater_than_1(pfk7_preprocessing)
+```
+
+# Calculate Pf7 data samples 
+```{r}
+#filter samples based on those in kelch13
+merged_kelch <- pfk7_preprocessing %>%
+  group_by(country, site, year) %>%
+  summarise(n = n(),
+            other_K13 = sum(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V, na.rm=TRUE)/(sum(F446I + Y493H + I543T + P553L + R561H + P574L + A675V + WT, na.rm=TRUE)),
+            C580Y = sum(C580Y, na.rm=TRUE)/(sum(C580Y + WT, na.rm=TRUE)),
+            R539T = sum(R539T, na.rm=TRUE)/(sum(R539T + WT, na.rm=TRUE)),
+            K13 = sum(k13, na.rm=TRUE)/(sum(k13 + WT, na.rm=TRUE)))  %>%
+  ungroup %>%
+  pivot_longer(cols = other_K13:K13) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  filter(is.finite(freq)) %>%
+  arrange(Locus, country, District, year) %>%
+  group_by(Locus, country, District) %>%
+  mutate(nobs = sum(freq > 0),
+         min_year = min(year[freq>0]),
+         adj_year = year - min_year) %>%
+  filter(is.finite(min_year),
+         year > 2000)
+```
+
+```{r}
+# log ratio function
+se_ln_ratio_noZeros <- function(x, N) {
+  inds <- which(x == 0)
+  x[inds] <- 0.5
+  inds <- which(x == N)
+  x[inds] <- x[inds] - 0.5
+  se <- sqrt(1 / x + 1 / (N - x))
+  return(se)
+}
+```
+
+```{r}
+# log ratio function
+numofobs <- 2
+merged_kelch$wt_med <- NA
+
+merged_kelch <-
+  merged_kelch %>% 
+  mutate(lrsmed = log(freq / (1 - freq)),
+         wt_med = replace(wt_med, nobs > numofobs & is.finite(lrsmed),
+                          1/(se_ln_ratio_noZeros(round(freq[nobs > numofobs & is.finite(lrsmed)]*n[nobs > numofobs & is.finite(lrsmed)]), n[nobs > numofobs & is.finite(lrsmed)])^2)
+         ))
+
+merged_kelch$lrsmed[merged_kelch$lrsmed == Inf] <- NA
+merged_kelch$lrsmed[merged_kelch$lrsmed == -Inf] <- NA
+
+write.table(merged_kelch,"data/data-derived/pfk7_allele_frequency.txt")
+```
+
+# Mean allele frequencies for bar plots and maps
+## Calculate Pf7 data samples per year and site
+```{r}
+#filter samples based on those in kelch13
+merged_kelch_avg_WSAF <- pfk7_preprocessing %>%
+  group_by(country, site, year) %>%
+  summarise(n = n(),
+            other_K13 = mean(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V, na.rm=TRUE),
+            C580Y = mean(C580Y, na.rm=TRUE),
+            R539T = mean(R539T, na.rm=TRUE),
+            K13 = mean(k13, na.rm=TRUE))  %>%
+  ungroup %>%
+  pivot_longer(cols = other_K13:K13) %>%
+  rename(freq = value,
+         Locus = name,
+         District = site) %>%
+  filter(is.finite(freq)) %>%
+  arrange(Locus, country, District, year) %>%
+  group_by(Locus, country, District) %>%
+  mutate(nobs = sum(freq > 0),
+         min_year = min(year[freq>0]),
+         adj_year = year - min_year) %>%
+  filter(is.finite(min_year),
+         year > 2000)
+write.table(merged_kelch_avg_WSAF,"data/data-derived/pfk7_allele_frequency_mean.txt")
+```
+
+## Calculate Pf7 data samples per year
+```{r}
+merged_kelch_avg_year <- pfk7_preprocessing %>%
+  group_by(year) %>%
+  summarise(n = n(),
+            other_K13 = mean(F446I + Y493H + I543T + P553L + R561H + P574L+ A675V, na.rm=TRUE),
+            C580Y = mean(C580Y, na.rm=TRUE),
+            R539T = mean(R539T, na.rm=TRUE),
+            K13 = mean(k13, na.rm=TRUE))  %>%
+  ungroup %>%
+  pivot_longer(cols = other_K13:K13) %>%
+  rename(freq = value,
+         Locus = name) %>%
+  filter(is.finite(freq),
+         year > 2000) %>%
+  arrange(Locus, year) %>%
+  group_by(Locus) 
+write.table(merged_kelch_avg_year,"data/data-derived/pfk7_allele_frequency_year_mean.txt")
+```

@@ -1,0 +1,181 @@
+---
+title: "Uganda 2016-2022: Selection coefficients analysis based on allele freuquency of K13 mutations"
+  in Uganda
+output: html_document
+date: "2024-05-11"
+---
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+# Load function
+```{r}
+source("GLM_model_s_functions.R")
+source("Uganda_analysis_selection_coef.R")
+source("Uganda_preprocessing_selection_coef.R")
+source("Uganda_selection_coef_estimate.R")
+```
+
+# Load data
+```{r}
+allele_freq <- read.table("data/data-derived/Uganda_allele_frequency.txt")
+```
+
+## Bayesian GMM with slopes and intercepts
+```{r}
+# Bayesian stan model with slopes and intercepts
+PfK13_freq <- GLM_model_mutant(allele_freq, "K13", numofobs=2)
+PfK13_stanmod_freq <- PfK13_freq$glmer
+ranef_k13_stanmod_freq <- PfK13_freq$ranef
+
+## C469Y
+C469Y_freq <- GLM_model_mutant(allele_freq, "C469Y", numofobs=2)
+c469y_stanmod_freq <- C469Y_freq$glmer
+ranef_c469y_stanmod_freq <- C469Y_freq$ranef
+
+## A675V
+A675V_freq <- GLM_model_mutant(allele_freq, "A675V", numofobs=2)
+a675v_stanmod_freq <- A675V_freq$glmer
+ranef_a675v_stanmod_freq <- A675V_freq$ranef
+
+## C469F
+C469F_freq <- GLM_model_mutant(allele_freq, "C469F", numofobs=2)
+c469f_stanmod_freq <- C469F_freq$glmer
+ranef_c469f_stanmod_freq <- C469F_freq$ranef
+
+## P441L
+P441L_freq <- GLM_model_mutant(allele_freq, "P441L", numofobs=2)
+p441l_stanmod_freq <- P441L_freq$glmer
+ranef_p441l_stanmod_freq <- P441L_freq$ranef
+``` 
+
+## Selection coefficient
+```{r}
+allele_freq <- selection_coef_estimate(allele_freq, PfK13_stanmod_freq, c469y_stanmod_freq, a675v_stanmod_freq, c469f_stanmod_freq, p441l_stanmod_freq, numofobs = 2)
+```
+
+## Figure 2: Plot Allele frequency for all mutations with numobs>2
+```{r}
+numofobs <- 2
+freq_plot <- allele_freq %>%
+  filter(is.finite(lrsmed) & nobs > numofobs, Locus != "K13" & Locus != "R561H") %>%
+  ggplot(aes(year, freq*100, group = Locus, color = Locus)) +
+  geom_point(aes(size = n)) + 
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  geom_line(aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) + 
+  geom_ribbon(aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,3)) +
+  facet_wrap(~District, ncol=5) +
+  #scale_y_log10() +
+  ylab("Allele frequency") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual(
+    values = c("#D55E00", "#0072B2", "#009E73", "#59386c"),
+    name = "Mutations",
+    labels = c("675V", "469F", "469Y", "441L")
+  ) +
+  scale_fill_manual(values = c("#D55E00", "#0072B2", "#009E73", "#59386c")) +
+  scale_x_continuous(breaks=seq(2016, 2022, 2)) +
+  theme(axis.line = element_line(), 
+        axis.text = element_text(size = 8), 
+        axis.title=element_text(size=12), 
+        legend.text=element_text(size=12), 
+        strip.text.x = element_text(size = 12), 
+        legend.title = element_text(size=12), 
+        legend.position = "right", 
+        legend.box = "vertical")
+
+freq_PfK13_plot <- allele_freq %>%
+  filter(is.finite(lrsmed) & nobs > numofobs, Locus == "K13" & Locus != "R561H") %>%
+  ggplot(aes(year, freq*100, group = Locus, color = Locus)) +
+  geom_point(aes(size = n)) + 
+  labs(shape="Mutations", size = "Sample Size") +
+  theme_bw() +
+  geom_line(aes(year, predict_stan_prev, color = Locus, group = Locus), size = 1) + 
+  geom_ribbon(aes(ymin = conf.low_prev, ymax = conf.high_prev, color = Locus, fill = Locus), alpha = 0.2,  show.legend = FALSE) +
+  scale_size_binned(name = "Sample Size",range = c(0.2,3)) +
+  facet_wrap(~District, ncol=5) +
+  #scale_y_log10() +
+  ylab("Allele frequency") +
+  xlab("Year") +
+  ggpubr::theme_pubclean(base_size = 12) +
+  scale_color_manual(
+    values = c("#BBBBBB"),
+    name = "Mutations",
+    labels = c("K13")
+  ) +
+  scale_fill_manual(values = c("#BBBBBB")) +
+  scale_x_continuous(breaks=seq(2016, 2022, 2)) +
+  theme(axis.line = element_line(), 
+        axis.text = element_text(size = 8), 
+        axis.title=element_text(size=12), 
+        legend.text=element_text(size=12), 
+        strip.text.x = element_text(size = 12), 
+        legend.title = element_text(size=12), 
+        legend.position = "right", 
+        legend.box = "vertical")
+
+ggsave("figures/Figure2_model_fit_uganda/Uganda_model_fit_individual_mut_freq.png", freq_plot, width = 8, height = 5, dpi=700)
+ggsave("figures/Figure2_model_fit_uganda/Uganda_model_fit_individual_mut_freq.pdf", freq_plot, width = 8, height = 5, dpi=700)
+ggsave("figures/Figure2_model_fit_uganda/Uganda_model_fit_K13_freq.png", freq_PfK13_plot, width = 8, height = 5, dpi=700)
+ggsave("figures/Figure2_model_fit_uganda/Uganda_model_fit_K13_freq.pdf", freq_PfK13_plot, width = 8, height = 5, dpi=700)
+```
+
+## Figure 3: Plot for selection coefficient 
+### Preprocessing
+```{r}
+effect_size_bay_freq <- preprocessing_selection_coef(PfK13_stanmod_freq, c469y_stanmod_freq, a675v_stanmod_freq, c469f_stanmod_freq, p441l_stanmod_freq)
+write.csv(effect_size_bay_freq, "figures/Figure3_selection_coefficient/Uganda/Uganda_selection_ceof_freq.csv")
+```
+
+### Plotting Selection Coefficients
+```{r}
+selection_coef_bay_freq <- ggplot() +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_pointrange(data = effect_size_bay_freq, 
+                  aes(x = estimate, y = mutation, xmin = conf.low, xmax = conf.high, color = District),
+                  position=position_dodge(width = 1), 
+                  shape = effect_size_bay_freq$s, 
+                  
+                  size = effect_size_bay_freq$sizes) +
+  ylab("Mutation") +
+  xlab("Selection Coefficient") +
+  scale_color_manual(values=c("#4477AA",
+                              "blue",
+                              "#66CCEE",
+                              "#228833",
+                              "#CCBB44",
+                              "#EE6677",
+                              "#AA3377",
+                              "#DDAA33",
+                              "#004488",
+                              "#CC3311",
+                              "#44AA99",
+                              "#EE99AA",
+                              "#EE7733",
+                              "#F0E442",
+                              "black")) +
+  theme_bw() +
+  xlim(-2.5,3) +
+  theme(
+    legend.title = element_blank(),
+    axis.line = element_line(),
+    legend.position = "right",
+    plot.title = element_text(hjust = 0.5, size = 20),
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 10)
+  )
+
+ggsave("figures/Figure3_selection_coefficient/Uganda/Uganda_selection_coef_freq.png", selection_coef_bay_freq, width = 8, height = 9, dpi=700)
+ggsave("figures/Figure3_selection_coefficient/Uganda/Uganda_selection_coef_freq.pdf", selection_coef_bay_freq,width = 8, height = 9, dpi=700)
+```
+
+## Statistical analysis of selection coefficients
+```{r}
+selec_ceof_stats_freq <- analysis_selection_coef(effect_size_bay_freq)
+write.csv(selec_ceof_stats_freq, "figures/Figure3_selection_coefficient/Uganda/Uganda_selection_ceof_sanalysis_freq.csv")
+```
